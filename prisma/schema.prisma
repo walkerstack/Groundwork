@@ -2,6 +2,10 @@ generator client {
     provider = "prisma-client-js"
 }
 
+generator json {
+    provider = "prisma-json-types-generator"
+}
+
 datasource db {
     provider  = "postgresql"
     url       = env("DATABASE_URL")
@@ -100,17 +104,102 @@ model OrganizationApiKey {
     @@unique([key])
 }
 
+enum ConnectionType {
+    NOTION
+    GOOGLE_DRIVE
+    DROPBOX
+    ONE_DRIVE
+}
+
+enum ConnectionStatus {
+    PENDING
+    CONNECTED
+    FAILED
+    REVOKED
+}
+
+model Connection {
+    id   String @id @default(cuid())
+    name String
+
+    type   ConnectionType
+    status ConnectionStatus @default(PENDING)
+
+    statusDetails     String?
+    clientRedirectUrl String?
+
+    /// [ConnectionConfig]
+    config Json?
+
+    namespaceId String
+    namespace   Namespace @relation(fields: [namespaceId], references: [id], onDelete: Cascade)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@map("connection")
+}
+
 model Namespace {
-    id             String       @id @default(cuid())
-    name           String
-    slug           String
-    createdAt      DateTime     @default(now())
-    updatedAt      DateTime     @updatedAt
+    id   String @id @default(cuid())
+    name String
+    slug String
+
     organizationId String
     organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
+    /// [NamespaceEmbeddingConfig]
+    embeddingConfig Json?
+
+    /// [NamespaceVectorStoreConfig]
+    vectorStoreConfig Json?
+
+    /// [NamespaceFileStoreConfig]
+    fileStoreConfig Json?
+
+    connections Connection[]
+    ingestJobs  IngestJob[]
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
     @@unique([slug])
     @@map("namespace")
+}
+
+enum IngestJobStatus {
+    QUEUED
+    PRE_PROCESSING
+    PROCESSING
+    COMPLETED
+    FAILED
+    CANCELLED
+}
+
+model IngestJob {
+    id          String    @id @default(cuid())
+    namespaceId String
+    namespace   Namespace @relation(fields: [namespaceId], references: [id], onDelete: Cascade)
+
+    status IngestJobStatus @default(QUEUED)
+    error  String?
+
+    /// [IngestJobPayload]
+    payload Json
+
+    /// [IngestJobConfig]
+    config Json?
+
+    queuedAt        DateTime? @default(now())
+    preProcessingAt DateTime?
+    processingAt    DateTime?
+    completedAt     DateTime?
+    failedAt        DateTime?
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@map("ingest_job")
 }
 
 model Member {
