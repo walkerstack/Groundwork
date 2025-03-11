@@ -110,6 +110,7 @@ export default function TeamSettingsPage() {
   const handleRemoveMember = async (memberId: string) => {
     await authClient.organization.removeMember({
       memberIdOrEmail: memberId,
+      organizationId: activeOrganization.id,
       fetchOptions: {
         onRequest: () => {
           setIsRemoving([...isRemoving, memberId]);
