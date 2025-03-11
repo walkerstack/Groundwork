@@ -14,12 +14,14 @@ import {
 
 import { type NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
+import { DEFAULT_SYSTEM_PROMPT, NEW_MESSAGE_PROMPT } from "./prompts";
 
 export const runtime = "edge";
 export const preferredRegion = "iad1"; // make this closer to the DB
 export const maxDuration = 60;
 
 const schema = z.object({
+  systemPrompt: z.string().optional().default(DEFAULT_SYSTEM_PROMPT),
   messages: z.array(z.any()),
   stream: z.boolean().optional().default(false),
   namespaceId: z.string(),
@@ -31,15 +33,6 @@ const schema = z.object({
   auth: z.boolean().optional().default(false),
   organizationId: z.string().optional(),
 });
-
-// TODO: move this to the namespace config
-const SYSTEM_PROMPT = `
-You are Digna AI, a helpful research assistant built by Digna. Your task is to deliver an accurate and cited response to a user's query, drawing from the given search results. The search results are not visible to the user so you MUST include relevant portions of the results in your response. Your answer must be of high-quality, and written by an expert using an unbiased and journalistic tone. It is EXTREMELY IMPORTANT to directly answer the query. NEVER say "based on the search results". Your answer must be written in the same language as the query, even if the search results language is different.
-
-You MUST cite the most relevant search results that answer the query. Do not mention any irrelevant results. You MUST ADHERE to the following instructions for citing search results: - to cite a search result, enclose its index located above the summary with brackets at the end of the corresponding sentence, for example "Ice is less dense than water12." or "Paris is the capital of France145." - NO SPACE between the last word and the citation, and ALWAYS use brackets. Only use this format to cite search results. NEVER include a References section at the end of your answer. - If you don't know the answer or the premise is incorrect, explain why. If the search results are empty or unhelpful, you MUST inform the user that you were unable to find references in the book and not answer the question.
-
-You should give direct quotes from the search results and cite them where it improves the answer and gives better context.
-`;
 
 export async function POST(request: NextRequest) {
   const result = await schema.safeParseAsync(await request.json());
@@ -170,18 +163,16 @@ export async function POST(request: NextRequest) {
     });
   }
 
-  const NEW_MESSAGE = `
-Most relevant search results:
-${data.map((chunk, idx) => `[${idx + 1}]: ${chunk.text}`).join("\n\n")}
-
-User's query:
-${query}
-  `;
-
   const newMessages = [
-    { role: "system", content: SYSTEM_PROMPT },
+    { role: "system", content: result.data.systemPrompt },
     ...messagesWithoutQuery,
-    { role: "user", content: NEW_MESSAGE },
+    {
+      role: "user",
+      content: NEW_MESSAGE_PROMPT.replace(
+        "{{chunks}}",
+        data.map((chunk, idx) => `[${idx + 1}]: ${chunk.text}`).join("\n\n"),
+      ).replace("{{query}}", query as string),
+    },
   ];
 
   if (result.data.stream) {
