@@ -32,7 +32,7 @@ class CustomPinecone {
     };
     id?: string
   }): Promise<QueryResponse<RecordMetadata>> {
-    return await (await fetch(`${this.indexHost}/query`, {
+    return (await (await fetch(`${this.indexHost}/query`, {
       method: 'POST',
       headers: {
         'Api-Key': this.apiKey,
@@ -42,11 +42,8 @@ class CustomPinecone {
       body: JSON.stringify({
         namespace: this.namespace,
         ...params
-      
-      
-      
       }),
-    })).json();
+    })).json()) as QueryResponse<RecordMetadata>;
   }
 }
 
@@ -166,12 +163,18 @@ export const queryVectorStore = async <IncludeMetadata extends boolean>(
   }
 
   try {
+  
     const parsedNodes = await z.array(nodeSchema).parseAsync(
-      matches.map((match) => ({
+      matches.map((match) => {
+        if (!match.metadata) {
+          throw new Error("No metadata found");
+        }
+
+        return ({
         id: match.id,
         score: match.score,
-        ...JSON.parse(match.metadata!["_node_content"] as string),
-      })),
+        ...JSON.parse((match.metadata as unknown as {_node_content: string})["_node_content"]) as Record<string, unknown>,
+      })}),
     );
     return parsedNodes.map((node) => {
       const {

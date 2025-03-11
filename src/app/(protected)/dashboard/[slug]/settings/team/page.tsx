@@ -161,6 +161,7 @@ export default function TeamSettingsPage() {
       <div className="grid gap-6">
         {activeOrganization.members.map((member) => (
           <MemberCard
+            key={member.id}
             name={member.user.name}
             email={member.user.email}
             image={member.user.image}

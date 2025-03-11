@@ -4,7 +4,7 @@ import { getNamespaceEmbeddingModel } from "@/lib/embedding";
 import { getNamespaceLanguageModel } from "@/lib/llm";
 import { supabase } from "@/lib/supabase";
 import { getNamespaceVectorStore, queryVectorStore } from "@/lib/vector-store";
-import { createDataStreamResponse, embed, generateText, streamText } from "ai";
+import { createDataStreamResponse, embed, generateText, JSONValue, streamText } from "ai";
 
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
@@ -164,7 +164,7 @@ export async function POST(request: NextRequest) {
           onFinish: () => {
             dataStream.writeMessageAnnotation({
               agentset_sources: data,
-            } as any);
+            } as JSONValue);
           },
         });
 
