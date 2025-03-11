@@ -37,6 +37,7 @@ function InviteMemberDialog({ trigger }: { trigger: React.ReactNode }) {
       return authClient.organization.inviteMember({
         email: email,
         role: role as Role,
+        organizationId: activeOrganization.id,
         fetchOptions: {
           throw: true,
         },
