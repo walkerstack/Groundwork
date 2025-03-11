@@ -13,18 +13,19 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar";
+import { useParams } from "next/navigation";
 
 // This is sample data.
 const data = {
   navMain: [
     {
       title: "Namespaces",
-      url: "/dashboard/namespaces",
+      url: "/dashboard/{slug}/namespaces",
       icon: FoldersIcon,
     },
     {
       title: "API Keys",
-      url: "/dashboard/api-keys",
+      url: "/dashboard/{slug}/api-keys",
       icon: LockIcon,
     },
     {
@@ -33,11 +34,11 @@ const data = {
       items: [
         {
           title: "General",
-          url: "/dashboard/settings/general",
+          url: "/dashboard/{slug}/settings/general",
         },
         {
           title: "Team",
-          url: "/dashboard/settings/team",
+          url: "/dashboard/{slug}/settings/team",
         },
 
         // {

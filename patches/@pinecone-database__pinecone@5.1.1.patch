@@ -1,0 +1,228 @@
+diff --git a/dist/assistant/data/chatStream.js b/dist/assistant/data/chatStream.js
+index 6eef71bbe7ee63f7ff0d2dd84eaa580b5abe5db4..69df112092b6ea6bbe0f4f38130cb8584d86ac3a 100644
+--- a/dist/assistant/data/chatStream.js
++++ b/dist/assistant/data/chatStream.js
+@@ -4,7 +4,6 @@ exports.chatStream = void 0;
+ const assistant_data_1 = require("../../pinecone-generated-ts-fetch/assistant_data");
+ const utils_1 = require("../../utils");
+ const errors_1 = require("../../errors");
+-const node_stream_1 = require("node:stream");
+ const chat_1 = require("./chat");
+ const chatStream = (assistantName, apiProvider, config) => {
+     return async (options) => {
+@@ -29,7 +28,7 @@ const chatStream = (assistantName, apiProvider, config) => {
+             }),
+         });
+         if (response.ok && response.body) {
+-            const nodeReadable = node_stream_1.Readable.fromWeb(response.body);
++            const nodeReadable = response.body;
+             return new utils_1.ChatStream(nodeReadable);
+         }
+         else {
+diff --git a/dist/index.js b/dist/index.js
+index 142a17095aaa92b01fb986f6a47aea695f01ea51..52a857027e44f2a62a2bf8d0a9f0067f39cfabb4 100644
+--- a/dist/index.js
++++ b/dist/index.js
+@@ -23,14 +23,15 @@ var __importStar = (this && this.__importStar) || function (mod) {
+     return result;
+ };
+ Object.defineProperty(exports, "__esModule", { value: true });
+-exports.Errors = exports.ChatStream = exports.Assistant = exports.Index = exports.Pinecone = void 0;
++// exports.Errors = exports.ChatStream = exports.Assistant = exports.Index = exports.Pinecone = void 0;
++exports.Errors = exports.Index = exports.Pinecone = void 0;
+ // Class, function exports
+ var pinecone_1 = require("./pinecone");
+ Object.defineProperty(exports, "Pinecone", { enumerable: true, get: function () { return pinecone_1.Pinecone; } });
+ var data_1 = require("./data");
+ Object.defineProperty(exports, "Index", { enumerable: true, get: function () { return data_1.Index; } });
+-var assistant_1 = require("./assistant");
+-Object.defineProperty(exports, "Assistant", { enumerable: true, get: function () { return assistant_1.Assistant; } });
+-Object.defineProperty(exports, "ChatStream", { enumerable: true, get: function () { return assistant_1.ChatStream; } });
++// var assistant_1 = require("./assistant");
++// Object.defineProperty(exports, "Assistant", { enumerable: true, get: function () { return assistant_1.Assistant; } });
++// Object.defineProperty(exports, "ChatStream", { enumerable: true, get: function () { return assistant_1.ChatStream; } });
+ exports.Errors = __importStar(require("./errors"));
+ //# sourceMappingURL=index.js.map
+\ No newline at end of file
+diff --git a/dist/pinecone.js b/dist/pinecone.js
+index 3b0baaa4ef1011341fc1392db0633e5897871900..abd064fd806738687159c2804656578f50e8da8b 100644
+--- a/dist/pinecone.js
++++ b/dist/pinecone.js
+@@ -2,8 +2,8 @@
+ Object.defineProperty(exports, "__esModule", { value: true });
+ exports.Pinecone = void 0;
+ const control_1 = require("./control");
+-const control_2 = require("./assistant/control");
+-const assistantHostSingleton_1 = require("./assistant/assistantHostSingleton");
++// const control_2 = require("./assistant/control");
++// const assistantHostSingleton_1 = require("./assistant/assistantHostSingleton");
+ const indexHostSingleton_1 = require("./data/indexHostSingleton");
+ const errors_1 = require("./errors");
+ const data_1 = require("./data");
+@@ -12,8 +12,8 @@ const inferenceOperationsBuilder_1 = require("./inference/inferenceOperationsBui
+ const environment_1 = require("./utils/environment");
+ const validateObjectProperties_1 = require("./utils/validateObjectProperties");
+ const types_1 = require("./data/vectors/types");
+-const asstControlOperationsBuilder_1 = require("./assistant/control/asstControlOperationsBuilder");
+-const assistant_1 = require("./assistant");
++// const asstControlOperationsBuilder_1 = require("./assistant/control/asstControlOperationsBuilder");
++// const assistant_1 = require("./assistant");
+ /**
+  * The `Pinecone` class is the main entrypoint to this sdk. You will use
+  * instances of it to create and manage indexes as well as perform data
+@@ -82,7 +82,7 @@ class Pinecone {
+         this._checkForBrowser();
+         const api = (0, control_1.indexOperationsBuilder)(this.config);
+         const infApi = (0, inferenceOperationsBuilder_1.inferenceOperationsBuilder)(this.config);
+-        const asstControlApi = (0, asstControlOperationsBuilder_1.asstControlOperationsBuilder)(this.config);
++        // const asstControlApi = (0, asstControlOperationsBuilder_1.asstControlOperationsBuilder)(this.config);
+         this._configureIndex = (0, control_1.configureIndex)(api);
+         this._createCollection = (0, control_1.createCollection)(api);
+         this._createIndex = (0, control_1.createIndex)(api);
+@@ -93,11 +93,11 @@ class Pinecone {
+         this._deleteIndex = (0, control_1.deleteIndex)(api);
+         this._listCollections = (0, control_1.listCollections)(api);
+         this._listIndexes = (0, control_1.listIndexes)(api);
+-        this._createAssistant = (0, control_2.createAssistant)(asstControlApi);
+-        this._deleteAssistant = (0, control_2.deleteAssistant)(asstControlApi);
+-        this._updateAssistant = (0, control_2.updateAssistant)(asstControlApi);
+-        this._describeAssistant = (0, control_2.describeAssistant)(asstControlApi);
+-        this._listAssistants = (0, control_2.listAssistants)(asstControlApi);
++        // this._createAssistant = (0, control_2.createAssistant)(asstControlApi);
++        // this._deleteAssistant = (0, control_2.deleteAssistant)(asstControlApi);
++        // this._updateAssistant = (0, control_2.updateAssistant)(asstControlApi);
++        // this._describeAssistant = (0, control_2.describeAssistant)(asstControlApi);
++        // this._listAssistants = (0, control_2.listAssistants)(asstControlApi);
+         this.inference = new inference_1.Inference(infApi);
+     }
+     /**
+@@ -553,13 +553,13 @@ class Pinecone {
+      * @throws Error if an invalid region is provided.
+      * @returns A Promise that resolves to an {@link Assistant} model.
+      */
+-    async createAssistant(options) {
+-        const assistant = await this._createAssistant(options);
+-        if (assistant.host) {
+-            assistantHostSingleton_1.AssistantHostSingleton._set(this.config, assistant.name, assistant.host);
+-        }
+-        return Promise.resolve(assistant);
+-    }
++    // async createAssistant(options) {
++    //     const assistant = await this._createAssistant(options);
++    //     if (assistant.host) {
++    //         assistantHostSingleton_1.AssistantHostSingleton._set(this.config, assistant.name, assistant.host);
++    //     }
++    //     return Promise.resolve(assistant);
++    // }
+     /**
+      * Deletes an Assistant by name.
+      *
+@@ -573,11 +573,11 @@ class Pinecone {
+      * @param assistantName - The name of the Assistant to be deleted.
+      * @throws Error if the Assistant API is not initialized.
+      */
+-    async deleteAssistant(assistantName) {
+-        await this._deleteAssistant(assistantName);
+-        assistantHostSingleton_1.AssistantHostSingleton._delete(this.config, assistantName);
+-        return Promise.resolve();
+-    }
++    // async deleteAssistant(assistantName) {
++    //     await this._deleteAssistant(assistantName);
++    //     assistantHostSingleton_1.AssistantHostSingleton._delete(this.config, assistantName);
++    //     return Promise.resolve();
++    // }
+     /**
+      * Retrieves information about an Assistant by name.
+      *
+@@ -602,13 +602,13 @@ class Pinecone {
+      * @throws Error if the Assistant API is not initialized.
+      * @returns A Promise that resolves to an {@link Assistant} model.
+      */
+-    async describeAssistant(assistantName) {
+-        const assistant = await this._describeAssistant(assistantName);
+-        if (assistant.host) {
+-            assistantHostSingleton_1.AssistantHostSingleton._set(this.config, assistantName, assistant.host);
+-        }
+-        return Promise.resolve(assistant);
+-    }
++    // async describeAssistant(assistantName) {
++    //     const assistant = await this._describeAssistant(assistantName);
++    //     if (assistant.host) {
++    //         assistantHostSingleton_1.AssistantHostSingleton._set(this.config, assistantName, assistant.host);
++    //     }
++    //     return Promise.resolve(assistant);
++    // }
+     /**
+      * Retrieves a list of all Assistants for a given Pinecone API key.
+      *
+@@ -636,20 +636,20 @@ class Pinecone {
+      * @throws Error if the Assistant API is not initialized.
+      * @returns A Promise that resolves to an object containing an array of {@link Assistant} models.
+      */
+-    async listAssistants() {
+-        const assistantList = await this._listAssistants();
+-        // For any listAssistants calls we want to update the AssistantHostSingleton cache.
+-        // This prevents unneeded calls to describeAssistant for resolving the host for assistant operations.
+-        if (assistantList.assistants && assistantList.assistants.length > 0) {
+-            for (let i = 0; i < assistantList.assistants.length; i++) {
+-                const assistant = assistantList.assistants[i];
+-                if (assistant.host) {
+-                    assistantHostSingleton_1.AssistantHostSingleton._set(this.config, assistant.name, assistant.host);
+-                }
+-            }
+-        }
+-        return Promise.resolve(assistantList);
+-    }
++    // async listAssistants() {
++    //     const assistantList = await this._listAssistants();
++    //     // For any listAssistants calls we want to update the AssistantHostSingleton cache.
++    //     // This prevents unneeded calls to describeAssistant for resolving the host for assistant operations.
++    //     if (assistantList.assistants && assistantList.assistants.length > 0) {
++    //         for (let i = 0; i < assistantList.assistants.length; i++) {
++    //             const assistant = assistantList.assistants[i];
++    //             if (assistant.host) {
++    //                 assistantHostSingleton_1.AssistantHostSingleton._set(this.config, assistant.name, assistant.host);
++    //             }
++    //         }
++    //     }
++    //     return Promise.resolve(assistantList);
++    // }
+     /**
+      * Updates an Assistant by name.
+      *
+@@ -671,9 +671,9 @@ class Pinecone {
+      * @throws Error if the Assistant API is not initialized.
+      * @returns A Promise that resolves to an {@link UpdateAssistant200Response} object.
+      */
+-    updateAssistant(assistantName, options) {
+-        return this._updateAssistant(assistantName, options);
+-    }
++    // updateAssistant(assistantName, options) {
++    //     return this._updateAssistant(assistantName, options);
++    // }
+     /** @internal */
+     _checkForBrowser() {
+         if ((0, environment_1.isBrowser)()) {
+@@ -811,16 +811,16 @@ class Pinecone {
+      * @param assistantName - The name of the assistant to target.
+      * @returns An {@link Assistant} object that can be used to perform assistant-related operations.
+      */
+-    assistant(assistantName) {
+-        return new assistant_1.Assistant(assistantName, this.config);
+-    }
++    // assistant(assistantName) {
++    //     return new assistant_1.Assistant(assistantName, this.config);
++    // }
+     /**
+      * {@inheritDoc assistant}
+      */
+     // Alias method
+-    Assistant(assistantName) {
+-        return this.assistant(assistantName);
+-    }
++    // Assistant(assistantName) {
++    //     return this.assistant(assistantName);
++    // }
+ }
+ exports.Pinecone = Pinecone;
+ //# sourceMappingURL=pinecone.js.map

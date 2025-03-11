@@ -18,6 +18,7 @@ import {
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 
 export function NavMain({
   items,
@@ -33,6 +34,8 @@ export function NavMain({
     }[];
   }[];
 }) {
+  const slug = useParams().slug;
+
   return (
     <SidebarGroup>
       <SidebarGroupLabel>Platform</SidebarGroupLabel>
@@ -41,7 +44,7 @@ export function NavMain({
           if (!item.items)
             return (
               <SidebarMenuButton key={item.title} asChild tooltip={item.title}>
-                <Link href={item.url || ""}>
+                <Link href={item.url?.replace("{slug}", slug as string) || ""}>
                   {item.icon && <item.icon />}
                   <span>{item.title}</span>
                 </Link>
@@ -68,7 +71,9 @@ export function NavMain({
                     {item.items?.map((subItem) => (
                       <SidebarMenuSubItem key={subItem.title}>
                         <SidebarMenuSubButton asChild>
-                          <Link href={subItem.url}>
+                          <Link
+                            href={subItem.url.replace("{slug}", slug as string)}
+                          >
                             <span>{subItem.title}</span>
                           </Link>
                         </SidebarMenuSubButton>

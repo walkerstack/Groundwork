@@ -16,6 +16,22 @@ type IngestJobPayloadFile = {
 };
 
 type OpenAIEmbeddingModel = "text-embedding-3-small" | "text-embedding-3-large";
+type OpenAILanguageModel = "gpt-4o" | "gpt-4o-mini";
+
+export type LLMConfig =
+  | {
+      provider: "OPENAI";
+      model: OpenAILanguageModel;
+      apiKey: string;
+    }
+  | {
+      provider: "AZURE_OPENAI";
+      model: OpenAILanguageModel;
+      resourceName: string;
+      deployment: string;
+      apiKey: string;
+      apiVersion?: string;
+    };
 
 declare global {
   namespace PrismaJson {
@@ -64,10 +80,12 @@ declare global {
       | {
           provider: "AZURE_OPENAI";
           model: OpenAIEmbeddingModel;
-          endpoint: string;
+          resourceName: string;
           deployment: string;
           apiKey: string;
           apiVersion?: string;
         };
+
+    type NamespaceLLMConfig = LLMConfig;
   }
 }

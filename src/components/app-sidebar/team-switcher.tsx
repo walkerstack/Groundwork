@@ -20,9 +20,10 @@ import {
 } from "@/components/ui/sidebar";
 import { authClient } from "@/lib/auth-client";
 import type { Organization } from "@/lib/auth-types";
-import { useDashboard } from "@/app/dashboard/dashboard-provider";
+import { useOrganization } from "@/contexts/organization-context";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import CreateOrganizationDialog from "./create-org-dialog";
+import { useRouter } from "next/navigation";
 
 const getFallback = (name: string) => {
   return name.charAt(0).toUpperCase();
@@ -30,32 +31,28 @@ const getFallback = (name: string) => {
 
 export function TeamSwitcher() {
   const { isMobile } = useSidebar();
-  const { activeOrganization, setActiveOrganization } = useDashboard();
+  const router = useRouter();
+  const { activeOrganization, setActiveOrganization } = useOrganization();
   const organizations = authClient.useListOrganizations();
   const [open, setOpen] = React.useState(false);
 
-  const handleOrganizationChange = async (
-    organization: Organization | null,
-  ) => {
-    if (organization?.id === activeOrganization?.id) {
+  const handleOrganizationChange = async (organization: Organization) => {
+    if (organization.id === activeOrganization.id) {
       return;
     }
 
-    const { data } = await authClient.organization.setActive({
-      organizationId: organization?.id || null,
+    setActiveOrganization({
+      ...organization,
+      members: [],
+      invitations: [],
     });
 
-    setActiveOrganization(
-      organization
-        ? {
-            ...organization,
-            members: [],
-            invitations: [],
-          }
-        : null,
-    );
+    const { data } = await authClient.organization.setActive({
+      organizationId: organization.id,
+    });
 
     if (data) {
+      router.push(`/dashboard/${data.slug}`);
       setActiveOrganization(data);
     }
   };
@@ -76,13 +73,13 @@ export function TeamSwitcher() {
                   <AvatarImage src={activeOrganization.logo} />
                 )}
                 <AvatarFallback className="bg-sidebar-primary text-sidebar-primary-foreground rounded-lg">
-                  {getFallback(activeOrganization?.name || "Personal")}
+                  {getFallback(activeOrganization.name)}
                 </AvatarFallback>
               </Avatar>
 
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-semibold">
-                  {activeOrganization?.name || "Personal"}
+                  {activeOrganization.name}
                 </span>
                 <span className="truncate text-xs">FREE</span>
               </div>
@@ -98,19 +95,6 @@ export function TeamSwitcher() {
             <DropdownMenuLabel className="text-muted-foreground text-xs">
               Organizations
             </DropdownMenuLabel>
-
-            <DropdownMenuItem
-              onClick={() => handleOrganizationChange(null)}
-              className="gap-2 p-2"
-            >
-              <div className="flex size-6 items-center justify-center rounded-sm border">
-                <Avatar className="size-4 shrink-0">
-                  <AvatarFallback>{getFallback("Personal")}</AvatarFallback>
-                </Avatar>
-              </div>
-              Personal
-              <DropdownMenuShortcut>⌘1</DropdownMenuShortcut>
-            </DropdownMenuItem>
 
             {organizations.data?.map((organization, index) => (
               <DropdownMenuItem
@@ -129,7 +113,7 @@ export function TeamSwitcher() {
                   </Avatar>
                 </div>
                 {organization.name}
-                <DropdownMenuShortcut>⌘{index + 2}</DropdownMenuShortcut>
+                <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
               </DropdownMenuItem>
             ))}
             <DropdownMenuSeparator />
@@ -141,7 +125,9 @@ export function TeamSwitcher() {
               <div className="bg-background flex size-6 items-center justify-center rounded-md border">
                 <Plus className="size-4" />
               </div>
-              <div className="text-muted-foreground font-medium">Add team</div>
+              <div className="text-muted-foreground font-medium">
+                Add organization
+              </div>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

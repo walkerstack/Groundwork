@@ -35,22 +35,16 @@ export const namespaceRouter = createTRPCRouter({
       return namespaces;
     }),
   getNamespaceBySlug: protectedProcedure
-    .input(z.object({ orgId: z.string(), slug: z.string() }))
+    .input(z.object({ orgSlug: z.string(), slug: z.string() }))
     .query(async ({ ctx, input }) => {
-      // make sure the user is a member of the org
-      const member = await ctx.db.member.findFirst({
-        where: {
-          userId: ctx.session.user.id,
-          organizationId: input.orgId,
-        },
-      });
-
-      if (!member) {
-        throw new TRPCError({ code: "UNAUTHORIZED" });
-      }
-
       const namespace = await ctx.db.namespace.findFirst({
-        where: { slug: input.slug },
+        where: {
+          slug: input.slug,
+          organization: {
+            slug: input.orgSlug,
+            members: { some: { userId: ctx.session.user.id } },
+          },
+        },
       });
 
       return namespace;
