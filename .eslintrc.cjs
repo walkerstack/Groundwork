@@ -8,10 +8,10 @@ const config = {
   extends: [
     "next/core-web-vitals",
     "plugin:@typescript-eslint/recommended-type-checked",
-    "plugin:@typescript-eslint/stylistic-type-checked",
   ],
   rules: {
     "@typescript-eslint/array-type": "off",
+    "@typescript-eslint/restrict-template-expressions": "off",
     "@typescript-eslint/consistent-type-definitions": "off",
     "react/no-unescaped-entities": "off",
     "@typescript-eslint/consistent-type-imports": [

@@ -21,7 +21,7 @@ export const env = createEnv({
     QSTASH_NEXT_SIGNING_KEY: z.string(),
 
     DEFAULT_PINECONE_API_KEY: z.string(),
-    DEFAULT_PINECONE_HOST: z.string(),
+    DEFAULT_PINECONE_HOST: z.string().url(),
 
     DEFAULT_AZURE_BASE_URL: z.string().url(),
     DEFAULT_AZURE_API_KEY: z.string(),
