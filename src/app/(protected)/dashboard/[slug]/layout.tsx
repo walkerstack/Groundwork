@@ -10,14 +10,15 @@ export default async function OrganizationLayout({
   params,
 }: {
   children: React.ReactNode;
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }) {
+  const { slug } = await params;
   const allHeaders = await headers();
   const organization = await auth.api
     .getFullOrganization({
       headers: allHeaders,
       query: {
-        organizationSlug: params.slug,
+        organizationSlug: slug,
       },
     })
     .catch(() => null);

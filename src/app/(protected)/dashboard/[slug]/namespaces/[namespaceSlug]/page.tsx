@@ -5,11 +5,12 @@ import { api } from "@/trpc/server";
 export default async function NamespacesPage({
   params,
 }: {
-  params: { slug: string; namespaceSlug: string };
+  params: Promise<{ slug: string; namespaceSlug: string }>;
 }) {
+  const { slug, namespaceSlug } = await params;
   const namespace = await api.namespace.getNamespaceBySlug({
-    slug: params.namespaceSlug,
-    orgSlug: params.slug,
+    slug: namespaceSlug,
+    orgSlug: slug,
   });
 
   if (!namespace) {
