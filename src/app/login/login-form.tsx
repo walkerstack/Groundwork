@@ -8,15 +8,16 @@ import { useState } from "react";
 import { authClient } from "@/lib/auth-client";
 import { Logo } from "@/components/ui/logo";
 import { useMutation } from "@tanstack/react-query";
-import { useSearchParams } from "next/navigation";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { CheckCircle2Icon } from "lucide-react";
 
 export function LoginForm({
   className,
+  redirectParam,
   ...props
-}: React.ComponentPropsWithoutRef<"div">) {
-  const redirectParam = useSearchParams().get("r");
+}: React.ComponentPropsWithoutRef<"div"> & {
+  redirectParam?: string;
+}) {
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
 
