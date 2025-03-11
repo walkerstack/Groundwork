@@ -21,7 +21,7 @@ export const env = createEnv({
     QSTASH_NEXT_SIGNING_KEY: z.string(),
 
     DEFAULT_PINECONE_API_KEY: z.string(),
-    DEFAULT_PINECONE_INDEX: z.string(),
+    DEFAULT_PINECONE_HOST: z.string(),
 
     DEFAULT_AZURE_BASE_URL: z.string().url(),
     DEFAULT_AZURE_API_KEY: z.string(),
@@ -48,7 +48,7 @@ export const env = createEnv({
     QSTASH_NEXT_SIGNING_KEY: process.env.QSTASH_NEXT_SIGNING_KEY,
 
     DEFAULT_PINECONE_API_KEY: process.env.DEFAULT_PINECONE_API_KEY,
-    DEFAULT_PINECONE_INDEX: process.env.DEFAULT_PINECONE_INDEX,
+    DEFAULT_PINECONE_HOST: process.env.DEFAULT_PINECONE_INDEX,
 
     DEFAULT_AZURE_BASE_URL: process.env.DEFAULT_AZURE_BASE_URL,
     DEFAULT_AZURE_API_KEY: process.env.DEFAULT_AZURE_API_KEY,

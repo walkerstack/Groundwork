@@ -58,7 +58,7 @@ declare global {
     type NamespaceVectorStoreConfig = {
       provider: "PINECONE";
       apiKey: string;
-      indexName: string;
+      indexHost: string;
     };
 
     type NamespaceFileStoreConfig = {

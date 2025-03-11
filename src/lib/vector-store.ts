@@ -1,9 +1,54 @@
 import { Namespace } from "@prisma/client";
 import { env } from "@/env";
-import { Pinecone } from "@pinecone-database/pinecone";
 import { z } from "zod";
+import type { QueryResponse, RecordMetadata } from "@pinecone-database/pinecone";
 
 type VectorStore = Awaited<ReturnType<typeof getNamespaceVectorStore>>;
+
+class CustomPinecone {
+  private apiKey: string;
+  private indexHost: string;
+  private namespace: string;
+
+  constructor({apiKey, indexHost, namespace}: {
+    apiKey: string;
+    indexHost: string;
+    namespace: string;
+  }) {
+    this.apiKey = apiKey;
+    this.indexHost = indexHost;
+    this.namespace = namespace;
+  }
+
+  async query(params: {
+    vector: number[];
+    topK?: number;
+    filter?: object;
+    includeMetadata?: boolean;
+    includeValues?: boolean;
+    sparseVector?: {
+      indices: number[];
+      values: number[];
+    };
+    id?: string
+  }): Promise<QueryResponse<RecordMetadata>> {
+    return await (await fetch(`${this.indexHost}/query`, {
+      method: 'POST',
+      headers: {
+        'Api-Key': this.apiKey,
+        'Content-Type': 'application/json',
+        'X-Pinecone-Api-Version': '2025-01',
+      },
+      body: JSON.stringify({
+        namespace: this.namespace,
+        ...params
+      
+      
+      
+      }),
+    })).json();
+  }
+}
 
 export const getNamespaceVectorStore = async (
   namespace: Pick<Namespace, "vectorStoreConfig" | "id">,
@@ -15,19 +60,17 @@ export const getNamespaceVectorStore = async (
 
   // TODO: handle different embedding models
   if (!config) {
-    const pc = new Pinecone({
+    return new CustomPinecone({
       apiKey: env.DEFAULT_PINECONE_API_KEY,
+      indexHost: env.DEFAULT_PINECONE_HOST,
+      namespace: tenantId,
     });
-
-    return pc.Index(env.DEFAULT_PINECONE_INDEX).namespace(tenantId);
   }
 
   switch (config.provider) {
     case "PINECONE": {
-      const { apiKey, indexName } = config;
-      const pc = new Pinecone({ apiKey });
-
-      return pc.Index(indexName).namespace(tenantId);
+      const { apiKey, indexHost } = config;
+      return new CustomPinecone({ apiKey, indexHost, namespace: tenantId });
     }
 
     default: {
