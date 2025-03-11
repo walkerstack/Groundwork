@@ -4,17 +4,17 @@ import { redirect } from "next/navigation";
 
 export default async function DashboardRootPage() {
   const allHeaders = await headers();
-  const organization = await auth.api
-    .getFullOrganization({
+  const organizations = await auth.api
+    .listOrganizations({
       headers: allHeaders,
     })
     .catch(() => null);
 
-  if (!organization) {
+  if (!organizations || organizations.length === 0) {
     redirect("/dashboard/create-organization");
   }
 
-  redirect(`/dashboard/${organization.slug}`);
+  redirect(`/dashboard/${organizations[0]!.slug}`);
 
   return <div>SHOULD BE REDIRECTED</div>;
 }
