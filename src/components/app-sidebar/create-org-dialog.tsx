@@ -11,7 +11,6 @@ import {
 import { Button } from "../ui/button";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
-import Image from "next/image";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "sonner";
 
@@ -114,12 +113,10 @@ function CreateOrganizationDialog({
               <Input type="file" accept="image/*" onChange={handleLogoChange} />
               {logo && (
                 <div className="mt-2">
-                  <Image
+                  <img
                     src={logo}
                     alt="Logo preview"
                     className="h-16 w-16 object-cover"
-                    width={16}
-                    height={16}
                   />
                 </div>
               )}

@@ -4,7 +4,6 @@ import { useSession } from "@/contexts/session-context";
 import { useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import Image from "next/image";
 import { Loader2Icon, XIcon } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "sonner";
@@ -133,11 +132,10 @@ export default function EditUser() {
           <div className="flex items-end gap-4">
             {imagePreview && (
               <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-sm">
-                <Image
+                <img
                   src={imagePreview}
                   alt="Profile preview"
-                  layout="fill"
-                  objectFit="cover"
+                  className="h-full w-full object-cover"
                 />
               </div>
             )}

@@ -29,6 +29,12 @@ export const env = createEnv({
     DEFAULT_AZURE_TEXT_3_LARGE_EMBEDDING_VERSION: z.string().optional(),
     DEFAULT_AZURE_GPT_4O_DEPLOYMENT: z.string(),
     DEFAULT_AZURE_GPT_4O_VERSION: z.string().optional(),
+
+    GITHUB_CLIENT_ID: z.string(),
+    GITHUB_CLIENT_SECRET: z.string(),
+
+    GOOGLE_CLIENT_ID: z.string(),
+    GOOGLE_CLIENT_SECRET: z.string(),
   },
   client: {},
   runtimeEnv: {
@@ -59,6 +65,12 @@ export const env = createEnv({
     DEFAULT_AZURE_GPT_4O_DEPLOYMENT:
       process.env.DEFAULT_AZURE_GPT_4O_DEPLOYMENT,
     DEFAULT_AZURE_GPT_4O_VERSION: process.env.DEFAULT_AZURE_GPT_4O_VERSION,
+
+    GITHUB_CLIENT_ID: process.env.GITHUB_CLIENT_ID,
+    GITHUB_CLIENT_SECRET: process.env.GITHUB_CLIENT_SECRET,
+
+    GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
+    GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
   },
   skipValidation: !!process.env.SKIP_ENV_VALIDATION,
   emptyStringAsUndefined: true,

@@ -8,7 +8,6 @@ import { useState } from "react";
 import { authClient } from "@/lib/auth-client";
 import { Logo } from "@/components/ui/logo";
 import { useMutation } from "@tanstack/react-query";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { CheckCircle2Icon } from "lucide-react";
 
 export function LoginForm({
@@ -21,115 +20,139 @@ export function LoginForm({
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
 
+  const redirect =
+    redirectParam && redirectParam?.startsWith("/")
+      ? redirectParam
+      : "/dashboard";
+
   const { mutateAsync: sendMagicLink, isPending: isSendingMagicLink } =
     useMutation({
-      mutationFn: async ({
-        email,
-        redirectUrl,
-      }: {
-        email: string;
-        redirectUrl: string;
-      }) => {
-        await authClient.signIn.magicLink({ email, callbackURL: redirectUrl });
+      mutationFn: async ({ email }: { email: string }) => {
+        await authClient.signIn.magicLink({ email, callbackURL: redirect });
       },
       onSuccess: () => {
         setSent(true);
       },
     });
 
+  const { mutateAsync: googleLogin, isPending: isLoggingInWithGoogle } =
+    useMutation({
+      mutationFn: () =>
+        authClient.signIn.social({ provider: "google", callbackURL: redirect }),
+    });
+
+  const { mutateAsync: githubLogin, isPending: isLoggingInWithGithub } =
+    useMutation({
+      mutationFn: () =>
+        authClient.signIn.social({ provider: "github", callbackURL: redirect }),
+    });
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
-    const redirect =
-      redirectParam && redirectParam?.startsWith("/")
-        ? redirectParam
-        : "/dashboard";
-
-    await sendMagicLink({ email: email.trim(), redirectUrl: redirect });
+    await sendMagicLink({ email: email.trim() });
   };
 
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <div className="flex flex-col items-center gap-2">
-        <a
-          href="https://agentset.ai"
-          target="_blank"
-          className="flex flex-col items-center gap-3 font-medium"
-        >
-          <Logo className="size-10" />
-
-          <span className="sr-only">Acme Inc.</span>
-        </a>
-
-        <h1 className="text-xl font-bold">Welcome to AgentSet</h1>
-      </div>
-
+    <div
+      className={cn(
+        "w-full max-w-md rounded-xl bg-white shadow-md ring-1 ring-black/5",
+        className,
+      )}
+      {...props}
+    >
       {sent ? (
-        <Alert>
-          <CheckCircle2Icon className="size-4" />
-          <AlertTitle>Check your email</AlertTitle>
-          <AlertDescription>
+        <div className="flex flex-col items-center justify-center p-7 sm:p-11">
+          <CheckCircle2Icon className="size-8" />
+          <h1 className="mt-4 text-lg font-medium">Check your email</h1>
+          <p className="mt-1 max-w-2xs text-center text-sm text-gray-600">
             We've sent a magic link to your email. Click the link to login.
-          </AlertDescription>
-        </Alert>
+          </p>
+        </div>
       ) : (
-        <form onSubmit={handleSubmit}>
-          <div className="flex flex-col gap-6">
-            <div className="flex flex-col gap-6">
-              <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="m@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-              </div>
+        <div className="p-7 sm:p-11">
+          <form onSubmit={handleSubmit}>
+            <div className="flex items-start">
+              <a href="/" target="_blank" title="Home">
+                <Logo className="h-9 fill-black" />
+              </a>
+            </div>
+            <h1 className="mt-8 text-base/6 font-medium">Welcome back!</h1>
+            <p className="mt-1 text-sm/5 text-gray-600">
+              Sign in to your account to continue.
+            </p>
 
+            <div className="mt-8 space-y-3">
+              <Label className="text-sm/5 font-medium" htmlFor="email">
+                Email
+              </Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="m@example.com"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
+
+            <div className="mt-8">
               <Button
                 type="submit"
                 className="w-full"
                 isLoading={isSendingMagicLink}
               >
-                Login
+                Sign in
               </Button>
             </div>
+          </form>
 
-            {/* <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
+          <div className="after:border-border relative my-4 text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
             <span className="bg-background text-muted-foreground relative z-10 px-2">
               Or
             </span>
           </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Button variant="outline" className="w-full">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                <path
-                  d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701"
-                  fill="currentColor"
-                />
-              </svg>
-              Continue with Apple
-            </Button>
-            <Button variant="outline" className="w-full">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                <path
-                  d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .307 5.387.307 12s5.56 12 12.173 12c3.573 0 6.267-1.173 8.373-3.36 2.16-2.16 2.84-5.213 2.84-7.667 0-.76-.053-1.467-.173-2.053H12.48z"
-                  fill="currentColor"
-                />
-              </svg>
-              Continue with Google
-            </Button>
-          </div> */}
-          </div>
-        </form>
-      )}
 
-      <div className="text-muted-foreground hover:[&_a]:text-primary text-center text-xs text-balance [&_a]:underline [&_a]:underline-offset-4">
-        By clicking continue, you agree to our <a href="#">Terms of Service</a>{" "}
-        and <a href="#">Privacy Policy</a>.
-      </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={() => googleLogin()}
+              isLoading={isLoggingInWithGoogle}
+              type="button"
+            >
+              <GoogleIcon className="size-4" />
+              Google
+            </Button>
+
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={() => githubLogin()}
+              isLoading={isLoggingInWithGithub}
+              type="button"
+            >
+              <GithubIcon className="size-4" />
+              Github
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+
+const GithubIcon = (props: React.ComponentPropsWithoutRef<"svg">) => (
+  <svg viewBox="0 0 16 16" aria-hidden="true" fill="currentColor" {...props}>
+    <path d="M8 .198a8 8 0 0 0-8 8 7.999 7.999 0 0 0 5.47 7.59c.4.076.547-.172.547-.384 0-.19-.007-.694-.01-1.36-2.226.482-2.695-1.074-2.695-1.074-.364-.923-.89-1.17-.89-1.17-.725-.496.056-.486.056-.486.803.056 1.225.824 1.225.824.714 1.224 1.873.87 2.33.666.072-.518.278-.87.507-1.07-1.777-.2-3.644-.888-3.644-3.954 0-.873.31-1.586.823-2.146-.09-.202-.36-1.016.07-2.118 0 0 .67-.214 2.2.82a7.67 7.67 0 0 1 2-.27 7.67 7.67 0 0 1 2 .27c1.52-1.034 2.19-.82 2.19-.82.43 1.102.16 1.916.08 2.118.51.56.82 1.273.82 2.146 0 3.074-1.87 3.75-3.65 3.947.28.24.54.73.54 1.48 0 1.07-.01 1.93-.01 2.19 0 .21.14.46.55.38A7.972 7.972 0 0 0 16 8.199a8 8 0 0 0-8-8Z"></path>
+  </svg>
+);
+
+const GoogleIcon = (props: React.ComponentPropsWithoutRef<"svg">) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 56 56" {...props}>
+    <path
+      fill="currentColor"
+      fillRule="evenodd"
+      d="M28.458 5c6.167 0 11.346 2.2 15.368 5.804l.323.295l-6.62 6.464c-1.695-1.59-4.666-3.493-9.07-3.493c-6.204 0-11.47 4.093-13.372 9.749c-.47 1.46-.756 3.023-.756 4.64c0 1.615.287 3.18.782 4.639c1.877 5.656 7.142 9.748 13.345 9.748c3.347 0 5.928-.886 7.881-2.176l.251-.17l.307-.222c2.813-2.108 4.144-5.084 4.46-7.169l.03-.22h-12.93v-8.705h22.025c.339 1.46.495 2.867.495 4.795c0 7.142-2.554 13.163-6.985 17.255c-3.884 3.597-9.201 5.682-15.535 5.682c-9.031 0-16.85-5.102-20.772-12.57l-.184-.358l-.222-.457A23.45 23.45 0 0 1 5 28.458c0-3.6.827-7.01 2.28-10.073l.222-.457l.184-.357C11.608 10.1 19.426 5 28.458 5"
+    ></path>
+  </svg>
+);

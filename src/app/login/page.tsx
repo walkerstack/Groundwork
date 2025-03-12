@@ -1,3 +1,4 @@
+import { GradientBackground } from "@/components/gradient-background";
 import { LoginForm } from "./login-form";
 
 export default async function Page({
@@ -8,10 +9,11 @@ export default async function Page({
   const _searchParams = await searchParams;
 
   return (
-    <div className="bg-background flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
-      <div className="w-full max-w-sm">
-        <LoginForm redirectParam={_searchParams.r as string | undefined} />
+    <main className="overflow-hidden bg-gray-50">
+      <GradientBackground />
+      <div className="isolate flex min-h-dvh items-center justify-center p-6 lg:p-8">
+        <LoginForm redirectParam={_searchParams.r as string} />
       </div>
-    </div>
+    </main>
   );
 }
