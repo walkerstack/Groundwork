@@ -13,19 +13,20 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar";
-import { useParams } from "next/navigation";
+
+const createOrgUrl = (url: string) => `/dashboard/{slug}${url}`;
 
 // This is sample data.
 const data = {
   navMain: [
     {
       title: "Namespaces",
-      url: "/dashboard/{slug}/namespaces",
+      url: createOrgUrl("/namespaces"),
       icon: FoldersIcon,
     },
     {
       title: "API Keys",
-      url: "/dashboard/{slug}/api-keys",
+      url: createOrgUrl("/api-keys"),
       icon: LockIcon,
     },
     {
@@ -34,11 +35,16 @@ const data = {
       items: [
         {
           title: "General",
-          url: "/dashboard/{slug}/settings/general",
+          url: createOrgUrl("/settings/general"),
         },
         {
           title: "Team",
-          url: "/dashboard/{slug}/settings/team",
+          url: createOrgUrl("/settings/team"),
+        },
+        {
+          title: "Danger",
+          url: createOrgUrl("/settings/danger"),
+          adminOnly: true,
         },
 
         // {

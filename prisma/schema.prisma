@@ -211,6 +211,7 @@ model Member {
     role           String
     createdAt      DateTime
 
+    @@unique([organizationId, userId])
     @@map("member")
 }
 

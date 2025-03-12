@@ -15,8 +15,8 @@ export const auth = betterAuth({
           from: "Agentset.ai <noreply@agentset.ai>",
           to: email,
           subject: `Invitation to join "${organization.name}" on AgentSet.ai`,
-          text: `You are invited to join ${organization.name} on AgentSet.ai. Click here to accept the invitation: ${getBaseUrl()}/accept-invitation/${id}`,
-          html: `<p>You are invited to join ${organization.name} on AgentSet.ai. Click here to accept the invitation: <a href="${getBaseUrl()}/accept-invitation/${id}">here</a></p>`,
+          text: `You are invited to join ${organization.name} on AgentSet.ai. Click here to accept the invitation: ${getBaseUrl()}/invitation/${id}`,
+          html: `<p>You are invited to join ${organization.name} on AgentSet.ai. Click here to accept the invitation: <a href="${getBaseUrl()}/invitation/${id}">here</a></p>`,
         });
       },
     }),

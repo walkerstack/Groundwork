@@ -34,21 +34,24 @@ function InviteMemberDialog({ trigger }: { trigger: React.ReactNode }) {
 
   const { mutateAsync: invite, isPending } = useMutation({
     mutationFn: async ({ email, role }: { email: string; role: string }) => {
-      return authClient.organization.inviteMember({
+      const res = await authClient.organization.inviteMember({
         email: email,
         role: role as Role,
         organizationId: activeOrganization.id,
-        fetchOptions: {
-          throw: true,
-        },
       });
+
+      if (res.error || !res.data) {
+        throw new Error(res.error?.message || "Failed to invite member");
+      }
+
+      return res.data;
     },
     onSuccess: (result) => {
       setActiveOrganization({
         ...activeOrganization,
         invitations: [
           ...(activeOrganization?.invitations || []),
-          result.data as ActiveOrganization["invitations"][number],
+          result as ActiveOrganization["invitations"][number],
         ],
       });
 

@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/sidebar";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { useOrganization } from "@/contexts/organization-context";
 
 export function NavMain({
   items,
@@ -27,21 +28,24 @@ export function NavMain({
     title: string;
     url?: string;
     icon?: LucideIcon;
+    adminOnly?: boolean;
     isActive?: boolean;
     items?: {
       title: string;
       url: string;
+      adminOnly?: boolean;
     }[];
   }[];
 }) {
   const slug = useParams().slug;
+  const { isAdmin } = useOrganization();
 
   return (
     <SidebarGroup>
       <SidebarGroupLabel>Platform</SidebarGroupLabel>
       <SidebarMenu>
         {items.map((item) => {
-          if (!item.items)
+          if (!item.items && (!item.adminOnly || isAdmin))
             return (
               <SidebarMenuButton key={item.title} asChild tooltip={item.title}>
                 <Link href={item.url?.replace("{slug}", slug as string) || ""}>
@@ -68,17 +72,23 @@ export function NavMain({
                 </CollapsibleTrigger>
                 <CollapsibleContent>
                   <SidebarMenuSub>
-                    {item.items?.map((subItem) => (
-                      <SidebarMenuSubItem key={subItem.title}>
-                        <SidebarMenuSubButton asChild>
-                          <Link
-                            href={subItem.url.replace("{slug}", slug as string)}
-                          >
-                            <span>{subItem.title}</span>
-                          </Link>
-                        </SidebarMenuSubButton>
-                      </SidebarMenuSubItem>
-                    ))}
+                    {item.items?.map(
+                      (subItem) =>
+                        (!subItem.adminOnly || isAdmin) && (
+                          <SidebarMenuSubItem key={subItem.title}>
+                            <SidebarMenuSubButton asChild>
+                              <Link
+                                href={subItem.url.replace(
+                                  "{slug}",
+                                  slug as string,
+                                )}
+                              >
+                                <span>{subItem.title}</span>
+                              </Link>
+                            </SidebarMenuSubButton>
+                          </SidebarMenuSubItem>
+                        ),
+                    )}
                   </SidebarMenuSub>
                 </CollapsibleContent>
               </SidebarMenuItem>
