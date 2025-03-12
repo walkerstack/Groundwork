@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -10,13 +12,15 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useOrganization } from "@/contexts/organization-context";
 import { api } from "@/trpc/react";
 import { PlusIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
-export default function CreateNamespace({ orgId }: { orgId: string }) {
+export default function CreateNamespace() {
+  const { activeOrganization } = useOrganization();
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [name, setName] = useState("");
@@ -25,7 +29,9 @@ export default function CreateNamespace({ orgId }: { orgId: string }) {
     onSuccess: (data) => {
       toast.success("Namespace created");
       setIsOpen(false);
-      router.push(`/dashboard/namespaces/${data.slug}`);
+      router.push(
+        `/dashboard/${activeOrganization.slug}/namespaces/${data.slug}`,
+      );
     },
     onError: (error) => {
       toast.error(error.message);
@@ -35,7 +41,7 @@ export default function CreateNamespace({ orgId }: { orgId: string }) {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     await mutateAsync({
-      orgId,
+      orgId: activeOrganization.id,
       name,
     });
   };

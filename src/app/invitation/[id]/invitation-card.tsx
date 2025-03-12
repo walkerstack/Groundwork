@@ -124,6 +124,10 @@ export function InvitationCard({
         iconClassName="text-green-600"
         title="Welcome to the team!"
         description={`You are now a member of ${invitation.organizationName}`}
+        action={{
+          label: "View dashboard",
+          href: `/dashboard/${invitation.organizationSlug}`,
+        }}
       />
     );
   }

@@ -1,6 +1,8 @@
 import { notFound } from "next/navigation";
 import DashboardPageWrapper from "../../dashboard-page-wrapper";
 import { api } from "@/trpc/server";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export default async function NamespacesPage({
   params,
@@ -19,7 +21,19 @@ export default async function NamespacesPage({
 
   return (
     <DashboardPageWrapper title={namespace.name}>
-      {JSON.stringify(namespace)}
+      <div>
+        <Button asChild>
+          <Link
+            href={`/dashboard/${slug}/namespaces/${namespace.slug}/playground`}
+          >
+            Playground
+          </Link>
+        </Button>
+      </div>
+
+      <pre className="bg-muted mt-4 max-w-full min-w-0 rounded-md p-4 text-sm break-words">
+        {JSON.stringify(namespace, null, 2)}
+      </pre>
     </DashboardPageWrapper>
   );
 }

@@ -1,5 +1,7 @@
-import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 
 export const InvitationStatus = ({
   icon: Icon,
@@ -7,15 +9,20 @@ export const InvitationStatus = ({
   iconClassName,
   title,
   description,
+  action,
 }: {
   icon: React.ElementType;
   iconContainerClassName?: string;
   iconClassName?: string;
   title: string;
   description: string;
+  action?: {
+    label: string;
+    href: string;
+  };
 }) => {
   return (
-    <Card className="w-full max-w-md shadow-lg">
+    <Card className="w-full max-w-md gap-2 shadow-lg">
       <CardContent>
         <div className="flex flex-col items-center justify-center py-6 text-center">
           <div className={cn("rounded-full p-3", iconContainerClassName)}>
@@ -26,6 +33,14 @@ export const InvitationStatus = ({
           <p className="text-muted-foreground mt-2">{description}</p>
         </div>
       </CardContent>
+
+      {action && (
+        <CardFooter className="flex justify-center">
+          <Button asChild className="w-auto">
+            <Link href={action.href}>{action.label}</Link>
+          </Button>
+        </CardFooter>
+      )}
     </Card>
   );
 };

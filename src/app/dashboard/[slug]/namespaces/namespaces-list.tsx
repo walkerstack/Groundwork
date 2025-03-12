@@ -1,40 +1,33 @@
+"use client";
+
 import { Skeleton } from "@/components/ui/skeleton";
 import { useOrganization } from "@/contexts/organization-context";
 import { api } from "@/trpc/react";
 import Link from "next/link";
 
-export default function NamespacesList({ orgId }: { orgId: string }) {
+export default function NamespacesList() {
   const { activeOrganization } = useOrganization();
   const { data, isLoading } = api.namespace.getOrgNamespaces.useQuery({
-    orgId,
+    orgId: activeOrganization.id,
   });
 
   if (isLoading) {
     return (
       <div className="grid grid-cols-3 gap-4">
-        <NamespaceCardSkeleton />
-        <NamespaceCardSkeleton />
-        <NamespaceCardSkeleton />
-        <NamespaceCardSkeleton />
-        <NamespaceCardSkeleton />
-        <NamespaceCardSkeleton />
-        <NamespaceCardSkeleton />
-        <NamespaceCardSkeleton />
-        <NamespaceCardSkeleton />
-        <NamespaceCardSkeleton />
-        <NamespaceCardSkeleton />
-        <NamespaceCardSkeleton />
+        {[...Array(9)].map((_, index) => (
+          <NamespaceCardSkeleton key={index} />
+        ))}
       </div>
     );
   }
 
-  if (data?.length === 0) {
+  if (!data || data?.length === 0) {
     return <div>No namespaces found</div>;
   }
 
   return (
     <div className="grid grid-cols-3 gap-4">
-      {data?.map((namespace) => (
+      {data.map((namespace) => (
         <Link
           key={namespace.id}
           href={`/dashboard/${activeOrganization.slug}/namespaces/${namespace.slug}`}
