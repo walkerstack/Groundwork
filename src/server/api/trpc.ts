@@ -129,3 +129,9 @@ export const protectedProcedure = t.procedure.use(({ ctx, next }) => {
     },
   });
 });
+
+export type ProcedureContext = Awaited<ReturnType<typeof createTRPCContext>>;
+
+export type ProtectedProcedureContext = ProcedureContext & {
+  session: NonNullable<ProcedureContext["session"]>;
+};

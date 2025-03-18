@@ -1,0 +1,48 @@
+enum IngestJobStatus {
+  BACKLOG
+  QUEUED
+  QUEUED_FOR_RESYNC
+  QUEUED_FOR_DELETE
+  PRE_PROCESSING
+  PROCESSING
+  DELETING
+  CANCELLING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+model IngestJob {
+  id String @id @default(cuid())
+
+  tenantId    String?
+  namespaceId String
+  namespace   Namespace @relation(fields: [namespaceId], references: [id], onDelete: Cascade)
+
+  status IngestJobStatus @default(BACKLOG)
+  error  String?
+
+  /// [IngestJobPayload]
+  payload Json
+
+  /// [IngestJobConfig]
+  config Json?
+
+  queuedAt        DateTime? @default(now())
+  preProcessingAt DateTime?
+  processingAt    DateTime?
+  completedAt     DateTime?
+  failedAt        DateTime?
+
+  workflowRunsIds String[] @default([])
+
+  documents Document[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([tenantId, status])
+  @@index([namespaceId, status])
+  @@map("ingest_job")
+}

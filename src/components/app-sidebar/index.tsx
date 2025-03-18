@@ -1,8 +1,3 @@
-"use client";
-
-import * as React from "react";
-import { FoldersIcon, LockIcon, Settings2 } from "lucide-react";
-
 import { NavMain } from "./nav-main";
 import { NavUser } from "./nav-user";
 import { TeamSwitcher } from "./team-switcher";
@@ -13,54 +8,25 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar";
+import { NavNamespace } from "./nav-namespace";
+import type { LucideIcon } from "lucide-react";
 
-const createOrgUrl = (url: string) => `/dashboard/{slug}${url}`;
-
-// This is sample data.
-const data = {
-  navMain: [
-    {
-      title: "Namespaces",
-      url: createOrgUrl("/namespaces"),
-      icon: FoldersIcon,
-    },
-    {
-      title: "API Keys",
-      url: createOrgUrl("/api-keys"),
-      icon: LockIcon,
-    },
-    {
-      title: "Settings",
-      icon: Settings2,
-      items: [
-        {
-          title: "General",
-          url: createOrgUrl("/settings/general"),
-        },
-        {
-          title: "Team",
-          url: createOrgUrl("/settings/team"),
-        },
-        {
-          title: "Danger",
-          url: createOrgUrl("/settings/danger"),
-          adminOnly: true,
-        },
-
-        // {
-        //   title: "Billing",
-        //   url: "/dashboard/settings/billing",
-        // },
-        // {
-        //   title: "Limits",
-        //   url: "/dashboard/settings/limits",
-        // },
-      ],
-    },
-  ],
+export type SidebarItemType = {
+  title: string;
+  url?: string;
+  icon?: LucideIcon;
+  adminOnly?: boolean;
+  isActive?: boolean;
+  exact?: boolean;
+  items?: {
+    title: string;
+    url: string;
+    adminOnly?: boolean;
+    exact?: boolean;
+  }[];
 };
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
@@ -68,7 +34,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
 
       <SidebarContent>
-        <NavMain items={data.navMain} />
+        <NavMain />
+        <NavNamespace />
       </SidebarContent>
 
       <SidebarFooter>

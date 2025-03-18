@@ -1,22 +1,61 @@
 /* eslint-disable @typescript-eslint/no-namespace */
 
 type IngestJobPayloadText = {
-  source: "TEXT";
+  type: "TEXT";
+  name?: string;
   text: string;
 };
 
 type IngestJobPayloadConnection = {
-  source: "CONNECTION";
+  type: "CONNECTION";
   connectionId: string;
 };
 
 type IngestJobPayloadFile = {
-  source: "FILE";
+  type: "FILE";
+  name?: string;
   fileUrl: string;
 };
 
+type IngestJobPayloadUrls = {
+  type: "URLS";
+  urls: string[];
+};
+
+type IngestJobPayloadSitemap = {
+  type: "SITEMAP";
+  sitemapUrl: string;
+};
+
+type IngestJobPayloadS3 = {
+  type: "S3";
+  bucket: string;
+  prefix?: string;
+  fileTypes?: string[];
+};
+
+type IngestJobPayloadGoogleDrive = {
+  type: "GOOGLE_DRIVE";
+  folderId: string;
+  fileTypes?: string[];
+};
+
+type Payload =
+  | IngestJobPayloadText
+  | IngestJobPayloadConnection
+  | IngestJobPayloadFile
+  | IngestJobPayloadUrls
+  | IngestJobPayloadSitemap
+  | IngestJobPayloadS3
+  | IngestJobPayloadGoogleDrive;
+
 type OpenAIEmbeddingModel = "text-embedding-3-small" | "text-embedding-3-large";
 type OpenAILanguageModel = "gpt-4o" | "gpt-4o-mini";
+
+type Config = {
+  chunkSize?: number;
+  chunkOverlap?: number;
+};
 
 export type LLMConfig =
   | {
@@ -43,15 +82,9 @@ declare global {
       };
     };
 
-    type IngestJobPayload =
-      | IngestJobPayloadText
-      | IngestJobPayloadConnection
-      | IngestJobPayloadFile;
+    type IngestJobPayload = Payload;
 
-    type IngestJobConfig = {
-      chunkSize?: number;
-      chunkOverlap?: number;
-
+    type IngestJobConfig = Config & {
       metadata?: Record<string, unknown>;
     };
 
@@ -87,5 +120,13 @@ declare global {
         };
 
     type NamespaceLLMConfig = LLMConfig;
+
+    type DocumentProperties = {
+      fileSize: number;
+      mimeType?: string;
+    };
+
+    type DocumentSource = Payload;
+    type DocumentMetadata = Record<string, unknown>;
   }
 }

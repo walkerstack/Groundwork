@@ -35,6 +35,9 @@ export const env = createEnv({
 
     GOOGLE_CLIENT_ID: z.string(),
     GOOGLE_CLIENT_SECRET: z.string(),
+
+    PARTITION_API_KEY: z.string(),
+    PARTITION_API_URL: z.string().url(),
   },
   client: {},
   runtimeEnv: {
@@ -71,6 +74,9 @@ export const env = createEnv({
 
     GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
     GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
+
+    PARTITION_API_KEY: process.env.PARTITION_API_KEY,
+    PARTITION_API_URL: process.env.PARTITION_API_URL,
   },
   skipValidation: !!process.env.SKIP_ENV_VALIDATION,
   emptyStringAsUndefined: true,

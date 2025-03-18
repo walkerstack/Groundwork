@@ -1,28 +1,72 @@
 import { env } from "@/env";
-import { Client } from "@upstash/workflow";
+import { Client as WorkflowClient } from "@upstash/workflow";
 import { getBaseUrl } from "./utils";
+import { Receiver } from "@upstash/qstash";
+import { Client as QstashClient } from "@upstash/qstash";
 
-const client = new Client({ token: env.QSTASH_TOKEN });
+export const qstashClient = new QstashClient({
+  baseUrl: env.QSTASH_URL,
+  token: env.QSTASH_TOKEN,
+});
 
-type TriggerArgs = Omit<Parameters<typeof client.trigger>[0], "url"> & {
-  /**
-   * The relative URL of the workflow endpoint.
-   *
-   * @default `/api/workflow`
-   */
-  relativeUrl?: string;
-};
-export const triggerWorkflow = async ({
-  relativeUrl = "/api/workflow",
-  ...args
-}: TriggerArgs) => {
-  return client.trigger({
-    url: `${getBaseUrl()}${relativeUrl}`,
-    ...args,
+const workflowClient = new WorkflowClient({
+  baseUrl: env.QSTASH_URL,
+  token: env.QSTASH_TOKEN,
+});
+
+export const qstashReceiver = new Receiver({
+  currentSigningKey: env.QSTASH_CURRENT_SIGNING_KEY,
+  nextSigningKey: env.QSTASH_NEXT_SIGNING_KEY,
+});
+
+export const triggerIngestionJob = async ({ jobId }: { jobId: string }) => {
+  return workflowClient.trigger({
+    url: `${getBaseUrl()}/api/workflows/ingest`,
+    body: {
+      jobId: jobId,
+    },
   });
 };
 
-type CancelArgs = Parameters<typeof client.cancel>[0];
+export const triggerDocumentJob = async ({
+  documentId,
+}: {
+  documentId: string;
+}) => {
+  return workflowClient.trigger({
+    url: `${getBaseUrl()}/api/workflows/process-document`,
+    body: {
+      documentId: documentId,
+    },
+  });
+};
+
+export const triggerDeleteDocumentJob = async ({
+  documentId,
+  deleteJobWhenDone,
+}: {
+  documentId: string;
+  deleteJobWhenDone?: boolean;
+}) => {
+  return workflowClient.trigger({
+    url: `${getBaseUrl()}/api/workflows/delete-document`,
+    body: {
+      documentId,
+      deleteJobWhenDone,
+    },
+  });
+};
+
+export const triggerDeleteIngestJob = async ({ jobId }: { jobId: string }) => {
+  return workflowClient.trigger({
+    url: `${getBaseUrl()}/api/workflows/delete-ingest-job`,
+    body: {
+      jobId,
+    },
+  });
+};
+
+type CancelArgs = Parameters<typeof workflowClient.cancel>[0];
 export const cancelWorkflow = async (args: CancelArgs) => {
-  return client.cancel(args);
+  return workflowClient.cancel(args);
 };

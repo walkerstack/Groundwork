@@ -1,83 +1,7 @@
-import { Namespace } from "@prisma/client";
-import { env } from "@/env";
 import { z } from "zod";
-import type { QueryResponse, RecordMetadata } from "@pinecone-database/pinecone";
+import type { getNamespaceVectorStore } from ".";
 
 type VectorStore = Awaited<ReturnType<typeof getNamespaceVectorStore>>;
-
-class CustomPinecone {
-  private apiKey: string;
-  private indexHost: string;
-  private namespace: string;
-
-  constructor({apiKey, indexHost, namespace}: {
-    apiKey: string;
-    indexHost: string;
-    namespace: string;
-  }) {
-    this.apiKey = apiKey;
-    this.indexHost = indexHost;
-    this.namespace = namespace;
-  }
-
-  async query(params: {
-    vector: number[];
-    topK?: number;
-    filter?: object;
-    includeMetadata?: boolean;
-    includeValues?: boolean;
-    sparseVector?: {
-      indices: number[];
-      values: number[];
-    };
-    id?: string
-  }): Promise<QueryResponse<RecordMetadata>> {
-    return (await (await fetch(`${this.indexHost}/query`, {
-      method: 'POST',
-      headers: {
-        'Api-Key': this.apiKey,
-        'Content-Type': 'application/json',
-        'X-Pinecone-Api-Version': '2025-01',
-      },
-      body: JSON.stringify({
-        namespace: this.namespace,
-        ...params
-      }),
-    })).json()) as QueryResponse<RecordMetadata>;
-  }
-}
-
-export const getNamespaceVectorStore = async (
-  namespace: Pick<Namespace, "vectorStoreConfig" | "id">,
-  tenant?: string,
-) => {
-  const config = namespace.vectorStoreConfig;
-
-  const tenantId = tenant ?? `agentset:${namespace.id}`;
-
-  // TODO: handle different embedding models
-  if (!config) {
-    return new CustomPinecone({
-      apiKey: env.DEFAULT_PINECONE_API_KEY,
-      indexHost: env.DEFAULT_PINECONE_HOST,
-      namespace: tenantId,
-    });
-  }
-
-  switch (config.provider) {
-    case "PINECONE": {
-      const { apiKey, indexHost } = config;
-      return new CustomPinecone({ apiKey, indexHost, namespace: tenantId });
-    }
-
-    default: {
-      // This exhaustive check ensures TypeScript will error if a new provider
-      // is added without handling it in the switch statement
-      const _exhaustiveCheck: never = config.provider;
-      throw new Error(`Unknown vector store provider: ${_exhaustiveCheck}`);
-    }
-  }
-};
 
 const jsonArraySchema = (type: z.ZodType) =>
   z.preprocess(
@@ -125,6 +49,15 @@ const nodeSchema = z.object({
   class_name: z.string(),
 });
 
+const excludeKeys = <T extends Record<string, unknown>, K extends string[]>(
+  obj: T,
+  keys: K,
+) => {
+  return Object.fromEntries(
+    Object.entries(obj).filter(([key]) => !keys.includes(key)),
+  ) as Omit<T, (typeof keys)[number]>;
+};
+
 export const queryVectorStore = async <IncludeMetadata extends boolean>(
   vectorStore: VectorStore,
   embedding: number[],
@@ -163,30 +96,33 @@ export const queryVectorStore = async <IncludeMetadata extends boolean>(
   }
 
   try {
-  
     const parsedNodes = await z.array(nodeSchema).parseAsync(
       matches.map((match) => {
         if (!match.metadata) {
           throw new Error("No metadata found");
         }
 
-        return ({
-        id: match.id,
-        score: match.score,
-        ...JSON.parse((match.metadata as unknown as {_node_content: string})["_node_content"]) as Record<string, unknown>,
-      })}),
+        return {
+          id: match.id,
+          score: match.score,
+          ...(JSON.parse(
+            (match.metadata as unknown as { _node_content: string })[
+              "_node_content"
+            ],
+          ) as Record<string, unknown>),
+        };
+      }),
     );
     return parsedNodes.map((node) => {
-      const {
-        start_char_idx: _start_char_idx,
-        end_char_idx: _end_char_idx,
-        metadata_seperator: _metadata_seperator,
-        text_template: _text_template,
-        class_name: _class_name,
-        metadata_template: _metadata_template,
-        metadata_separator: _metadata_separator,
-        ...rest
-      } = node;
+      const rest = excludeKeys(node, [
+        "start_char_idx",
+        "end_char_idx",
+        "metadata_seperator",
+        "text_template",
+        "metadata_template",
+        "class_name",
+        "metadata_separator",
+      ] as const);
 
       return {
         ...rest,

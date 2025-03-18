@@ -1,0 +1,53 @@
+enum DocumentStatus {
+  BACKLOG
+  QUEUED
+  QUEUED_FOR_RESYNC
+  QUEUED_FOR_DELETE
+  PRE_PROCESSING
+  PROCESSING
+  DELETING
+  CANCELLING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+model Document {
+  id         String  @id @default(cuid())
+  externalId String?
+  name       String?
+  tenantId   String?
+
+  status DocumentStatus @default(BACKLOG)
+  error  String?
+
+  /// [DocumentSource]
+  source Json
+
+  /// [DocumentMetadata]
+  metadata Json?
+
+  queuedAt        DateTime? @default(now())
+  preProcessingAt DateTime?
+  processingAt    DateTime?
+  completedAt     DateTime?
+  failedAt        DateTime?
+
+  ingestJobId String
+  ingestJob   IngestJob @relation(fields: [ingestJobId], references: [id], onDelete: Cascade)
+
+  workflowRunsIds String[] @default([])
+
+  /// [DocumentProperties]
+  documentProperties Json?
+
+  totalChunks     Int @default(0)
+  totalTokens     Int @default(0)
+  totalCharacters Int @default(0)
+  totalPages      Int @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("document")
+}

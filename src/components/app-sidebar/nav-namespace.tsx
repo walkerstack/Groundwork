@@ -1,6 +1,12 @@
 "use client";
 
-import { ChevronRight } from "lucide-react";
+import {
+  ChevronRight,
+  CodeIcon,
+  FilesIcon,
+  HomeIcon,
+  WrenchIcon,
+} from "lucide-react";
 
 import {
   Collapsible,
@@ -9,6 +15,7 @@ import {
 } from "@/components/ui/collapsible";
 import {
   SidebarGroup,
+  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -18,62 +25,48 @@ import {
 } from "@/components/ui/sidebar";
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
-import { useOrganization } from "@/contexts/organization-context";
-import { FoldersIcon, LockIcon, Settings2 } from "lucide-react";
 import { SidebarItemType } from ".";
 
-const createOrgUrl = (url: string) => `/dashboard/{slug}${url}`;
+const createNamespaceUrl = (url: string) =>
+  `/dashboard/{slug}/namespaces/{namespaceSlug}${url}`;
 
-// This is sample data.
 const items: SidebarItemType[] = [
   {
-    title: "Namespaces",
-    url: createOrgUrl("/namespaces"),
-    icon: FoldersIcon,
+    title: "Home",
+    url: createNamespaceUrl("/"),
+    icon: HomeIcon,
+    exact: true,
   },
   {
-    title: "API Keys",
-    url: createOrgUrl("/api-keys"),
-    icon: LockIcon,
+    title: "Ingestion",
+    url: createNamespaceUrl("/jobs"),
+    icon: WrenchIcon,
   },
   {
-    title: "Settings",
-    icon: Settings2,
-    items: [
-      {
-        title: "General",
-        url: createOrgUrl("/settings/general"),
-      },
-      {
-        title: "Team",
-        url: createOrgUrl("/settings/team"),
-      },
-      {
-        title: "Danger",
-        url: createOrgUrl("/settings/danger"),
-        adminOnly: true,
-      },
-
-      // {
-      //   title: "Billing",
-      //   url: "/dashboard/settings/billing",
-      // },
-      // {
-      //   title: "Limits",
-      //   url: "/dashboard/settings/limits",
-      // },
-    ],
+    title: "Documents",
+    url: createNamespaceUrl("/documents"),
+    icon: FilesIcon,
+  },
+  {
+    title: "Playground",
+    url: createNamespaceUrl("/playground"),
+    icon: CodeIcon,
   },
 ];
 
-const processUrl = (url: string, slug: string) => {
-  return url.replace("{slug}", slug);
+export function NavNamespace() {
+  const slug = useParams().namespaceSlug;
+  if (!slug) return null;
+
+  return <NavNamespaceInner />;
+}
+
+const processUrl = (url: string, slug: string, namespaceSlug: string) => {
+  return url.replace("{slug}", slug).replace("{namespaceSlug}", namespaceSlug);
 };
 
-export function NavMain() {
-  const slug = useParams().slug;
-  const { isAdmin } = useOrganization();
-
+function NavNamespaceInner() {
+  const { slug, namespaceSlug } = useParams();
   const pathname = usePathname();
 
   const isActive = (url: string, exact?: boolean) => {
@@ -86,10 +79,15 @@ export function NavMain() {
 
   return (
     <SidebarGroup>
+      <SidebarGroupLabel>Namespace</SidebarGroupLabel>
       <SidebarMenu>
         {items.map((item) => {
-          if (!item.items && (!item.adminOnly || isAdmin)) {
-            const url = processUrl(item.url!, slug as string);
+          if (!item.items) {
+            const url = processUrl(
+              item.url!,
+              slug as string,
+              namespaceSlug as string,
+            );
             return (
               <SidebarMenuButton
                 key={item.title}
@@ -123,8 +121,11 @@ export function NavMain() {
                 <CollapsibleContent>
                   <SidebarMenuSub>
                     {item.items?.map((subItem) => {
-                      if (subItem.adminOnly && !isAdmin) return;
-                      const url = processUrl(subItem.url, slug as string);
+                      const url = processUrl(
+                        subItem.url,
+                        slug as string,
+                        namespaceSlug as string,
+                      );
                       return (
                         <SidebarMenuSubItem key={subItem.title}>
                           <SidebarMenuSubButton
