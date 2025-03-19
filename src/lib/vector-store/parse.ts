@@ -1,6 +1,6 @@
 import { z } from "zod";
 import type { getNamespaceVectorStore } from ".";
-import { metadataDictToNode } from "@llamaindex/core/vector-store";
+// import { metadataDictToNode } from "@llamaindex/core/vector-store";
 
 type VectorStore = Awaited<ReturnType<typeof getNamespaceVectorStore>>;
 
@@ -20,34 +20,36 @@ const nodeMetadataSchema = z.object({
   sequence_number: z.number().optional(),
 });
 
+// const relationshipsSchema = z
+// .record(
+//   z.string(),
+//   z.object({
+//     node_id: z.string(),
+//     node_type: z.string(),
+//     metadata: nodeMetadataSchema,
+//     hash: z.string(),
+//     class_name: z.string(),
+//   }),
+// )
+const relationshipsSchema = z.record(z.string(), z.any());
+
 const nodeSchema = z.object({
   id: z.string(),
   score: z.number(),
   metadata: nodeMetadataSchema,
+  text: z.string(),
+  relationships: relationshipsSchema.optional(),
   // embedding: z.any().nullable(),
   // excluded_embed_metadata_keys: z.array(z.string()),
   // excluded_llm_metadata_keys: z.array(z.string()),
-  relationships: z
-    .record(
-      z.string(),
-      z.object({
-        node_id: z.string(),
-        node_type: z.string(),
-        metadata: nodeMetadataSchema,
-        hash: z.string(),
-        class_name: z.string(),
-      }),
-    )
-    .optional(),
-  metadata_template: z.string(),
-  metadata_separator: z.string(),
-  text: z.string(),
-  mimetype: z.string(),
-  start_char_idx: z.number().nullable(),
-  end_char_idx: z.number().nullable(),
-  metadata_seperator: z.string(),
-  text_template: z.string(),
-  class_name: z.string(),
+  // metadata_template: z.string(),
+  // metadata_separator: z.string(),
+  // mimetype: z.string(),
+  // start_char_idx: z.number().nullable(),
+  // end_char_idx: z.number().nullable(),
+  // metadata_seperator: z.string(),
+  // text_template: z.string(),
+  // class_name: z.string(),
 });
 
 const excludeKeys = <T extends Record<string, unknown>, K extends string[]>(
@@ -114,6 +116,7 @@ export const queryVectorStore = async <IncludeMetadata extends boolean>(
         };
       }),
     );
+
     return parsedNodes.map((node) => {
       const rest = excludeKeys(node, [
         "start_char_idx",
@@ -134,19 +137,19 @@ export const queryVectorStore = async <IncludeMetadata extends boolean>(
       };
     });
   } catch (e) {
-    try {
-      return matches.map((match) => {
-        return {
-          id: match.id,
-          score: match.score,
-          // @ts-expect-error - metadata is not typed
-          node: metadataDictToNode(match.metadata),
-        };
-      });
-    } catch (err) {
-      console.error(e);
-      console.error(err);
-      return null;
-    }
+    // try {
+    //   return matches.map((match) => {
+    //     return {
+    //       id: match.id,
+    //       score: match.score,
+    //       // @ts-expect-error - metadata is not typed
+    //       node: metadataDictToNode(match.metadata),
+    //     };
+    //   });
+    // } catch (err) {
+    // console.error(err);
+    console.error(e);
+    return null;
+    // }
   }
 };

@@ -2,7 +2,7 @@ import { getApiKeyScopeAndOrganizationId, getNamespaceConfig } from "@/lib/api";
 import { getNamespaceEmbeddingModel } from "@/lib/embedding";
 import { getNamespaceVectorStore, queryVectorStore } from "@/lib/vector-store";
 import { embed } from "ai";
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
 export const runtime = "edge";
