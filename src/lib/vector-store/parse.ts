@@ -1,6 +1,6 @@
 import { z } from "zod";
 import type { getNamespaceVectorStore } from ".";
-import { jsonToNode, metadataDictToNode } from "llamaindex";
+import { metadataDictToNode } from "@llamaindex/core/vector-store";
 
 type VectorStore = Awaited<ReturnType<typeof getNamespaceVectorStore>>;
 
