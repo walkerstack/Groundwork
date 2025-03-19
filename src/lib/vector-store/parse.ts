@@ -139,8 +139,8 @@ export const queryVectorStore = async <IncludeMetadata extends boolean>(
         return {
           id: match.id,
           score: match.score,
-          // @ts-ignore - metadata is not typed
-          node: metadataDictToNode(match.metadata! as any),
+          // @ts-expect-error - metadata is not typed
+          node: metadataDictToNode(match.metadata),
         };
       });
     } catch (err) {
