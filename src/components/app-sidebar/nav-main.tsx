@@ -20,7 +20,7 @@ import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
 import { useOrganization } from "@/contexts/organization-context";
 import { FoldersIcon, LockIcon, Settings2 } from "lucide-react";
-import { SidebarItemType } from ".";
+import type { SidebarItemType } from ".";
 
 const createOrgUrl = (url: string) => `/dashboard/{slug}${url}`;
 
@@ -28,8 +28,9 @@ const createOrgUrl = (url: string) => `/dashboard/{slug}${url}`;
 const items: SidebarItemType[] = [
   {
     title: "Namespaces",
-    url: createOrgUrl("/namespaces"),
+    url: createOrgUrl("/"),
     icon: FoldersIcon,
+    exact: true,
   },
   {
     title: "API Keys",

@@ -1,7 +1,7 @@
 "use client";
 
 import { useNamespace } from "@/contexts/namespace-context";
-import DashboardPageWrapper from "../../../dashboard-page-wrapper";
+import DashboardPageWrapper from "../../dashboard-page-wrapper";
 import { DataTable } from "@/components/data-table";
 import { columns } from "./columns";
 import { api } from "@/trpc/react";

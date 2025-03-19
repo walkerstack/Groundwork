@@ -29,9 +29,7 @@ export default function CreateNamespace() {
     onSuccess: (data) => {
       toast.success("Namespace created");
       setIsOpen(false);
-      router.push(
-        `/dashboard/${activeOrganization.slug}/namespaces/${data.slug}`,
-      );
+      router.push(`/dashboard/${activeOrganization.slug}/${data.slug}`);
     },
     onError: (error) => {
       toast.error(error.message);

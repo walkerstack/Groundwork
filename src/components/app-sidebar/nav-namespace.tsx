@@ -28,7 +28,7 @@ import { useParams, usePathname } from "next/navigation";
 import { SidebarItemType } from ".";
 
 const createNamespaceUrl = (url: string) =>
-  `/dashboard/{slug}/namespaces/{namespaceSlug}${url}`;
+  `/dashboard/{slug}/{namespaceSlug}${url}`;
 
 const items: SidebarItemType[] = [
   {

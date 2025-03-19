@@ -1,12 +1,15 @@
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
+import { cn } from "@/lib/utils";
 
 export default function DashboardPageWrapper({
   children,
   title,
+  className,
 }: {
   children: React.ReactNode;
   title: string;
+  className?: string;
 }) {
   return (
     <>
@@ -18,7 +21,9 @@ export default function DashboardPageWrapper({
         </div>
       </header>
 
-      <div className="flex flex-1 flex-col p-4 pt-10">{children}</div>
+      <div className={cn("flex flex-1 flex-col p-4 pt-10", className)}>
+        {children}
+      </div>
     </>
   );
 }

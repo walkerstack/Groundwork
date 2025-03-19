@@ -134,7 +134,7 @@ export const columns: ColumnDef<Job>[] = [
         {
           onSuccess: () => {
             toast.success("Ingest job deleted");
-            utils.ingestJob.all.invalidate();
+            void utils.ingestJob.all.invalidate();
           },
         },
       );

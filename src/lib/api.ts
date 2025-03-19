@@ -1,6 +1,6 @@
 import { unstable_cache } from "next/cache";
 import { supabase } from "./supabase";
-import { Namespace } from "@prisma/client";
+import type { Namespace } from "@prisma/client";
 
 export const getApiKeyScopeAndOrganizationId = (apiKey: string) => {
   return unstable_cache(

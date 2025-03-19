@@ -118,7 +118,7 @@ export const columns: ColumnDef<DocumentCol>[] = [
         api.document.delete.useMutation({
           onSuccess: () => {
             toast.success("Document deleted");
-            utils.document.all.invalidate();
+            void utils.document.all.invalidate();
           },
         });
 
