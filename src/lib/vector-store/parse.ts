@@ -110,7 +110,7 @@ export const queryVectorStore = async <IncludeMetadata extends boolean>(
         return {
           id: match.id,
           score: match.score,
-          metadata: rest,
+          // metadata: rest,
           ...(JSON.parse(_node_content as string) as Record<string, unknown>),
         };
       }),
