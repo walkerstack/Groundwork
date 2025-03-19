@@ -1,12 +1,18 @@
 import { getApiKeyScopeAndOrganizationId, getNamespaceConfig } from "@/lib/api";
 import { getNamespaceEmbeddingModel } from "@/lib/embedding";
-import { getNamespaceVectorStore, queryVectorStore } from "@/lib/vector-store";
+import {
+  getNamespaceVectorStore,
+  queryVectorStore,
+  queryVectorStoreV2,
+} from "@/lib/vector-store";
 import { embed } from "ai";
 import { type NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
 export const runtime = "edge";
 export const preferredRegion = "iad1"; // make this closer to the DB
+
+const DIGNA_ID = "cm7zzvk4w0001ri45hfl7lkyo";
 
 const schema = z.object({
   query: z.string(),
@@ -64,9 +70,7 @@ export async function POST(request: NextRequest) {
     getNamespaceEmbeddingModel(namespace),
     getNamespaceVectorStore(
       namespace,
-      namespace.id === "cm7zzvk4w0001ri45hfl7lkyo"
-        ? "agentset:digna"
-        : undefined,
+      namespace.id === DIGNA_ID ? "agentset:digna" : undefined,
     ),
   ]);
 
@@ -76,13 +80,24 @@ export async function POST(request: NextRequest) {
   });
 
   // TODO: track the usage
-  const data = await queryVectorStore(vectorStore, embedding.embedding, {
-    topK: result.data.topK,
-    minScore: result.data.minScore,
-    filter: result.data.filter,
-    includeMetadata: result.data.includeMetadata,
-    includeRelationships: result.data.includeRelationships,
-  });
+  let data;
+  if (namespace.id === DIGNA_ID) {
+    data = await queryVectorStore(vectorStore, embedding.embedding, {
+      topK: result.data.topK,
+      minScore: result.data.minScore,
+      filter: result.data.filter,
+      includeMetadata: result.data.includeMetadata,
+      includeRelationships: result.data.includeRelationships,
+    });
+  } else {
+    data = await queryVectorStoreV2(vectorStore, embedding.embedding, {
+      topK: result.data.topK,
+      minScore: result.data.minScore,
+      filter: result.data.filter,
+      includeMetadata: result.data.includeMetadata,
+      includeRelationships: result.data.includeRelationships,
+    });
+  }
 
   return NextResponse.json({
     success: true,

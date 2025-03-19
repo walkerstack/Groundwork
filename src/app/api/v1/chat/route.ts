@@ -3,7 +3,11 @@ import type { Session } from "@/lib/auth-types";
 import { getNamespaceEmbeddingModel } from "@/lib/embedding";
 import { getNamespaceLanguageModel } from "@/lib/llm";
 import { supabase } from "@/lib/supabase";
-import { getNamespaceVectorStore, queryVectorStore } from "@/lib/vector-store";
+import {
+  getNamespaceVectorStore,
+  queryVectorStore,
+  queryVectorStoreV2,
+} from "@/lib/vector-store";
 import {
   type JSONValue,
   createDataStreamResponse,
@@ -19,6 +23,8 @@ import { DEFAULT_SYSTEM_PROMPT, NEW_MESSAGE_PROMPT } from "./prompts";
 export const runtime = "edge";
 export const preferredRegion = "iad1"; // make this closer to the DB
 export const maxDuration = 60;
+
+const DIGNA_ID = "cm7zzvk4w0001ri45hfl7lkyo";
 
 const schema = z.object({
   systemPrompt: z.string().optional().default(DEFAULT_SYSTEM_PROMPT),
@@ -135,9 +141,7 @@ export async function POST(request: NextRequest) {
     getNamespaceEmbeddingModel(namespace),
     getNamespaceVectorStore(
       namespace,
-      namespace.id === "cm7zzvk4w0001ri45hfl7lkyo"
-        ? "agentset:digna"
-        : undefined,
+      namespace.id === DIGNA_ID ? "agentset:digna" : undefined,
     ),
     getNamespaceLanguageModel(), // TODO: pass namespace config
   ]);
@@ -148,13 +152,24 @@ export async function POST(request: NextRequest) {
   });
 
   // TODO: track the usage
-  const data = await queryVectorStore(vectorStore, embedding.embedding, {
-    topK: result.data.topK,
-    minScore: result.data.minScore,
-    filter: result.data.filter,
-    includeMetadata: true,
-    includeRelationships: result.data.includeRelationships,
-  });
+  let data;
+  if (namespace.id === DIGNA_ID) {
+    data = await queryVectorStore(vectorStore, embedding.embedding, {
+      topK: result.data.topK,
+      minScore: result.data.minScore,
+      filter: result.data.filter,
+      includeMetadata: true,
+      includeRelationships: result.data.includeRelationships,
+    });
+  } else {
+    data = await queryVectorStoreV2(vectorStore, embedding.embedding, {
+      topK: result.data.topK,
+      minScore: result.data.minScore,
+      filter: result.data.filter,
+      includeMetadata: true,
+      includeRelationships: result.data.includeRelationships,
+    });
+  }
 
   if (!data) {
     return NextResponse.json({
