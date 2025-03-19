@@ -1,5 +1,6 @@
 import { z } from "zod";
 import type { getNamespaceVectorStore } from ".";
+import { jsonToNode, metadataDictToNode } from "llamaindex";
 
 type VectorStore = Awaited<ReturnType<typeof getNamespaceVectorStore>>;
 
@@ -133,7 +134,18 @@ export const queryVectorStore = async <IncludeMetadata extends boolean>(
       };
     });
   } catch (e) {
-    console.error(e);
-    return null;
+    try {
+      return matches.map((match) => {
+        return {
+          id: match.id,
+          score: match.score,
+          node: metadataDictToNode(match.metadata as any),
+        };
+      });
+    } catch (err) {
+      console.error(e);
+      console.error(err);
+      return null;
+    }
   }
 };

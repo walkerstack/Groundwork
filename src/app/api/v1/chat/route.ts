@@ -15,6 +15,7 @@ import {
 import { type NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { DEFAULT_SYSTEM_PROMPT, NEW_MESSAGE_PROMPT } from "./prompts";
+import { MetadataMode } from "llamaindex";
 
 export const runtime = "edge";
 export const preferredRegion = "iad1"; // make this closer to the DB
@@ -170,7 +171,12 @@ export async function POST(request: NextRequest) {
       role: "user",
       content: NEW_MESSAGE_PROMPT.replace(
         "{{chunks}}",
-        data.map((chunk, idx) => `[${idx + 1}]: ${chunk.text}`).join("\n\n"),
+        data
+          .map(
+            (chunk, idx) =>
+              `[${idx + 1}]: ${"text" in chunk ? chunk.text : chunk.node.getContent(MetadataMode.NONE)}`,
+          )
+          .join("\n\n"),
       ).replace("{{query}}", query as string),
     },
   ];
