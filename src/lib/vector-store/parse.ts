@@ -36,7 +36,7 @@ const relationshipsSchema = z.record(z.string(), z.any());
 const nodeSchema = z.object({
   id: z.string(),
   score: z.number(),
-  metadata: nodeMetadataSchema,
+  metadata: nodeMetadataSchema.optional(),
   text: z.string(),
   relationships: relationshipsSchema.optional(),
   // embedding: z.any().nullable(),
@@ -105,14 +105,13 @@ export const queryVectorStore = async <IncludeMetadata extends boolean>(
           throw new Error("No metadata found");
         }
 
+        const { _node_content, _node_type, ...rest } = match.metadata;
+
         return {
           id: match.id,
           score: match.score,
-          ...(JSON.parse(
-            (match.metadata as unknown as { _node_content: string })[
-              "_node_content"
-            ],
-          ) as Record<string, unknown>),
+          metadata: rest,
+          ...(JSON.parse(_node_content as string) as Record<string, unknown>),
         };
       }),
     );
