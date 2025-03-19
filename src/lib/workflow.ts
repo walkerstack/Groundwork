@@ -1,6 +1,6 @@
 import { env } from "@/env";
 import { Client as WorkflowClient } from "@upstash/workflow";
-import { getBaseUrl } from "./utils";
+import { getAppUrl } from "./utils";
 import { Receiver } from "@upstash/qstash";
 import { Client as QstashClient } from "@upstash/qstash";
 
@@ -21,7 +21,7 @@ export const qstashReceiver = new Receiver({
 
 export const triggerIngestionJob = async ({ jobId }: { jobId: string }) => {
   return workflowClient.trigger({
-    url: `${getBaseUrl()}/api/workflows/ingest`,
+    url: `${getAppUrl()}/api/workflows/ingest`,
     body: {
       jobId: jobId,
     },
@@ -34,7 +34,7 @@ export const triggerDocumentJob = async ({
   documentId: string;
 }) => {
   return workflowClient.trigger({
-    url: `${getBaseUrl()}/api/workflows/process-document`,
+    url: `${getAppUrl()}/api/workflows/process-document`,
     body: {
       documentId: documentId,
     },
@@ -49,7 +49,7 @@ export const triggerDeleteDocumentJob = async ({
   deleteJobWhenDone?: boolean;
 }) => {
   return workflowClient.trigger({
-    url: `${getBaseUrl()}/api/workflows/delete-document`,
+    url: `${getAppUrl()}/api/workflows/delete-document`,
     body: {
       documentId,
       deleteJobWhenDone,
@@ -59,7 +59,7 @@ export const triggerDeleteDocumentJob = async ({
 
 export const triggerDeleteIngestJob = async ({ jobId }: { jobId: string }) => {
   return workflowClient.trigger({
-    url: `${getBaseUrl()}/api/workflows/delete-ingest-job`,
+    url: `${getAppUrl()}/api/workflows/delete-ingest-job`,
     body: {
       jobId,
     },
