@@ -1,7 +1,6 @@
-import { z } from "zod";
-
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { TRPCError } from "@trpc/server";
+import { z } from "zod";
 
 export const namespaceRouter = createTRPCRouter({
   getOrgNamespaces: protectedProcedure
@@ -12,6 +11,8 @@ export const namespaceRouter = createTRPCRouter({
     )
     .query(async ({ ctx, input }) => {
       // make sure the user is a member of the org
+      console.log({ s: ctx.session.user.id });
+
       const member = await ctx.db.member.findFirst({
         where: {
           userId: ctx.session.user.id,

@@ -73,7 +73,7 @@ export type LLMConfig =
     };
 
 declare global {
-  namespace PrismaJson {
+  export namespace PrismaJson {
     type ConnectionConfig = {
       authType: "OAUTH2";
       credentials: {

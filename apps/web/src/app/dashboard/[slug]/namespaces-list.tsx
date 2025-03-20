@@ -1,9 +1,9 @@
 "use client";
 
+import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useOrganization } from "@/contexts/organization-context";
 import { api } from "@/trpc/react";
-import Link from "next/link";
 
 export default function NamespacesList() {
   const { activeOrganization } = useOrganization();
@@ -21,7 +21,7 @@ export default function NamespacesList() {
     );
   }
 
-  if (!data || data?.length === 0) {
+  if (!data || data.length === 0) {
     return <div>No namespaces found</div>;
   }
 

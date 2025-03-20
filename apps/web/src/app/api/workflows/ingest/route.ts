@@ -57,10 +57,12 @@ export const { POST } = serve<{
             name: ingestionJob.payload.name,
             source: {
               type: "TEXT",
+              name: ingestionJob.payload.name,
               text,
             },
             totalCharacters: text.length,
           },
+          select: { id: true },
         });
 
         return [document];
@@ -73,14 +75,38 @@ export const { POST } = serve<{
             ...commonData,
             name: ingestionJob.payload.name,
             source: {
-              name: ingestionJob.payload.name,
               type: "FILE",
+              name: ingestionJob.payload.name,
               fileUrl: fileUrl,
             },
           },
+          select: { id: true },
         });
 
         return [document];
+      }
+
+      if (ingestionJob.payload.type === "URLS") {
+        const { urls } = ingestionJob.payload;
+        const batches = chunkArray(urls, 20);
+
+        const documents = await Promise.all(
+          batches.map((batch) => {
+            return db.$transaction(
+              batch.map((url) =>
+                db.document.create({
+                  data: {
+                    ...commonData,
+                    source: { type: "FILE", fileUrl: url },
+                  },
+                  select: { id: true },
+                }),
+              ),
+            );
+          }),
+        );
+
+        return documents.flat();
       }
 
       return [];

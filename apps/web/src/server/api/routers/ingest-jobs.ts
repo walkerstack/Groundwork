@@ -1,11 +1,14 @@
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
-import { deleteIngestJob } from "@/server/services/ingest/delete";
-import { ingestFile } from "@/server/services/ingest/file";
-import { ingestText } from "@/server/services/ingest/text";
+import {
+  getAllIngestJobs,
+  getAllIngestJobsSchema,
+} from "@/services/ingest-jobs/all";
+import { deleteIngestJob } from "@/services/ingest-jobs/delete";
+import { ingestFile } from "@/services/ingest-jobs/file";
+import { ingestText } from "@/services/ingest-jobs/text";
+import { ingestUrls } from "@/services/ingest-jobs/urls";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-
-import { IngestJobStatus } from "@agentset/db";
 
 import { getNamespaceByUser } from "../auth";
 
@@ -17,20 +20,7 @@ const configSchema = z.object({
 
 export const ingestJobRouter = createTRPCRouter({
   all: protectedProcedure
-    .input(
-      z.object({
-        namespaceId: z.string(),
-        statuses: z.array(z.nativeEnum(IngestJobStatus)).optional(),
-        orderBy: z.enum(["createdAt"]).optional().default("createdAt"),
-        order: z.enum(["asc", "desc"]).optional().default("desc"),
-        cursor: z.string().optional(),
-        perPage: z.number().optional().default(30),
-        cursorDirection: z
-          .enum(["forward", "backward"])
-          .optional()
-          .default("forward"),
-      }),
-    )
+    .input(getAllIngestJobsSchema)
     .query(async ({ ctx, input }) => {
       const namespace = await getNamespaceByUser(ctx, {
         id: input.namespaceId,
@@ -40,31 +30,7 @@ export const ingestJobRouter = createTRPCRouter({
         throw new TRPCError({ code: "NOT_FOUND" });
       }
 
-      const ingestJobs = await ctx.db.ingestJob.findMany({
-        where: {
-          namespaceId: namespace.id,
-          ...(input.statuses &&
-            input.statuses.length > 0 && {
-              status: { in: input.statuses },
-            }),
-        },
-        orderBy: [
-          {
-            [input.orderBy]: input.order,
-          },
-        ],
-        take:
-          (input.perPage + 1) * (input.cursorDirection === "forward" ? 1 : -1),
-        cursor: input.cursor ? { id: input.cursor } : undefined,
-      });
-
-      return {
-        records: ingestJobs.slice(0, input.perPage),
-        nextCursor:
-          ingestJobs.length > input.perPage
-            ? ingestJobs[ingestJobs.length - 1]?.id
-            : null,
-      };
+      return await getAllIngestJobs(input);
     }),
   ingestText: protectedProcedure
     .input(
@@ -84,7 +50,7 @@ export const ingestJobRouter = createTRPCRouter({
         throw new TRPCError({ code: "NOT_FOUND" });
       }
 
-      await ingestText({
+      return await ingestText({
         name: input.name,
         text: input.text,
         namespaceId: input.namespaceId,
@@ -109,9 +75,32 @@ export const ingestJobRouter = createTRPCRouter({
         throw new TRPCError({ code: "NOT_FOUND" });
       }
 
-      await ingestFile({
+      return await ingestFile({
         name: input.name,
         fileUrl: input.fileUrl,
+        namespaceId: input.namespaceId,
+        config: input.config,
+      });
+    }),
+  ingestUrls: protectedProcedure
+    .input(
+      z.object({
+        urls: z.array(z.string().url()),
+        namespaceId: z.string(),
+        config: configSchema.optional(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const namespace = await getNamespaceByUser(ctx, {
+        id: input.namespaceId,
+      });
+
+      if (!namespace) {
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
+
+      return await ingestUrls({
+        urls: input.urls,
         namespaceId: input.namespaceId,
         config: input.config,
       });

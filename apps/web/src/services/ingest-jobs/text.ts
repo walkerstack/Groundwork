@@ -16,17 +16,19 @@ export const ingestText = async ({
   tenantId?: string;
   config?: NonNullable<IngestJob["config"]>;
 }) => {
+  const payload: PrismaJson.IngestJobPayload = {
+    type: "TEXT",
+    name,
+    text,
+  };
+
   const job = await db.ingestJob.create({
     data: {
       namespace: { connect: { id: namespaceId } },
       tenantId,
       config,
       status: IngestJobStatus.QUEUED,
-      payload: {
-        type: "TEXT",
-        name,
-        text,
-      },
+      payload,
     },
   });
 

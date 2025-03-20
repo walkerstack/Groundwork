@@ -16,17 +16,19 @@ export const ingestFile = async ({
   tenantId?: string;
   config?: NonNullable<IngestJob["config"]>;
 }) => {
+  const payload: PrismaJson.IngestJobPayload = {
+    type: "FILE",
+    name,
+    fileUrl,
+  };
+
   const job = await db.ingestJob.create({
     data: {
       namespace: { connect: { id: namespaceId } },
       tenantId,
       config,
       status: IngestJobStatus.QUEUED,
-      payload: {
-        type: "FILE",
-        name,
-        fileUrl,
-      },
+      payload,
     },
   });
 
