@@ -1,0 +1,27 @@
+packages:
+  - apps/*
+  - packages/*
+  - tooling/*
+
+catalog:
+  # Dev tooling
+  eslint: ^9.19.0
+  prettier: ^3.4.2
+  tailwindcss: ^4.0.12
+  typescript: ^5.7.3
+
+  # Misc
+  zod: ^3.24.2
+
+  # Tanstack & tRPC
+  "@tanstack/react-query": ^5.67.1
+  "@trpc/react-query": ^11.0.0-rc.824
+  "@trpc/client": ^11.0.0-rc.824
+  "@trpc/server": ^11.0.0-rc.824
+
+catalogs:
+  react19:
+    react: 19.0.0
+    react-dom: 19.0.0
+    "@types/react": ^19.0.0
+    "@types/react-dom": ^19.0.0

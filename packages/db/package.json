@@ -1,0 +1,37 @@
+{
+  "name": "@agentset/db",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./supabase-types": "./src/supabase.types.ts"
+  },
+  "scripts": {
+    "build": "tsc",
+    "clean": "git clean -xdf .cache .turbo dist node_modules",
+    "dev": "tsc",
+    "format": "prettier --check . --ignore-path ../../.gitignore",
+    "lint": "eslint",
+    "db:generate": "pnpm with-env prisma generate",
+    "db:deploy": "pnpm with-env prisma migrate deploy",
+    "db:studio": "pnpm with-env prisma studio",
+    "db:migrate": "pnpm with-env prisma migrate dev",
+    "typecheck": "tsc --noEmit --emitDeclarationOnly false",
+    "with-env": "dotenv -e ../../.env --"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.4.1"
+  },
+  "devDependencies": {
+    "@agentset/eslint-config": "workspace:*",
+    "@agentset/prettier-config": "workspace:*",
+    "@agentset/tsconfig": "workspace:*",
+    "dotenv-cli": "^8.0.0",
+    "eslint": "catalog:",
+    "prettier": "catalog:",
+    "prisma": "^6.4.1",
+    "prisma-json-types-generator": "^3.2.2",
+    "typescript": "catalog:"
+  },
+  "prettier": "@agentset/prettier-config"
+}
