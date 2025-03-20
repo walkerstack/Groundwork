@@ -1,6 +1,4 @@
-import { NavMain } from "./nav-main";
-import { NavUser } from "./nav-user";
-import { TeamSwitcher } from "./team-switcher";
+import type { LucideIcon } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -8,8 +6,12 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar";
+
+import { NavMain } from "./nav-main";
 import { NavNamespace } from "./nav-namespace";
-import type { LucideIcon } from "lucide-react";
+import { NavSecondary } from "./nav-secondary";
+import { NavUser } from "./nav-user";
+import { OrganizationSwitcher } from "./org-switcher";
 
 export type SidebarItemType = {
   title: string;
@@ -28,14 +30,15 @@ export type SidebarItemType = {
 
 export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
   return (
-    <Sidebar collapsible="icon" {...props}>
+    <Sidebar collapsible="icon" variant="inset" {...props}>
       <SidebarHeader>
-        <TeamSwitcher />
+        <OrganizationSwitcher />
       </SidebarHeader>
 
       <SidebarContent>
         <NavMain />
         <NavNamespace />
+        <NavSecondary />
       </SidebarContent>
 
       <SidebarFooter>

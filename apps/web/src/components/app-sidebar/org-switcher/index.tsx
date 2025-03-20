@@ -1,8 +1,9 @@
 "use client";
 
+import type { Organization } from "@/lib/auth-types";
 import * as React from "react";
-import { ChevronsUpDown, Plus } from "lucide-react";
-
+import { useRouter } from "next/navigation";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,18 +19,17 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { authClient } from "@/lib/auth-client";
-import type { Organization } from "@/lib/auth-types";
 import { useOrganization } from "@/contexts/organization-context";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { authClient } from "@/lib/auth-client";
+import { ChevronsUpDown, Plus } from "lucide-react";
+
 import CreateOrganizationDialog from "./create-org-dialog";
-import { useRouter } from "next/navigation";
 
 const getFallback = (name: string) => {
   return name.charAt(0).toUpperCase();
 };
 
-export function TeamSwitcher() {
+export function OrganizationSwitcher() {
   const { isMobile } = useSidebar();
   const router = useRouter();
   const { activeOrganization, setActiveOrganization } = useOrganization();
@@ -69,7 +69,7 @@ export function TeamSwitcher() {
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <Avatar className="size-8 shrink-0 rounded-lg">
-                {activeOrganization?.logo && (
+                {activeOrganization.logo && (
                   <AvatarImage src={activeOrganization.logo} />
                 )}
                 <AvatarFallback className="bg-sidebar-primary text-sidebar-primary-foreground rounded-lg">

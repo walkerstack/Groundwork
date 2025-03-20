@@ -1,7 +1,8 @@
 "use client";
 
-import { BadgeCheck, ChevronsUpDown, CreditCard, LogOut } from "lucide-react";
-
+import { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -18,15 +19,13 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { useSession } from "@/contexts/session-context";
 import { authClient } from "@/lib/auth-client";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
+import { BadgeCheck, CreditCard, LogOut, MoreVerticalIcon } from "lucide-react";
 
 export function NavUser() {
   const { isMobile } = useSidebar();
-  const { data, isPending } = authClient.useSession();
-  const isLoadingUser = !data || isPending;
+  const [{ user }] = useSession();
 
   const router = useRouter();
   const [isSigningOut, setIsSigningOut] = useState(false);
@@ -43,15 +42,9 @@ export function NavUser() {
     setIsSigningOut(false);
   };
 
-  if (isLoadingUser) {
-    return null;
-  }
-
-  const user = data.user;
-
   const avatarFallback =
     user.name
-      ?.split(" ")
+      .split(" ")
       .slice(0, 2)
       .map((name) => name[0])
       .join("")
@@ -73,10 +66,16 @@ export function NavUser() {
                 </AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-semibold">{user.name}</span>
-                <span className="truncate text-xs">{user.email}</span>
+                {user.name ? (
+                  <>
+                    <span className="truncate font-semibold">{user.name}</span>
+                    <span className="truncate text-xs">{user.email}</span>
+                  </>
+                ) : (
+                  <span className="truncate font-semibold">{user.email}</span>
+                )}
               </div>
-              <ChevronsUpDown className="ml-auto size-4" />
+              <MoreVerticalIcon className="ml-auto size-4" />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent

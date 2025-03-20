@@ -1,5 +1,6 @@
+import type { RouterOutputs } from "@/trpc/react";
 import { Button } from "@/components/ui/button";
-import { api, type RouterOutputs } from "@/trpc/react";
+import { api } from "@/trpc/react";
 import { TrashIcon } from "lucide-react";
 import { toast } from "sonner";
 

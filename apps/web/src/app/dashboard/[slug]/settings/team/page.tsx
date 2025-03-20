@@ -1,14 +1,13 @@
 "use client";
 
-import DashboardPageWrapper from "../../dashboard-page-wrapper";
-import InviteMemberDialog from "./invite-dialog";
+import { Button } from "@/components/ui/button";
+import CopyButton from "@/components/ui/copy-button";
+import { Separator } from "@/components/ui/separator";
 import { useOrganization } from "@/contexts/organization-context";
 import { useSession } from "@/contexts/session-context";
-import { Button } from "@/components/ui/button";
 import { PlusIcon } from "lucide-react";
-import CopyButton from "@/components/ui/copy-button";
 
-import { Separator } from "@/components/ui/separator";
+import InviteMemberDialog from "./invite-dialog";
 import { MemberCard } from "./member-card";
 import { RemoveMemberButton } from "./remove-member";
 import { RevokeInvitationButton } from "./revoke-invitation";
@@ -22,7 +21,7 @@ export default function TeamSettingsPage() {
   );
 
   return (
-    <DashboardPageWrapper title="Team">
+    <>
       <div className="flex items-center justify-between">
         <div>
           <h2 className="font-semibold">Team Members</h2>
@@ -65,13 +64,13 @@ export default function TeamSettingsPage() {
           />
         ))}
 
-        {activeOrganization?.invitations
-          .filter((invitation) => invitation?.status === "pending")
+        {activeOrganization.invitations
+          .filter((invitation) => invitation.status === "pending")
           .map((invitation) => (
             <MemberCard
               key={invitation.id}
               name={invitation.email}
-              email={invitation?.status}
+              email={invitation.status}
               role={invitation.role}
               showRole={isAdmin}
               actions={
@@ -90,6 +89,6 @@ export default function TeamSettingsPage() {
             />
           ))}
       </div>
-    </DashboardPageWrapper>
+    </>
   );
 }
