@@ -8,6 +8,7 @@
     "./types": "./src/types/prisma.ts"
   },
   "scripts": {
+    "postinstall": "pnpm db:generate",
     "build": "tsc",
     "clean": "git clean -xdf .cache .turbo dist node_modules",
     "dev": "tsc",
