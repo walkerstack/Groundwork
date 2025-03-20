@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -14,9 +15,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useOrganization } from "@/contexts/organization-context";
 import { api } from "@/trpc/react";
+import { useRouter } from "@bprogress/next/app";
 import { PlusIcon } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
 import { toast } from "sonner";
 
 export default function CreateNamespace() {

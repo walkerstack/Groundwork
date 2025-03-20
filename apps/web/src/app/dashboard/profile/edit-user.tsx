@@ -1,15 +1,15 @@
 "use client";
 
-import { useSession } from "@/contexts/session-context";
 import { useState } from "react";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Loader2Icon, XIcon } from "lucide-react";
-import { authClient } from "@/lib/auth-client";
-import { toast } from "sonner";
-import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useSession } from "@/contexts/session-context";
+import { authClient } from "@/lib/auth-client";
+import { useRouter } from "@bprogress/next/app";
+import { Loader2Icon, XIcon } from "lucide-react";
+import { toast } from "sonner";
 
 async function convertImageToBase64(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -67,7 +67,7 @@ export default function EditUser() {
 
   return (
     <div>
-      {session?.user.emailVerified ? null : (
+      {session.user.emailVerified ? null : (
         <Alert className="mb-10">
           <AlertTitle>Verify Your Email Address</AlertTitle>
           <AlertDescription className="text-muted-foreground">

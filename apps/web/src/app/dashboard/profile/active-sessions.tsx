@@ -1,15 +1,15 @@
 "use client";
 
-import { authClient } from "@/lib/auth-client";
-import { UAParser } from "ua-parser-js";
-import { LaptopIcon, SmartphoneIcon } from "lucide-react";
 import type { Session } from "@/lib/auth-types";
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
-import { useSession } from "@/contexts/session-context";
-import { useMutation } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { Button } from "@/components/ui/button";
+import { useSession } from "@/contexts/session-context";
+import { authClient } from "@/lib/auth-client";
+import { useRouter } from "@bprogress/next/app";
+import { useMutation } from "@tanstack/react-query";
+import { LaptopIcon, SmartphoneIcon } from "lucide-react";
+import { toast } from "sonner";
+import { UAParser } from "ua-parser-js";
 
 const SessionItem = ({ session }: { session: Session["session"] }) => {
   const [activeSession] = useSession();

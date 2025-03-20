@@ -2,7 +2,6 @@
 
 import type { Organization } from "@/lib/auth-types";
 import * as React from "react";
-import { useRouter } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -21,6 +20,7 @@ import {
 } from "@/components/ui/sidebar";
 import { useOrganization } from "@/contexts/organization-context";
 import { authClient } from "@/lib/auth-client";
+import { useRouter } from "@bprogress/next/app";
 import { ChevronsUpDown, Plus } from "lucide-react";
 
 import CreateOrganizationDialog from "./create-org-dialog";

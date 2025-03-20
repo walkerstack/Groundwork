@@ -1,8 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { useOrganization } from "@/contexts/organization-context";
 import { authClient } from "@/lib/auth-client";
+import { useRouter } from "@bprogress/next/app";
 import { useMutation } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 export const RemoveMemberButton = ({
@@ -24,7 +24,7 @@ export const RemoveMemberButton = ({
       });
 
       if (data.error || !data.data) {
-        throw new Error(data.error?.message || "Failed to remove member");
+        throw new Error(data.error.message || "Failed to remove member");
       }
 
       return data;

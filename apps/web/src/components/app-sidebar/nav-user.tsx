@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -21,6 +20,7 @@ import {
 } from "@/components/ui/sidebar";
 import { useSession } from "@/contexts/session-context";
 import { authClient } from "@/lib/auth-client";
+import { useRouter } from "@bprogress/next/app";
 import { BadgeCheck, CreditCard, LogOut, MoreVerticalIcon } from "lucide-react";
 
 export function NavUser() {

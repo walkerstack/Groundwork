@@ -1,15 +1,7 @@
 "use client";
 
-import { cn } from "@/lib/utils";
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { authClient } from "@/lib/auth-client";
-import { useMutation } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
-import { toSlug } from "@/lib/slug";
-import { z } from "zod";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Form,
   FormControl,
@@ -18,8 +10,16 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { useEffect } from "react";
+import { Input } from "@/components/ui/input";
+import { authClient } from "@/lib/auth-client";
+import { toSlug } from "@/lib/slug";
+import { cn } from "@/lib/utils";
+import { useRouter } from "@bprogress/next/app";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { z } from "zod";
 
 const formSchema = z.object({
   name: z.string().min(1),
@@ -62,7 +62,7 @@ export function CreateOrgForm({
         });
 
         if (response.error || !response.data) {
-          throw new Error(response.error?.message);
+          throw new Error(response.error.message);
         }
 
         return response.data;
