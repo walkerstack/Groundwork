@@ -3,13 +3,11 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "pnpm with-env tsup",
+    "build": "echo 🔥",
     "clean": "git clean -xdf .cache .next .turbo node_modules",
     "check": "pnpm lint && tsc --noEmit",
-    "dev": "pnpm with-env tsup --watch",
     "format": "prettier --check . --ignore-path ../../.gitignore",
     "lint": "eslint",
-    "start": "pnpm with-env node dist/index.js",
     "typecheck": "tsc --noEmit",
     "with-env": "dotenv -e ../../.env --"
   },
