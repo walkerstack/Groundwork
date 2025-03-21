@@ -1,16 +1,11 @@
-import { Hono } from "hono";
 import { handle } from "hono/vercel";
+
+import app from "../src/app";
 
 export const runtime = "edge";
 export const config = {
   runtime: "edge",
 };
-
-const app = new Hono();
-
-app.get("/", (c) => {
-  return c.json({ message: "Hello Hono!" });
-});
 
 export const GET = handle(app);
 export const POST = handle(app);
