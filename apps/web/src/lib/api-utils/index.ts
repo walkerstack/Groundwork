@@ -2,7 +2,7 @@ import { unstable_cache } from "next/cache";
 
 import type { Namespace } from "@agentset/db";
 
-import { supabase } from "./supabase";
+import { supabase } from "../supabase";
 
 export const getApiKeyScopeAndOrganizationId = (apiKey: string) => {
   return unstable_cache(
