@@ -3,7 +3,7 @@ import { z } from "zod";
 export const paginationSchema = z.object({
   cursor: z.string().optional(),
   cursorDirection: z.enum(["forward", "backward"]).default("forward"),
-  perPage: z.number().min(1).max(100).optional().default(30),
+  perPage: z.coerce.number().min(1).max(100).optional().default(30),
 });
 
 export const getPaginationArgs = (input: z.infer<typeof paginationSchema>) => {

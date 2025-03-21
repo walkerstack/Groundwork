@@ -29,7 +29,7 @@ export const validateBody = async <T extends z.ZodSchema>(
     };
   }
 
-  const result = await schema.safeParseAsync(body);
+  const result = await schema.safeParseAsync(body.data);
 
   if (!result.success) {
     return {
