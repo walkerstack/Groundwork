@@ -1,12 +1,9 @@
 import { Hono } from "hono";
 
-import { db } from "@agentset/db";
-
 const app = new Hono();
 
-app.get("/", async (c) => {
-  const total = await db.user.count();
-  return c.json({ message: "Hello Hono!", total });
+app.get("/", (c) => {
+  return c.json({ message: "Hello Hono!" });
 });
 
 export default app;

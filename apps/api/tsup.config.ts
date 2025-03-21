@@ -2,12 +2,12 @@ import { defineConfig } from "tsup";
 
 export default defineConfig({
   entry: ["src/index.ts"],
-  outDir: "dist/api",
+  outDir: "api",
   target: "node22",
   splitting: false,
-  sourcemap: true,
+  sourcemap: false,
   clean: true,
   format: "esm",
-  dts: true,
+  dts: false,
   external: ["@agentset/db"],
 });
