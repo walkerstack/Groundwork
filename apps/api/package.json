@@ -1,13 +1,15 @@
 {
-  "name": "api",
+  "name": "@agentset/api",
+  "private": true,
+  "type": "module",
   "scripts": {
-    "build": "pnpm with-env vercel build",
+    "build": "pnpm with-env tsup",
     "clean": "git clean -xdf .cache .next .turbo node_modules",
     "check": "pnpm lint && tsc --noEmit",
-    "dev": "pnpm with-env vercel dev",
+    "dev": "pnpm with-env tsup --watch",
     "format": "prettier --check . --ignore-path ../../.gitignore",
     "lint": "eslint",
-    "start": "pnpm with-env vercel start",
+    "start": "pnpm with-env node dist/index.js",
     "typecheck": "tsc --noEmit",
     "with-env": "dotenv -e ../../.env --"
   },
@@ -24,8 +26,9 @@
     "dotenv-cli": "^8.0.0",
     "eslint": "catalog:",
     "prettier": "catalog:",
+    "tsup": "^8.4.0",
     "typescript": "catalog:",
-    "vercel": "^32.4.1"
+    "vercel": "^41.3.2"
   },
   "prettier": "@agentset/prettier-config"
 }
