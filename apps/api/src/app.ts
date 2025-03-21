@@ -2,8 +2,6 @@ import { Hono } from "hono";
 
 import { db } from "@agentset/db";
 
-import { env } from "./env";
-
 const app = new Hono();
 
 app.get("/", async (c) => {
