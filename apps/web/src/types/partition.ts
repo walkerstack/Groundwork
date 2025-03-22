@@ -7,6 +7,8 @@ export type PartitionResult = {
   };
   total_characters: number;
   total_chunks: number;
+  total_tokens: number;
+  total_pages?: number;
   chunks: {
     id_: string;
     embedding: null;

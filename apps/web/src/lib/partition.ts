@@ -1,4 +1,4 @@
-import type { Document, IngestJob } from "@agentset/db";
+import type { Document, IngestJob, Namespace } from "@agentset/db";
 
 interface PartitionBody {
   // one of url or text is required
@@ -7,6 +7,7 @@ interface PartitionBody {
 
   filename: string;
   extra_metadata?: Record<string, unknown>;
+  tokenizer_model?: PrismaJson.NamespaceEmbeddingConfig["model"];
   unstructured_args?: {
     overlap?: number;
     overlap_all?: boolean; // if true, overlap is applied to all chunks
@@ -21,7 +22,7 @@ interface PartitionBody {
 export const getPartitionDocumentBody = (
   document: Document,
   ingestJob: IngestJob,
-  namespaceId: string,
+  namespace: Pick<Namespace, "id" | "embeddingConfig">,
 ) => {
   const body: Partial<PartitionBody> = {};
 
@@ -37,7 +38,7 @@ export const getPartitionDocumentBody = (
     ...(ingestJob.config?.metadata ?? {}),
     ...(document.metadata ?? {}),
     ...(document.tenantId && { tenantId: document.tenantId }),
-    namespaceId,
+    namespaceId: namespace.id,
     documentId: document.id,
   };
 
@@ -60,6 +61,10 @@ export const getPartitionDocumentBody = (
 
   if (Object.keys(unstructuredArgs).length > 0) {
     body.unstructured_args = unstructuredArgs;
+  }
+
+  if (namespace.embeddingConfig?.model) {
+    body.tokenizer_model = namespace.embeddingConfig.model;
   }
 
   return body;

@@ -6,7 +6,7 @@ import {
 } from "@/lib/workflow";
 import { serve } from "@upstash/workflow/nextjs";
 
-import type { IngestJob, Prisma } from "@agentset/db";
+import type { Document, IngestJob, Prisma } from "@agentset/db";
 import { db, DocumentStatus, IngestJobStatus } from "@agentset/db";
 
 const BATCH_SIZE = 30;
@@ -41,76 +41,84 @@ export const { POST } = serve<{
       });
     });
 
-    const documents = await context.run("create-documents", async () => {
-      const commonData = {
-        status: DocumentStatus.QUEUED,
-        tenantId: ingestionJob.tenantId,
-        ingestJob: { connect: { id: ingestionJob.id } },
-        // metadata: ingestionJob.config?.metadata,
-      } satisfies Partial<Prisma.DocumentCreateInput>;
+    const commonData = {
+      status: DocumentStatus.QUEUED,
+      tenantId: ingestionJob.tenantId,
+      ingestJobId: ingestionJob.id,
+      // metadata: ingestionJob.config?.metadata,
+    } satisfies Partial<Prisma.DocumentCreateArgs["data"]>;
 
-      if (ingestionJob.payload.type === "TEXT") {
-        const { text } = ingestionJob.payload;
-        const document = await db.document.create({
-          data: {
-            ...commonData,
-            name: ingestionJob.payload.name,
-            source: {
-              type: "TEXT",
+    let documents: Pick<Document, "id">[] = [];
+
+    if (
+      ingestionJob.payload.type === "FILE" ||
+      ingestionJob.payload.type === "TEXT"
+    ) {
+      documents = await context.run("create-documents", async () => {
+        if (ingestionJob.payload.type === "TEXT") {
+          const { text } = ingestionJob.payload;
+          const document = await db.document.create({
+            data: {
+              ...commonData,
               name: ingestionJob.payload.name,
-              text,
+              source: {
+                type: "TEXT",
+                name: ingestionJob.payload.name,
+                text,
+              },
+              totalCharacters: text.length,
             },
-            totalCharacters: text.length,
-          },
-          select: { id: true },
-        });
+            select: { id: true },
+          });
 
-        return [document];
-      }
+          return [document];
+        }
 
-      if (ingestionJob.payload.type === "FILE") {
-        const { fileUrl } = ingestionJob.payload;
-        const document = await db.document.create({
-          data: {
-            ...commonData,
-            name: ingestionJob.payload.name,
-            source: {
-              type: "FILE",
+        if (ingestionJob.payload.type === "FILE") {
+          const { fileUrl } = ingestionJob.payload;
+          const document = await db.document.create({
+            data: {
+              ...commonData,
               name: ingestionJob.payload.name,
-              fileUrl: fileUrl,
+              source: {
+                type: "FILE",
+                name: ingestionJob.payload.name,
+                fileUrl: fileUrl,
+              },
             },
+            select: { id: true },
+          });
+
+          return [document];
+        }
+
+        return [];
+      });
+    } else if (ingestionJob.payload.type === "URLS") {
+      // we need to batch create the documents
+      const batches = chunkArray(ingestionJob.payload.urls, 20);
+
+      for (let i = 0; i < batches.length; i++) {
+        const urlBatch = batches[i]!;
+        const batchResult = await context.run(
+          `create-documents-${i}`,
+          async () => {
+            const newDocuments = await db.document.createManyAndReturn({
+              select: { id: true },
+              data: urlBatch.map((url) => ({
+                ...commonData,
+                ingestJobId: ingestionJob.id,
+                source: { type: "FILE", fileUrl: url },
+              })),
+            });
+
+            return newDocuments.flat();
           },
-          select: { id: true },
-        });
-
-        return [document];
-      }
-
-      if (ingestionJob.payload.type === "URLS") {
-        const { urls } = ingestionJob.payload;
-        const batches = chunkArray(urls, 20);
-
-        const documents = await Promise.all(
-          batches.map((batch) => {
-            return db.$transaction(
-              batch.map((url) =>
-                db.document.create({
-                  data: {
-                    ...commonData,
-                    source: { type: "FILE", fileUrl: url },
-                  },
-                  select: { id: true },
-                }),
-              ),
-            );
-          }),
         );
 
-        return documents.flat();
+        documents = documents.concat(batchResult);
       }
-
-      return [];
-    });
+    }
 
     const documentIdToWorkflowRunId = await context.run(
       "enqueue-documents",

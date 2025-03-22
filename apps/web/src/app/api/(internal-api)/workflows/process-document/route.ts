@@ -46,11 +46,7 @@ export const { POST } = serve<{
       });
     });
 
-    const formData = getPartitionDocumentBody(
-      document,
-      ingestJob,
-      namespace.id,
-    );
+    const formData = getPartitionDocumentBody(document, ingestJob, namespace);
     const { body, status } = await context.call<PartitionResult>(
       "partition-document",
       {
@@ -105,9 +101,12 @@ export const { POST } = serve<{
             processingAt: new Date(),
             totalCharacters: body.total_characters,
             totalChunks: body.total_chunks,
-            // TODO: return them from the partition api
-            // totalPages: body.total_pages,
-            // totalTokens: body.total_tokens,
+            ...(body.total_pages && typeof body.total_pages === "number"
+              ? {
+                  totalPages: body.total_pages,
+                }
+              : {}),
+            totalTokens: body.total_tokens,
             documentProperties: {
               fileSize: body.metadata.sizeInBytes,
               mimeType: body.metadata.filetype,
