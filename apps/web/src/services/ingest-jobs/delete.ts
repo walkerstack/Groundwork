@@ -1,52 +1,31 @@
 import { triggerDeleteIngestJob } from "@/lib/workflow";
+import { z } from "zod";
 
 import { db, IngestJobStatus } from "@agentset/db";
 
+export const deleteIngestJobSchema = z.object({
+  jobId: z.string(),
+});
+
 export const deleteIngestJob = async ({
   jobId,
-  userId,
-}: {
-  jobId: string;
-  userId?: string;
-}) => {
-  const ingestJob = await db.ingestJob.findUnique({
-    where: {
-      id: jobId,
-      ...(userId
-        ? {
-            namespace: {
-              organization: {
-                members: {
-                  some: { userId, role: { in: ["admin", "owner"] } },
-                },
-              },
-            },
-          }
-        : {}),
-    },
-    select: {
-      id: true,
-    },
-  });
-
-  if (!ingestJob) return null;
-
-  await db.ingestJob.update({
-    where: { id: ingestJob.id },
+}: z.infer<typeof deleteIngestJobSchema>) => {
+  const job = await db.ingestJob.update({
+    where: { id: jobId },
     data: {
       status: IngestJobStatus.QUEUED_FOR_DELETE,
     },
     select: { id: true },
   });
 
-  const { workflowRunId } = await triggerDeleteIngestJob({ jobId });
-  await db.ingestJob.update({
-    where: { id: ingestJob.id },
+  const { workflowRunId } = await triggerDeleteIngestJob({ jobId: job.id });
+  const updatedJob = await db.ingestJob.update({
+    where: { id: job.id },
     data: {
       workflowRunsIds: { push: workflowRunId },
     },
     select: { id: true },
   });
 
-  return ingestJob;
+  return updatedJob;
 };

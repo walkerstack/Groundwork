@@ -1,3 +1,4 @@
+import z from "@/lib/zod";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import {
   getAllDocuments,
@@ -13,7 +14,7 @@ import { getNamespaceByUser } from "../auth";
 
 export const documentsRouter = createTRPCRouter({
   all: protectedProcedure
-    .input(getAllDocumentsSchema)
+    .input(getAllDocumentsSchema.extend({ namespaceId: z.string() }))
     .query(async ({ ctx, input }) => {
       const namespace = await getNamespaceByUser(ctx, {
         id: input.namespaceId,

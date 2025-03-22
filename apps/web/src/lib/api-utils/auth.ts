@@ -14,6 +14,11 @@ const makeErrorResponse = () =>
   });
 
 // via api key
+export type AuthenticatedRequest = Exclude<
+  Awaited<ReturnType<typeof authenticateRequest>>,
+  { data: null }
+>;
+
 export const authenticateRequest = async (
   request: NextRequest,
   namespaceId?: string,

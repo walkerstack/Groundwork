@@ -35,3 +35,10 @@ export const notFoundResponse = (message?: string) => {
     status: 404,
   });
 };
+
+export const forbiddenResponse = (message?: string) => {
+  return makeApiErrorResponse({
+    message: message ?? "Forbidden",
+    status: 403,
+  });
+};

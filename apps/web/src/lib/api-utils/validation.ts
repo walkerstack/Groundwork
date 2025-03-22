@@ -11,15 +11,37 @@ const makeErrorResponse = (error?: z.ZodError) =>
     error: error?.flatten().fieldErrors,
   });
 
+export const validateRequestNamespace = (request: NextRequest) => {
+  const namespaceId = request.nextUrl.searchParams.get("namespaceId");
+  if (!namespaceId) {
+    return {
+      error: makeApiErrorResponse({
+        status: 400,
+        message: "Namespace ID is required",
+      }),
+      data: null,
+    };
+  }
+
+  return {
+    error: null,
+    data: {
+      namespaceId,
+    },
+  };
+};
+
 export const validateBody = async <T extends z.ZodSchema>(
   request: NextRequest,
   schema: T,
-  type: "body" | "query" = "body",
+  typeOrBody: "body" | "query" | object = "body",
 ) => {
   const body = await tryCatch(
-    type === "body"
-      ? request.json()
-      : () => Object.fromEntries(request.nextUrl.searchParams.entries()),
+    typeof typeOrBody === "string"
+      ? typeOrBody === "body"
+        ? request.json()
+        : () => Object.fromEntries(request.nextUrl.searchParams.entries())
+      : () => typeOrBody,
   );
 
   if (body.error) {

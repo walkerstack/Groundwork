@@ -3,7 +3,10 @@ import {
   getAllIngestJobs,
   getAllIngestJobsSchema,
 } from "@/services/ingest-jobs/all";
-import { deleteIngestJob } from "@/services/ingest-jobs/delete";
+import {
+  deleteIngestJob,
+  deleteIngestJobSchema,
+} from "@/services/ingest-jobs/delete";
 import { ingestFile } from "@/services/ingest-jobs/file";
 import { ingestManagedFile } from "@/services/ingest-jobs/managed-file";
 import { ingestText } from "@/services/ingest-jobs/text";
@@ -21,7 +24,7 @@ const configSchema = z.object({
 
 export const ingestJobRouter = createTRPCRouter({
   all: protectedProcedure
-    .input(getAllIngestJobsSchema)
+    .input(getAllIngestJobsSchema.extend({ namespaceId: z.string() }))
     .query(async ({ ctx, input }) => {
       const namespace = await getNamespaceByUser(ctx, {
         id: input.namespaceId,
@@ -132,17 +135,33 @@ export const ingestJobRouter = createTRPCRouter({
       });
     }),
   delete: protectedProcedure
-    .input(z.object({ jobId: z.string() }))
+    .input(deleteIngestJobSchema)
     .mutation(async ({ ctx, input }) => {
-      const ingestJob = await deleteIngestJob({
-        jobId: input.jobId,
-        userId: ctx.session.user.id,
+      const ingestJob = await ctx.db.ingestJob.findUnique({
+        where: {
+          id: input.jobId,
+          namespace: {
+            organization: {
+              members: {
+                some: {
+                  userId: ctx.session.user.id,
+                  role: { in: ["admin", "owner"] },
+                },
+              },
+            },
+          },
+        },
+        select: { id: true },
       });
 
       if (!ingestJob) {
         throw new TRPCError({ code: "NOT_FOUND" });
       }
 
-      return ingestJob;
+      const updatedIngestJob = await deleteIngestJob({
+        jobId: ingestJob.id,
+      });
+
+      return updatedIngestJob;
     }),
 });
