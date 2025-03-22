@@ -5,9 +5,11 @@ import {
   makeApiSuccessResponse,
   notFoundResponse,
 } from "@/lib/api-utils/response";
+import { getTenantFromRequest } from "@/lib/api-utils/tenant";
 import { validateBody } from "@/lib/api-utils/validation";
 import { getNamespaceEmbeddingModel } from "@/lib/embedding";
 import {
+  DIGNA_NAMESPACE_ID,
   getNamespaceVectorStore,
   queryVectorStore,
   queryVectorStoreV2,
@@ -17,8 +19,6 @@ import { z } from "zod";
 
 export const runtime = "edge";
 export const preferredRegion = "iad1"; // make this closer to the DB
-
-const DIGNA_ID = "cm7zzvk4w0001ri45hfl7lkyo";
 
 const schema = z.object({
   query: z.string(),
@@ -46,13 +46,12 @@ export async function POST(request: NextRequest) {
 
   if (!namespace) return notFoundResponse("Namespace not found");
 
+  const tenantId = getTenantFromRequest(request);
+
   // TODO: if the embedding model is managed, track the usage
   const [embeddingModel, vectorStore] = await Promise.all([
     getNamespaceEmbeddingModel(namespace),
-    getNamespaceVectorStore(
-      namespace,
-      namespace.id === DIGNA_ID ? "agentset:digna" : undefined,
-    ),
+    getNamespaceVectorStore(namespace, tenantId),
   ]);
 
   const embedding = await embed({
@@ -62,7 +61,7 @@ export async function POST(request: NextRequest) {
 
   // TODO: track the usage
   let data;
-  if (namespace.id === DIGNA_ID) {
+  if (namespace.id === DIGNA_NAMESPACE_ID) {
     data = await queryVectorStore(vectorStore, embedding.embedding, {
       topK: body.topK,
       minScore: body.minScore,

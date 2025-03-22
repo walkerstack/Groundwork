@@ -10,10 +10,12 @@ import {
   makeApiSuccessResponse,
   notFoundResponse,
 } from "@/lib/api-utils/response";
+import { getTenantFromRequest } from "@/lib/api-utils/tenant";
 import { validateBody } from "@/lib/api-utils/validation";
 import { getNamespaceEmbeddingModel } from "@/lib/embedding";
 import { getNamespaceLanguageModel } from "@/lib/llm";
 import {
+  DIGNA_NAMESPACE_ID,
   getNamespaceVectorStore,
   queryVectorStore,
   queryVectorStoreV2,
@@ -26,8 +28,6 @@ import { DEFAULT_SYSTEM_PROMPT, NEW_MESSAGE_PROMPT } from "./prompts";
 export const runtime = "edge";
 export const preferredRegion = "iad1"; // make this closer to the DB
 export const maxDuration = 60;
-
-const DIGNA_ID = "cm7zzvk4w0001ri45hfl7lkyo";
 
 const schema = z.object({
   namespaceId: z.string(),
@@ -79,13 +79,12 @@ export async function POST(request: NextRequest) {
     return notFoundResponse("Namespace not found");
   }
 
+  const tenantId = getTenantFromRequest(request);
+
   // TODO: if the embedding model is managed, track the usage
   const [embeddingModel, vectorStore, languageModel] = await Promise.all([
     getNamespaceEmbeddingModel(namespace),
-    getNamespaceVectorStore(
-      namespace,
-      namespace.id === DIGNA_ID ? "agentset:digna" : undefined,
-    ),
+    getNamespaceVectorStore(namespace, tenantId),
     getNamespaceLanguageModel(), // TODO: pass namespace config
   ]);
 
@@ -96,7 +95,7 @@ export async function POST(request: NextRequest) {
 
   // TODO: track the usage
   let data;
-  if (namespace.id === DIGNA_ID) {
+  if (namespace.id === DIGNA_NAMESPACE_ID) {
     data = await queryVectorStore(vectorStore, embedding.embedding, {
       topK: body.topK,
       minScore: body.minScore,
