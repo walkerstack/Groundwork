@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import type { getNamespaceVectorStore } from ".";
+import { rerankResults } from "./cohere-rerank";
 
 // import { metadataDictToNode } from "@llamaindex/core/vector-store";
 
@@ -72,12 +73,16 @@ export const queryVectorStoreV2 = async <IncludeMetadata extends boolean>(
     filter?: Record<string, string>;
     includeMetadata?: IncludeMetadata;
     includeRelationships?: boolean;
+    rerankLimit?: number;
+    query?: string;
+    rerank?: boolean;
   },
 ) => {
   // TODO: track usage
+  const vectorLimit = options.rerankLimit || options.topK;
   let { matches } = await vectorStore.query({
     vector: embedding,
-    topK: options.topK,
+    topK: vectorLimit,
     filter: options.filter,
     includeMetadata: options.includeMetadata,
   });
@@ -117,7 +122,7 @@ export const queryVectorStoreV2 = async <IncludeMetadata extends boolean>(
       }),
     );
 
-    return parsedNodes.map((node) => {
+    let processedNodes = parsedNodes.map((node) => {
       const rest = excludeKeys(node, [
         "start_char_idx",
         "end_char_idx",
@@ -136,6 +141,21 @@ export const queryVectorStoreV2 = async <IncludeMetadata extends boolean>(
         metadata: options.includeMetadata ? node.metadata : undefined,
       };
     });
+
+    // If reranking is enabled and we have a query, perform reranking
+    if (options.rerankLimit && options.query && processedNodes.length > 0 && (options.rerank !== false)) {
+      processedNodes = await rerankResults(processedNodes, options.query, {
+        topK: options.topK,
+        query: options.query,
+      });
+    }
+
+    // Limit to topK after potential reranking
+    if (processedNodes.length > options.topK) {
+      processedNodes = processedNodes.slice(0, options.topK);
+    }
+
+    return processedNodes;
   } catch (e) {
     console.error(e);
     return null;

@@ -35,6 +35,8 @@ const schema = z.object({
   messages: z.array(z.any()),
   stream: z.boolean().optional().default(false),
   topK: z.number().min(1).max(100).optional().default(10),
+  rerankLimit: z.number().min(1).max(1000).optional().default(50),
+  rerank: z.boolean().optional().default(true),
   filter: z.record(z.string(), z.any()).optional(),
   minScore: z.number().min(0).max(1).optional(),
   includeRelationships: z.boolean().optional().default(false),
@@ -102,6 +104,9 @@ export async function POST(request: NextRequest) {
       filter: body.filter,
       includeMetadata: true,
       includeRelationships: body.includeRelationships,
+      rerankLimit: body.rerankLimit,
+      query: query,
+      rerank: body.rerank,
     });
   } else {
     data = await queryVectorStoreV2(vectorStore, embedding.embedding, {
@@ -110,6 +115,9 @@ export async function POST(request: NextRequest) {
       filter: body.filter,
       includeMetadata: true,
       includeRelationships: body.includeRelationships,
+      rerankLimit: body.rerankLimit,
+      query: query,
+      rerank: body.rerank,
     });
   }
 
