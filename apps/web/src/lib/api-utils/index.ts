@@ -1,21 +1,19 @@
 import { unstable_cache } from "next/cache";
 
-import type { Namespace } from "@agentset/db";
-
-import { supabase } from "../supabase";
+import { db } from "@agentset/db";
 
 export const getApiKeyScopeAndOrganizationId = (apiKey: string) => {
   return unstable_cache(
     async () => {
-      const { data, error } = await supabase
-        .from("OrganizationApiKey")
-        .select("scope, organizationId")
-        .eq("key", apiKey)
-        .single();
-
-      if (error) {
-        throw new Error(error.message);
-      }
+      const data = await db.organizationApiKey.findUnique({
+        where: {
+          key: apiKey,
+        },
+        select: {
+          scope: true,
+          organizationId: true,
+        },
+      });
 
       return data;
     },
@@ -33,21 +31,19 @@ export const getNamespaceConfig = async (
 ) => {
   return unstable_cache(
     async () => {
-      const { data, error } = await supabase
-        .from("namespace")
-        .select("id, vectorStoreConfig, embeddingConfig")
-        .eq("id", namespaceId)
-        .eq("organizationId", orgId)
-        .single();
+      const data = await db.namespace.findUnique({
+        where: {
+          id: namespaceId,
+          organizationId: orgId,
+        },
+        select: {
+          id: true,
+          vectorStoreConfig: true,
+          embeddingConfig: true,
+        },
+      });
 
-      if (error) {
-        throw new Error(error.message);
-      }
-
-      return data as Pick<
-        Namespace,
-        "id" | "vectorStoreConfig" | "embeddingConfig"
-      > | null;
+      return data;
     },
     ["namespace", namespaceId, orgId],
     {

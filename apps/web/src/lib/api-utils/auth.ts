@@ -1,9 +1,10 @@
 import type { NextRequest } from "next/server";
 
+import { db } from "@agentset/db";
+
 import type { Session } from "../auth-types";
 import { getApiKeyScopeAndOrganizationId } from ".";
 import { tryCatch } from "../error";
-import { supabase } from "../supabase";
 import { makeApiErrorResponse } from "./response";
 
 const makeErrorResponse = () =>
@@ -37,11 +38,15 @@ export const authenticateRequest = async (
   }
 
   if (namespaceId) {
-    const { data: namespace } = await supabase
-      .from("namespace")
-      .select("organizationId")
-      .eq("id", namespaceId)
-      .single();
+    const namespace = await db.namespace.findUnique({
+      where: {
+        id: namespaceId,
+      },
+      select: {
+        id: true,
+        organizationId: true,
+      },
+    });
 
     if (
       !namespace ||
@@ -96,11 +101,15 @@ export const authenticateRequestWithSession = async (
     };
   }
 
-  const { data: namespace } = await supabase
-    .from("namespace")
-    .select("organizationId")
-    .eq("id", namespaceId)
-    .single();
+  const namespace = await db.namespace.findUnique({
+    where: {
+      id: namespaceId,
+    },
+    select: {
+      id: true,
+      organizationId: true,
+    },
+  });
 
   if (!namespace) {
     return {
@@ -112,14 +121,20 @@ export const authenticateRequestWithSession = async (
     };
   }
 
-  const { data: member } = await supabase
-    .from("member")
-    .select("id, role")
-    .eq("organizationId", namespace.organizationId)
-    .eq("userId", session.user.id)
-    .single();
+  const member = await db.member.findUnique({
+    where: {
+      organizationId_userId: {
+        organizationId: namespace.organizationId,
+        userId: session.user.id,
+      },
+    },
+    select: {
+      id: true,
+      role: true,
+    },
+  });
 
-  if (!member?.id) {
+  if (!member) {
     return {
       error: makeApiErrorResponse({
         message: "Unauthenticated",

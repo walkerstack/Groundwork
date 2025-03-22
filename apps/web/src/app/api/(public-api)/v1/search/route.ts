@@ -17,7 +17,7 @@ import {
 import { embed } from "ai";
 import { z } from "zod";
 
-export const runtime = "edge";
+// export const runtime = "edge";
 export const preferredRegion = "iad1"; // make this closer to the DB
 
 const schema = z.object({

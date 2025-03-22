@@ -25,7 +25,7 @@ import { z } from "zod";
 
 import { DEFAULT_SYSTEM_PROMPT, NEW_MESSAGE_PROMPT } from "./prompts";
 
-export const runtime = "edge";
+// export const runtime = "edge";
 export const preferredRegion = "iad1"; // make this closer to the DB
 export const maxDuration = 60;
 
