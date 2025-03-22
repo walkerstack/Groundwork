@@ -27,13 +27,14 @@ export function middleware(request: NextRequest) {
   const domain = request.nextUrl.hostname;
 
   // rewrite to /api
-  // if (domain === "api.agentset.ai") {
-  const searchParams = request.nextUrl.searchParams.toString();
-  const searchParamsString = searchParams.length > 0 ? `?${searchParams}` : "";
-  const fullPath = `${pathname}${searchParamsString}`;
+  if (domain === "api.agentset.ai") {
+    const searchParams = request.nextUrl.searchParams.toString();
+    const searchParamsString =
+      searchParams.length > 0 ? `?${searchParams}` : "";
+    const fullPath = `${pathname}${searchParamsString}`;
 
-  return NextResponse.rewrite(new URL(`/api${fullPath}`, request.url));
-  // }
+    return NextResponse.rewrite(new URL(`/api${fullPath}`, request.url));
+  }
 
   // if the user is not logged in, and is trying to access a dashboard page, redirect to login
   if (!cookies && (pathname.startsWith("/dashboard") || pathname === "/")) {
