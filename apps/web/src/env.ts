@@ -39,7 +39,7 @@ export const env = createEnv({
     PARTITION_API_KEY: z.string(),
     PARTITION_API_URL: z.string().url(),
 
-    COHERE_API_KEY: z.string(),
+    DEFAULT_COHERE_API_KEY: z.string(),
   },
   client: {},
   runtimeEnv: {
@@ -80,7 +80,7 @@ export const env = createEnv({
     PARTITION_API_KEY: process.env.PARTITION_API_KEY,
     PARTITION_API_URL: process.env.PARTITION_API_URL,
 
-    COHERE_API_KEY: process.env.COHERE_API_KEY,
+    DEFAULT_COHERE_API_KEY: process.env.COHERE_API_KEY,
   },
   skipValidation: !!process.env.SKIP_ENV_VALIDATION,
   emptyStringAsUndefined: true,

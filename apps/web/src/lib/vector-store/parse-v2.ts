@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 import type { getNamespaceVectorStore } from ".";
-import { rerankResults } from "./cohere-rerank";
+import { rerankResults } from "../rerank/cohere";
 
 // import { metadataDictToNode } from "@llamaindex/core/vector-store";
 
@@ -143,16 +143,11 @@ export const queryVectorStoreV2 = async <IncludeMetadata extends boolean>(
     });
 
     // If reranking is enabled and we have a query, perform reranking
-    if (options.rerankLimit && options.query && processedNodes.length > 0 && (options.rerank !== false)) {
-      processedNodes = await rerankResults(processedNodes, options.query, {
-        topK: options.topK,
+    if (options.rerank && options.query) {
+      processedNodes = await rerankResults(processedNodes, {
+        limit: options.rerankLimit || options.topK,
         query: options.query,
       });
-    }
-
-    // Limit to topK after potential reranking
-    if (processedNodes.length > options.topK) {
-      processedNodes = processedNodes.slice(0, options.topK);
     }
 
     return processedNodes;
