@@ -80,7 +80,7 @@ export const env = createEnv({
     PARTITION_API_KEY: process.env.PARTITION_API_KEY,
     PARTITION_API_URL: process.env.PARTITION_API_URL,
 
-    DEFAULT_COHERE_API_KEY: process.env.COHERE_API_KEY,
+    DEFAULT_COHERE_API_KEY: process.env.DEFAULT_COHERE_API_KEY,
   },
   skipValidation: !!process.env.SKIP_ENV_VALIDATION,
   emptyStringAsUndefined: true,
