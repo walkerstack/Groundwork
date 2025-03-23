@@ -40,6 +40,11 @@ export const env = createEnv({
     PARTITION_API_URL: z.string().url(),
 
     DEFAULT_COHERE_API_KEY: z.string(),
+
+    S3_ACCESS_KEY: z.string(),
+    S3_SECRET_KEY: z.string(),
+    S3_ENDPOINT: z.string().url(),
+    S3_BUCKET: z.string(),
   },
   client: {},
   runtimeEnv: {
@@ -81,6 +86,11 @@ export const env = createEnv({
     PARTITION_API_URL: process.env.PARTITION_API_URL,
 
     DEFAULT_COHERE_API_KEY: process.env.DEFAULT_COHERE_API_KEY,
+
+    S3_ACCESS_KEY: process.env.S3_ACCESS_KEY,
+    S3_SECRET_KEY: process.env.S3_SECRET_KEY,
+    S3_ENDPOINT: process.env.S3_ENDPOINT,
+    S3_BUCKET: process.env.S3_BUCKET,
   },
   skipValidation: !!process.env.SKIP_ENV_VALIDATION,
   emptyStringAsUndefined: true,

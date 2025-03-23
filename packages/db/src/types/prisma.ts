@@ -2,19 +2,30 @@
 
 type IngestJobPayloadText = {
   type: "TEXT";
-  name?: string;
   text: string;
-};
-
-type IngestJobPayloadConnection = {
-  type: "CONNECTION";
-  connectionId: string;
+  name?: string;
 };
 
 type IngestJobPayloadFile = {
   type: "FILE";
-  name?: string;
   fileUrl: string;
+  name?: string;
+};
+
+type IngestJobPayloadManagedFile = {
+  type: "MANAGED_FILE";
+  key: string;
+  name?: string;
+};
+
+type DocPayload =
+  | Omit<IngestJobPayloadText, "name">
+  | Omit<IngestJobPayloadFile, "name">
+  | Omit<IngestJobPayloadManagedFile, "name">;
+
+type IngestJobPayloadConnection = {
+  type: "CONNECTION";
+  connectionId: string;
 };
 
 type IngestJobPayloadUrls = {
@@ -47,7 +58,8 @@ type Payload =
   | IngestJobPayloadUrls
   | IngestJobPayloadSitemap
   | IngestJobPayloadS3
-  | IngestJobPayloadGoogleDrive;
+  | IngestJobPayloadGoogleDrive
+  | IngestJobPayloadManagedFile;
 
 type OpenAIEmbeddingModel = "text-embedding-3-small" | "text-embedding-3-large";
 type OpenAILanguageModel = "gpt-4o" | "gpt-4o-mini";
@@ -126,7 +138,7 @@ declare global {
       mimeType?: string;
     };
 
-    type DocumentSource = Payload;
+    type DocumentSource = DocPayload;
     type DocumentMetadata = Record<string, unknown>;
   }
 }

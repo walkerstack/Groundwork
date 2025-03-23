@@ -52,7 +52,8 @@ export const { POST } = serve<{
 
     if (
       ingestionJob.payload.type === "FILE" ||
-      ingestionJob.payload.type === "TEXT"
+      ingestionJob.payload.type === "TEXT" ||
+      ingestionJob.payload.type === "MANAGED_FILE"
     ) {
       documents = await context.run("create-documents", async () => {
         if (ingestionJob.payload.type === "TEXT") {
@@ -63,7 +64,6 @@ export const { POST } = serve<{
               name: ingestionJob.payload.name,
               source: {
                 type: "TEXT",
-                name: ingestionJob.payload.name,
                 text,
               },
               totalCharacters: text.length,
@@ -82,8 +82,24 @@ export const { POST } = serve<{
               name: ingestionJob.payload.name,
               source: {
                 type: "FILE",
-                name: ingestionJob.payload.name,
                 fileUrl: fileUrl,
+              },
+            },
+            select: { id: true },
+          });
+
+          return [document];
+        }
+
+        if (ingestionJob.payload.type === "MANAGED_FILE") {
+          const { key } = ingestionJob.payload;
+          const document = await db.document.create({
+            data: {
+              ...commonData,
+              name: ingestionJob.payload.name,
+              source: {
+                type: "MANAGED_FILE",
+                key: key,
               },
             },
             select: { id: true },

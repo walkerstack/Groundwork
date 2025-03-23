@@ -46,7 +46,13 @@ export const { POST } = serve<{
       });
     });
 
-    const formData = getPartitionDocumentBody(document, ingestJob, namespace);
+    const partitionBody = await context.run(
+      "get-partition-document-body",
+      async () => {
+        return await getPartitionDocumentBody(document, ingestJob, namespace);
+      },
+    );
+
     const { body, status } = await context.call<PartitionResult>(
       "partition-document",
       {
@@ -55,33 +61,9 @@ export const { POST } = serve<{
         headers: {
           "api-key": env.PARTITION_API_KEY,
         },
-        body: formData,
+        body: partitionBody,
       },
     );
-
-    // const { status, body } = await context.run(
-    //   "partition-document",
-    //   async () => {
-    //     const formData = getPartitionDocumentBody(
-    //       document,
-    //       ingestJob,
-    //       namespace.id,
-    //     );
-
-    //     const response = await fetch(env.PARTITION_API_URL, {
-    //       method: "POST",
-    //       headers: {
-    //         "api-key": env.PARTITION_API_KEY,
-    //       },
-    //       body: formData,
-    //     });
-
-    //     return {
-    //       status: response.status,
-    //       body: (await response.json()) as PartitionResult,
-    //     };
-    //   },
-    // );
 
     if (status !== 200 || body.status !== 200) {
       throw new Error(

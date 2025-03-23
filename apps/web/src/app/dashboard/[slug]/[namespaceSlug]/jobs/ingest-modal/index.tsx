@@ -15,6 +15,7 @@ import { PlusIcon } from "lucide-react";
 import { toast } from "sonner";
 
 import TextForm from "./text-form";
+import UploadForm from "./upload-form";
 import UrlsForm from "./urls-form";
 
 export function IngestModal() {
@@ -29,6 +30,11 @@ export function IngestModal() {
   const onTextSuccess = () => {
     onSuccess();
     toast.success("Text ingestion job created");
+  };
+
+  const onUploadSuccess = () => {
+    onSuccess();
+    toast.success("Upload ingestion job created");
   };
 
   const onUrlSuccess = () => {
@@ -66,6 +72,9 @@ export function IngestModal() {
             <TabsTrigger value="text" className="flex-1">
               Text
             </TabsTrigger>
+            <TabsTrigger value="upload" className="flex-1">
+              Upload
+            </TabsTrigger>
             <TabsTrigger value="urls" className="flex-1">
               URLs
             </TabsTrigger>
@@ -73,6 +82,10 @@ export function IngestModal() {
 
           <TabsContent value="text">
             <TextForm onSuccess={onTextSuccess} />
+          </TabsContent>
+
+          <TabsContent value="upload">
+            <UploadForm onSuccess={onUploadSuccess} />
           </TabsContent>
 
           <TabsContent value="urls">

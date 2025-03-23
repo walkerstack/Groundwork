@@ -5,6 +5,7 @@ import {
 } from "@/services/ingest-jobs/all";
 import { deleteIngestJob } from "@/services/ingest-jobs/delete";
 import { ingestFile } from "@/services/ingest-jobs/file";
+import { ingestManagedFile } from "@/services/ingest-jobs/managed-file";
 import { ingestText } from "@/services/ingest-jobs/text";
 import { ingestUrls } from "@/services/ingest-jobs/urls";
 import { TRPCError } from "@trpc/server";
@@ -78,6 +79,31 @@ export const ingestJobRouter = createTRPCRouter({
       return await ingestFile({
         name: input.name,
         fileUrl: input.fileUrl,
+        namespaceId: input.namespaceId,
+        config: input.config,
+      });
+    }),
+  ingestManagedFile: protectedProcedure
+    .input(
+      z.object({
+        name: z.string().optional(),
+        key: z.string(),
+        namespaceId: z.string(),
+        config: configSchema.optional(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const namespace = await getNamespaceByUser(ctx, {
+        id: input.namespaceId,
+      });
+
+      if (!namespace) {
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
+
+      return await ingestManagedFile({
+        name: input.name,
+        key: input.key,
         namespaceId: input.namespaceId,
         config: input.config,
       });

@@ -10,6 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { formatBytes } from "@/lib/utils";
 import { api } from "@/trpc/react";
 import { EllipsisVerticalIcon, Trash2Icon } from "lucide-react";
 import { toast } from "sonner";
@@ -27,14 +28,6 @@ interface DocumentCol {
   totalCharacters: number;
   documentProperties?: Document["documentProperties"];
 }
-
-const formatBytes = (bytes: number) => {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(2)} KB`;
-  if (bytes < 1024 * 1024 * 1024)
-    return `${(bytes / 1024 / 1024).toFixed(2)} MB`;
-  return `${(bytes / 1024 / 1024 / 1024).toFixed(2)} GB`;
-};
 
 const statusToBadgeVariant = (
   status: DocumentStatus,

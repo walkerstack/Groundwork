@@ -1,5 +1,7 @@
 import type { Document, IngestJob, Namespace } from "@agentset/db";
 
+import { presignGetUrl } from "./s3";
+
 interface PartitionBody {
   // one of url or text is required
   url?: string;
@@ -19,7 +21,7 @@ interface PartitionBody {
   };
 }
 
-export const getPartitionDocumentBody = (
+export const getPartitionDocumentBody = async (
   document: Document,
   ingestJob: IngestJob,
   namespace: Pick<Namespace, "id" | "embeddingConfig">,
@@ -31,6 +33,10 @@ export const getPartitionDocumentBody = (
     body.filename = document.name || `${document.id}.txt`;
   } else if (document.source.type === "FILE") {
     body.url = document.source.fileUrl;
+    body.filename = document.name || document.id;
+  } else if (document.source.type === "MANAGED_FILE") {
+    const url = await presignGetUrl(document.source.key);
+    body.url = url.url;
     body.filename = document.name || document.id;
   }
 

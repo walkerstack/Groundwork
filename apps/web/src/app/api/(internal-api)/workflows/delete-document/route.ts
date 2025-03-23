@@ -1,4 +1,5 @@
 import { chunkArray } from "@/lib/functions";
+import { deleteObject } from "@/lib/s3";
 import { getNamespaceVectorStore } from "@/lib/vector-store";
 import { cancelWorkflow, qstashClient, qstashReceiver } from "@/lib/workflow";
 import { serve } from "@upstash/workflow/nextjs";
@@ -57,7 +58,6 @@ export const { POST } = serve<{
       }
     });
 
-    // TODO: delete files if they exist (document.source)
     const vectorStore = await getNamespaceVectorStore(
       namespace,
       document.tenantId ?? undefined,
@@ -99,6 +99,12 @@ export const { POST } = serve<{
       });
     });
 
+    await context.run("check-and-delete-managed-file", async () => {
+      if (document.source.type === "MANAGED_FILE") {
+        await deleteObject(document.source.key);
+      }
+    });
+
     await context.run("check-and-delete-ingest-job", async () => {
       if (deleteJobWhenDone) {
         const document = await db.document.findFirst({
@@ -107,9 +113,18 @@ export const { POST } = serve<{
 
         if (!document) {
           // TODO: delete payload
-          await db.ingestJob.delete({
-            where: { id: ingestJob.id },
-          });
+          await db.ingestJob
+            .delete({
+              where: { id: ingestJob.id },
+              select: { id: true },
+            })
+            .catch((e) => {
+              if (e.code === "P2025") {
+                return null; // already deleted
+              }
+
+              throw e;
+            });
         }
       }
     });
