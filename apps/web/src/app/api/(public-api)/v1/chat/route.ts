@@ -29,18 +29,39 @@ import { DEFAULT_SYSTEM_PROMPT, NEW_MESSAGE_PROMPT } from "./prompts";
 export const preferredRegion = "iad1"; // make this closer to the DB
 export const maxDuration = 60;
 
-const schema = z.object({
-  namespaceId: z.string(),
-  systemPrompt: z.string().optional().default(DEFAULT_SYSTEM_PROMPT.compile()),
-  messages: z.array(z.any()),
-  stream: z.boolean().optional().default(false),
-  topK: z.number().min(1).max(100).optional().default(10),
-  filter: z.record(z.string(), z.any()).optional(),
-  minScore: z.number().min(0).max(1).optional(),
-  includeRelationships: z.boolean().optional().default(false),
-  includeMetadata: z.boolean().optional().default(true),
-  auth: z.boolean().optional().default(false),
-});
+const schema = z
+  .object({
+    namespaceId: z.string(),
+    systemPrompt: z
+      .string()
+      .optional()
+      .default(DEFAULT_SYSTEM_PROMPT.compile()),
+    messages: z.array(z.any()),
+    stream: z.boolean().optional().default(false),
+    topK: z.number().min(1).max(100).optional().default(10),
+    rerank: z.boolean().optional().default(true),
+    rerankLimit: z.number().min(1).max(100).optional(),
+    filter: z.record(z.string(), z.any()).optional(),
+    minScore: z.number().min(0).max(1).optional(),
+    includeRelationships: z.boolean().optional().default(false),
+    includeMetadata: z.boolean().optional().default(true),
+    auth: z.boolean().optional().default(false),
+  })
+  .superRefine((val, ctx) => {
+    if (val.rerankLimit && val.rerankLimit > val.topK) {
+      ctx.addIssue({
+        path: ["rerankLimit"],
+        code: z.ZodIssueCode.too_big,
+        message: "rerankLimit cannot be larger than topK",
+        inclusive: true,
+        type: "number",
+        maximum: val.topK,
+      });
+      return false;
+    }
+
+    return true;
+  });
 
 export async function POST(request: NextRequest) {
   const validatedBody = await validateBody(request, schema);
@@ -102,6 +123,9 @@ export async function POST(request: NextRequest) {
       filter: body.filter,
       includeMetadata: true,
       includeRelationships: body.includeRelationships,
+      rerankLimit: body.rerankLimit,
+      query: query,
+      rerank: body.rerank,
     });
   } else {
     data = await queryVectorStoreV2(vectorStore, embedding.embedding, {
@@ -110,6 +134,9 @@ export async function POST(request: NextRequest) {
       filter: body.filter,
       includeMetadata: true,
       includeRelationships: body.includeRelationships,
+      rerankLimit: body.rerankLimit,
+      query: query,
+      rerank: body.rerank,
     });
   }
 
