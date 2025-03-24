@@ -74,5 +74,7 @@ export const getPartitionDocumentBody = async (
   //   body.tokenizer_model = namespace.embeddingConfig.model;
   // }
 
+  body.batch_size = 10;
+
   return body;
 };

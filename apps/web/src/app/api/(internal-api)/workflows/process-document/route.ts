@@ -2,6 +2,7 @@ import type { PartitionBatch, PartitionResult } from "@/types/partition";
 import { env } from "@/env";
 import { makeChunk } from "@/lib/chunk";
 import { getNamespaceEmbeddingModel } from "@/lib/embedding";
+import { chunkArray } from "@/lib/functions";
 import { getPartitionDocumentBody } from "@/lib/partition";
 import { redis } from "@/lib/redis";
 import { getNamespaceVectorStore } from "@/lib/vector-store";
@@ -125,16 +126,9 @@ export const { POST } = serve<{
         );
       });
 
-      await Promise.all([
-        context.run(`store-batch-${batchIdx}`, async () => {
-          await vectorStore.upsert(nodes);
-        }),
-        context.run(`delete-batch-${batchIdx}-from-redis`, async () => {
-          await redis.del(
-            body.batch_template.replace("[BATCH_INDEX]", batchIdx.toString()),
-          );
-        }),
-      ]);
+      await context.run(`store-batch-${batchIdx}`, async () => {
+        await vectorStore.upsert(nodes);
+      });
     }
 
     await context.run("update-status-completed", async () => {
@@ -168,6 +162,20 @@ export const { POST } = serve<{
           },
           select: { id: true },
         });
+      }
+    });
+
+    // delete all chunks from redis
+    await context.run("delete-chunks-from-redis", async () => {
+      const keys = new Array(body.total_batches)
+        .fill(null)
+        .map((_, idx) =>
+          body.batch_template.replace("[BATCH_INDEX]", idx.toString()),
+        );
+
+      const keyBatches = chunkArray(keys, 150);
+      for (const keyBatch of keyBatches) {
+        await redis.del(...keyBatch);
       }
     });
   },
