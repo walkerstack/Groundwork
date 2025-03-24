@@ -13,7 +13,7 @@ import {
 import { capitalize } from "@/lib/string-utils";
 import { formatMs } from "@/lib/utils";
 import { api } from "@/trpc/react";
-import { EllipsisVerticalIcon, Trash2Icon } from "lucide-react";
+import { CopyIcon, EllipsisVerticalIcon, Trash2Icon } from "lucide-react";
 import { toast } from "sonner";
 
 import type { IngestJob } from "@agentset/db";
@@ -141,15 +141,25 @@ export const columns: ColumnDef<Job>[] = [
         },
       );
 
+      const copyId = async () => {
+        await navigator.clipboard.writeText(row.original.id);
+        toast.success("Copied ID");
+      };
+
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button size="icon" variant="ghost">
-              <EllipsisVerticalIcon className="h-4 w-4" />
+              <EllipsisVerticalIcon className="size-4" />
             </Button>
           </DropdownMenuTrigger>
 
           <DropdownMenuContent>
+            <DropdownMenuItem onClick={copyId}>
+              <CopyIcon className="size-4" />
+              Copy ID
+            </DropdownMenuItem>
+
             <DropdownMenuItem
               disabled={
                 isPending ||
@@ -158,7 +168,7 @@ export const columns: ColumnDef<Job>[] = [
               }
               onClick={() => deleteJob({ jobId: row.original.id })}
             >
-              <Trash2Icon className="h-4 w-4" />
+              <Trash2Icon className="size-4" />
               Delete
             </DropdownMenuItem>
           </DropdownMenuContent>
