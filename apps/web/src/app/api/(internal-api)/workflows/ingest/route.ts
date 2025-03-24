@@ -15,9 +15,8 @@ export const { POST } = serve<{
   jobId: IngestJob["id"];
 }>(
   async (context) => {
-    const { jobId } = context.requestPayload;
-
     const ingestionJob = await context.run("get-config", async () => {
+      const { jobId } = context.requestPayload;
       const ingestionJob = await db.ingestJob.findUnique({
         where: { id: jobId },
         include: { namespace: true },
@@ -183,17 +182,19 @@ export const { POST } = serve<{
   },
   {
     failureFunction: async ({ context, failResponse }) => {
-      const { jobId } = context.requestPayload;
+      if (context.requestPayload && context.requestPayload.jobId) {
+        const { jobId } = context.requestPayload;
 
-      await db.ingestJob.update({
-        where: { id: jobId },
-        data: {
-          status: IngestJobStatus.FAILED,
-          error: failResponse || "Unknown error",
-          failedAt: new Date(),
-        },
-        select: { id: true },
-      });
+        await db.ingestJob.update({
+          where: { id: jobId },
+          data: {
+            status: IngestJobStatus.FAILED,
+            error: failResponse || "Unknown error",
+            failedAt: new Date(),
+          },
+          select: { id: true },
+        });
+      }
     },
     qstashClient: qstashClient,
     receiver: qstashReceiver,

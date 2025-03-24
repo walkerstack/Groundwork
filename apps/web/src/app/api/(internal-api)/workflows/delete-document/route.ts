@@ -13,13 +13,11 @@ export const { POST } = serve<{
   deleteJobWhenDone?: boolean;
 }>(
   async (context) => {
-    const currentWorkflowRunId = context.workflowRunId;
-    const { documentId, deleteJobWhenDone } = context.requestPayload;
-
     const {
       ingestJob: { namespace, ...ingestJob },
       ...document
     } = await context.run("get-config", async () => {
+      const { documentId } = context.requestPayload;
       const doc = await db.document.findUnique({
         where: { id: documentId },
         select: {
@@ -49,6 +47,7 @@ export const { POST } = serve<{
     });
 
     await context.run("cancel-document-workflows", async () => {
+      const currentWorkflowRunId = context.workflowRunId;
       const idsToCancel = document.workflowRunsIds.filter(
         (id) => id !== currentWorkflowRunId,
       );
@@ -106,6 +105,8 @@ export const { POST } = serve<{
     });
 
     await context.run("check-and-delete-ingest-job", async () => {
+      const { deleteJobWhenDone } = context.requestPayload;
+
       if (deleteJobWhenDone) {
         const document = await db.document.findFirst({
           where: { ingestJobId: ingestJob.id },

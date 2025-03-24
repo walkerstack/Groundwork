@@ -15,12 +15,10 @@ export const { POST } = serve<{
   jobId: string;
 }>(
   async (context) => {
-    const currentWorkflowRunId = context.workflowRunId;
-    const { jobId } = context.requestPayload;
-
-    const { namespace, ...ingestJob } = await context.run(
+    const { namespace: _ns, ...ingestJob } = await context.run(
       "get-config",
       async () => {
+        const { jobId } = context.requestPayload;
         const job = await db.ingestJob.findUnique({
           where: { id: jobId },
           select: {
@@ -51,6 +49,7 @@ export const { POST } = serve<{
     });
 
     await context.run("cancel-ingest-job-workflows", async () => {
+      const currentWorkflowRunId = context.workflowRunId;
       const idsToCancel = ingestJob.workflowRunsIds.filter(
         (id) => id !== currentWorkflowRunId,
       );

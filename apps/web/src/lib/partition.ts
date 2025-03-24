@@ -9,7 +9,8 @@ interface PartitionBody {
 
   filename: string;
   extra_metadata?: Record<string, unknown>;
-  tokenizer_model?: PrismaJson.NamespaceEmbeddingConfig["model"];
+  // tokenizer_model?: PrismaJson.NamespaceEmbeddingConfig["model"];
+  batch_size?: number; // default to 5
   unstructured_args?: {
     overlap?: number;
     overlap_all?: boolean; // if true, overlap is applied to all chunks
@@ -69,9 +70,9 @@ export const getPartitionDocumentBody = async (
     body.unstructured_args = unstructuredArgs;
   }
 
-  if (namespace.embeddingConfig?.model) {
-    body.tokenizer_model = namespace.embeddingConfig.model;
-  }
+  // if (namespace.embeddingConfig?.model) {
+  //   body.tokenizer_model = namespace.embeddingConfig.model;
+  // }
 
   return body;
 };

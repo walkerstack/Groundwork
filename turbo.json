@@ -97,6 +97,8 @@
     "S3_SECRET_KEY",
     "S3_ENDPOINT",
     "S3_BUCKET",
+    "REDIS_URL",
+    "REDIS_TOKEN",
     "PORT"
   ],
   "globalPassThroughEnv": [

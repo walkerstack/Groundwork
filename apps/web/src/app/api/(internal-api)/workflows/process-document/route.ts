@@ -1,9 +1,9 @@
-import type { PartitionResult } from "@/types/partition";
+import type { PartitionBatch, PartitionResult } from "@/types/partition";
 import { env } from "@/env";
 import { makeChunk } from "@/lib/chunk";
 import { getNamespaceEmbeddingModel } from "@/lib/embedding";
-import { chunkArray } from "@/lib/functions";
 import { getPartitionDocumentBody } from "@/lib/partition";
+import { redis } from "@/lib/redis";
 import { getNamespaceVectorStore } from "@/lib/vector-store";
 import { qstashClient, qstashReceiver } from "@/lib/workflow";
 import { serve } from "@upstash/workflow/nextjs";
@@ -11,18 +11,15 @@ import { embedMany } from "ai";
 
 import { db, DocumentStatus, IngestJobStatus } from "@agentset/db";
 
-const BATCH_SIZE = 5;
-
 export const { POST } = serve<{
   documentId: string;
 }>(
   async (context) => {
-    const { documentId } = context.requestPayload;
-
     const {
       ingestJob: { namespace, ...ingestJob },
       ...document
     } = await context.run("get-config", async () => {
+      const { documentId } = context.requestPayload;
       const doc = await db.document.findUnique({
         where: { id: documentId },
         include: { ingestJob: { include: { namespace: true } } },
@@ -88,7 +85,7 @@ export const { POST } = serve<{
                   totalPages: body.total_pages,
                 }
               : {}),
-            totalTokens: body.total_tokens,
+            // totalTokens: body.total_tokens,
             documentProperties: {
               fileSize: body.metadata.sizeInBytes,
               mimeType: body.metadata.filetype,
@@ -99,18 +96,22 @@ export const { POST } = serve<{
       },
     );
 
-    const chunkBatches = await context.run("batch-chunks", () => {
-      return chunkArray(body.chunks, BATCH_SIZE);
-    });
-
     const [embeddingModel, vectorStore] = await Promise.all([
       getNamespaceEmbeddingModel(namespace),
       getNamespaceVectorStore(namespace, document.tenantId ?? undefined),
     ]);
 
-    for (let batchIdx = 0; batchIdx < chunkBatches.length; batchIdx++) {
+    for (let batchIdx = 0; batchIdx < body.total_batches; batchIdx++) {
       const nodes = await context.run(`embed-batch-${batchIdx}`, async () => {
-        const chunkBatch = chunkBatches[batchIdx]!;
+        const batchStr = await redis.get<string>(
+          body.batch_template.replace("[BATCH_INDEX]", batchIdx.toString()),
+        );
+
+        if (!batchStr) {
+          throw new Error("Chunk batch not found");
+        }
+
+        const chunkBatch = JSON.parse(batchStr) as unknown as PartitionBatch;
 
         const results = await embedMany({
           model: embeddingModel,
@@ -167,24 +168,26 @@ export const { POST } = serve<{
   },
   {
     failureFunction: async ({ context, failResponse }) => {
-      const { documentId } = context.requestPayload;
+      if (context.requestPayload && context.requestPayload.documentId) {
+        const { documentId } = context.requestPayload;
 
-      await db.document.update({
-        where: { id: documentId },
-        data: {
-          status: DocumentStatus.FAILED,
-          error: failResponse || "Unknown error",
-          failedAt: new Date(),
-          ingestJob: {
-            update: {
-              status: IngestJobStatus.FAILED,
-              failedAt: new Date(),
-              error: failResponse || "Unknown error",
+        await db.document.update({
+          where: { id: documentId },
+          data: {
+            status: DocumentStatus.FAILED,
+            error: failResponse || "Unknown error",
+            failedAt: new Date(),
+            ingestJob: {
+              update: {
+                status: IngestJobStatus.FAILED,
+                failedAt: new Date(),
+                error: failResponse || "Unknown error",
+              },
             },
           },
-        },
-        select: { id: true },
-      });
+          select: { id: true },
+        });
+      }
     },
     qstashClient: qstashClient,
     receiver: qstashReceiver,

@@ -45,6 +45,9 @@ export const env = createEnv({
     S3_SECRET_KEY: z.string(),
     S3_ENDPOINT: z.string().url(),
     S3_BUCKET: z.string(),
+
+    REDIS_URL: z.string().url(),
+    REDIS_TOKEN: z.string(),
   },
   client: {},
   runtimeEnv: {
@@ -91,6 +94,9 @@ export const env = createEnv({
     S3_SECRET_KEY: process.env.S3_SECRET_KEY,
     S3_ENDPOINT: process.env.S3_ENDPOINT,
     S3_BUCKET: process.env.S3_BUCKET,
+
+    REDIS_URL: process.env.REDIS_URL,
+    REDIS_TOKEN: process.env.REDIS_TOKEN,
   },
   skipValidation: !!process.env.SKIP_ENV_VALIDATION,
   emptyStringAsUndefined: true,
