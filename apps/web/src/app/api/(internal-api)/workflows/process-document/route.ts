@@ -127,9 +127,16 @@ export const { POST } = serve<{
         );
       });
 
-      await context.run(`store-batch-${batchIdx}`, async () => {
-        await vectorStore.upsert(nodes);
-      });
+      await Promise.all([
+        context.run(`store-batch-${batchIdx}`, async () => {
+          await vectorStore.upsert(nodes);
+        }),
+        context.run(`delete-batch-${batchIdx}-from-redis`, async () => {
+          await redis.del(
+            body.batch_template.replace("[BATCH_INDEX]", batchIdx.toString()),
+          );
+        }),
+      ]);
     }
 
     await context.run("update-status-completed", async () => {
