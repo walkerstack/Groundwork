@@ -10,6 +10,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { capitalize } from "@/lib/string-utils";
+import { formatMs } from "@/lib/utils";
 import { api } from "@/trpc/react";
 import { EllipsisVerticalIcon, Trash2Icon } from "lucide-react";
 import { toast } from "sonner";
@@ -26,7 +28,8 @@ export interface Job {
   config: IngestJob["config"];
   tenantId?: IngestJob["tenantId"];
   completedAt?: IngestJob["completedAt"];
-  createdAt?: IngestJob["createdAt"];
+  queuedAt?: IngestJob["queuedAt"];
+  createdAt: IngestJob["createdAt"];
 }
 
 const statusToBadgeVariant = (
@@ -59,15 +62,11 @@ const formatDate = (date: Date | string) => {
 
 export const columns: ColumnDef<Job>[] = [
   {
-    accessorKey: "id",
-    header: "ID",
-  },
-  {
     accessorKey: "payload",
-    header: "Source",
+    header: "Type",
     cell: ({ row }) => {
       return (
-        <p className="capitalize">{row.original.payload.type.toLowerCase()}</p>
+        <p>{capitalize(row.original.payload.type.split("_").join(" "))}</p>
       );
     },
   },
@@ -91,30 +90,7 @@ export const columns: ColumnDef<Job>[] = [
       return <p>{row.original.tenantId ?? "-"}</p>;
     },
   },
-  {
-    accessorKey: "createdAt",
-    header: "Created At",
-    cell: ({ row }) => {
-      return (
-        <p>
-          {row.original.createdAt ? formatDate(row.original.createdAt) : "-"}
-        </p>
-      );
-    },
-  },
-  {
-    accessorKey: "completedAt",
-    header: "Completed At",
-    cell: ({ row }) => {
-      return (
-        <p>
-          {row.original.completedAt
-            ? formatDate(row.original.completedAt)
-            : "-"}
-        </p>
-      );
-    },
-  },
+
   {
     accessorKey: "status",
     header: "Status",
@@ -126,6 +102,29 @@ export const columns: ColumnDef<Job>[] = [
         >
           {row.original.status.toLowerCase()}
         </Badge>
+      );
+    },
+  },
+  {
+    accessorKey: "createdAt",
+    header: "Created At",
+    cell: ({ row }) => {
+      return <p>{formatDate(row.original.createdAt)}</p>;
+    },
+  },
+  {
+    id: "duration",
+    header: "Duration",
+    cell: ({ row }) => {
+      return (
+        <p>
+          {row.original.completedAt && row.original.queuedAt
+            ? formatMs(
+                row.original.completedAt.getTime() -
+                  row.original.queuedAt.getTime(),
+              )
+            : "-"}
+        </p>
       );
     },
   },

@@ -34,3 +34,51 @@ export function formatBytes(
       : (sizes[i] ?? "Bytes")
   }`;
 }
+
+let formatter: Intl.NumberFormat | undefined;
+let compactFormatter: Intl.NumberFormat | undefined;
+export function formatNumber(
+  num: number,
+  style: "decimal" | "compact" = "decimal",
+) {
+  let formatterToUse;
+
+  if (style === "decimal") {
+    if (!formatter) {
+      formatter = new Intl.NumberFormat("en-US", {
+        style: "decimal",
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 1,
+      });
+    }
+    formatterToUse = formatter;
+  } else {
+    if (!compactFormatter) {
+      compactFormatter = new Intl.NumberFormat("en-US", {
+        notation: "compact",
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 1,
+      });
+    }
+    formatterToUse = compactFormatter;
+  }
+
+  return formatterToUse.format(num);
+}
+
+export function formatMs(ms: number) {
+  const seconds = Math.floor(ms / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+
+  if (hours > 0) {
+    return `${hours}h ${minutes}m ${seconds}s`;
+  }
+  if (minutes > 0) {
+    return `${minutes}m ${seconds}s`;
+  }
+  if (seconds > 0) {
+    return `${seconds}s`;
+  }
+  return `${ms}ms`;
+}

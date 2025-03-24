@@ -10,9 +10,23 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { formatBytes } from "@/lib/utils";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { capitalize } from "@/lib/string-utils";
+import { formatBytes, formatMs, formatNumber } from "@/lib/utils";
 import { api } from "@/trpc/react";
-import { EllipsisVerticalIcon, Trash2Icon } from "lucide-react";
+import {
+  BookTextIcon,
+  Code2Icon,
+  EllipsisVerticalIcon,
+  FileTextIcon,
+  ImageIcon,
+  Trash2Icon,
+} from "lucide-react";
 import { toast } from "sonner";
 
 import type { Document } from "@agentset/db";
@@ -24,10 +38,44 @@ interface DocumentCol {
   id: string;
   status: DocumentStatus;
   name?: string | null;
+  source: Document["source"];
   totalChunks: number;
   totalCharacters: number;
+  totalTokens: number;
   documentProperties?: Document["documentProperties"];
+  completedAt?: Date | null;
+  createdAt: Date;
 }
+
+const MimeType = ({ mimeType }: { mimeType: string }) => {
+  let Icon;
+  if (mimeType === "application/pdf") {
+    Icon = BookTextIcon;
+  } else if (mimeType.startsWith("image/")) {
+    Icon = ImageIcon;
+  } else if (
+    mimeType === "text/html" ||
+    mimeType === "application/xhtml+xml" ||
+    mimeType === "text/xml"
+  ) {
+    Icon = Code2Icon;
+  } else {
+    Icon = FileTextIcon;
+  }
+
+  return (
+    <TooltipProvider delayDuration={0}>
+      <div className="flex flex-row gap-2">
+        <Tooltip>
+          <TooltipTrigger>
+            <Icon className="size-5" />
+          </TooltipTrigger>
+          <TooltipContent>{mimeType}</TooltipContent>
+        </Tooltip>
+      </div>
+    </TooltipProvider>
+  );
+};
 
 const statusToBadgeVariant = (
   status: DocumentStatus,
@@ -55,27 +103,55 @@ const statusToBadgeVariant = (
 
 export const columns: ColumnDef<DocumentCol>[] = [
   {
-    accessorKey: "id",
-    header: "ID",
-  },
-  {
     accessorKey: "name",
     header: "Name",
+    cell: ({ row }) => {
+      return <p>{row.original.name ?? "-"}</p>;
+    },
   },
   {
-    accessorKey: "totalChunks",
-    header: "Total Chunks",
-  },
-  {
-    accessorKey: "totalCharacters",
-    header: "Total Characters",
+    id: "source",
+    header: "Source",
+    accessorKey: "source",
+    cell: ({ row }) => {
+      return <p>{capitalize(row.original.source.type.split("_").join(" "))}</p>;
+    },
   },
   {
     id: "type",
     header: "Type",
     accessorKey: "documentProperties.mimeType",
     cell: ({ row }) => {
-      return <p>{row.original.documentProperties?.mimeType ?? "-"}</p>;
+      return (
+        <div>
+          {row.original.documentProperties?.mimeType ? (
+            <MimeType mimeType={row.original.documentProperties.mimeType} />
+          ) : (
+            "-"
+          )}
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "totalChunks",
+    header: "Total Chunks",
+    cell: ({ row }) => {
+      return <p>{formatNumber(row.original.totalChunks, "compact")}</p>;
+    },
+  },
+  {
+    accessorKey: "totalCharacters",
+    header: "Total Characters",
+    cell: ({ row }) => {
+      return <p>{formatNumber(row.original.totalCharacters, "compact")}</p>;
+    },
+  },
+  {
+    accessorKey: "totalCharacters",
+    header: "Total Tokens",
+    cell: ({ row }) => {
+      return <p>{formatNumber(row.original.totalTokens, "compact")}</p>;
     },
   },
   {
@@ -103,6 +179,22 @@ export const columns: ColumnDef<DocumentCol>[] = [
         >
           {row.original.status.toLowerCase()}
         </Badge>
+      );
+    },
+  },
+  {
+    id: "duration",
+    header: "Duration",
+    cell: ({ row }) => {
+      return (
+        <p>
+          {row.original.completedAt
+            ? formatMs(
+                row.original.completedAt.getTime() -
+                  row.original.createdAt.getTime(),
+              )
+            : "-"}
+        </p>
       );
     },
   },
