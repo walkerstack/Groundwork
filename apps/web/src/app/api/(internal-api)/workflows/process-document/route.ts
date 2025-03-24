@@ -103,15 +103,13 @@ export const { POST } = serve<{
 
     for (let batchIdx = 0; batchIdx < body.total_batches; batchIdx++) {
       const nodes = await context.run(`embed-batch-${batchIdx}`, async () => {
-        const batchStr = await redis.get<string>(
+        const chunkBatch = await redis.get<PartitionBatch>(
           body.batch_template.replace("[BATCH_INDEX]", batchIdx.toString()),
         );
 
-        if (!batchStr) {
+        if (!chunkBatch) {
           throw new Error("Chunk batch not found");
         }
-
-        const chunkBatch = JSON.parse(batchStr) as unknown as PartitionBatch;
 
         const results = await embedMany({
           model: embeddingModel,
