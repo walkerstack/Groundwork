@@ -102,8 +102,9 @@ export const { POST } = serve<{
       getNamespaceVectorStore(namespace, document.tenantId ?? undefined),
     ]);
 
+    let totalTokens = 0;
     for (let batchIdx = 0; batchIdx < body.total_batches; batchIdx++) {
-      const nodes = await context.run(`embed-batch-${batchIdx}`, async () => {
+      const tokens = await context.run(`embed-batch-${batchIdx}`, async () => {
         const chunkBatch = await redis.get<PartitionBatch>(
           body.batch_template.replace("[BATCH_INDEX]", batchIdx.toString()),
         );
@@ -117,18 +118,20 @@ export const { POST } = serve<{
           values: chunkBatch.map((chunk) => chunk.text),
         });
 
-        return chunkBatch.map((chunk, idx) =>
+        const nodes = chunkBatch.map((chunk, idx) =>
           makeChunk({
             documentId: document.id,
             chunk,
             embedding: results.embeddings[idx]!,
           }),
         );
+
+        await vectorStore.upsert(nodes);
+
+        return results.usage.tokens;
       });
 
-      await context.run(`store-batch-${batchIdx}`, async () => {
-        await vectorStore.upsert(nodes);
-      });
+      totalTokens += tokens;
     }
 
     await context.run("update-status-completed", async () => {
@@ -136,6 +139,7 @@ export const { POST } = serve<{
         where: { id: document.id },
         data: {
           status: DocumentStatus.COMPLETED,
+          totalTokens,
           completedAt: new Date(),
           error: null,
         },
