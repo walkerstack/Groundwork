@@ -2,8 +2,8 @@ import { AgentsetApiError } from "./errors";
 
 export const parseRequestBody = async (req: Request) => {
   try {
-    const body = await req.json();
-    return body;
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+    return await req.json();
   } catch (e) {
     console.error(e);
     throw new AgentsetApiError({

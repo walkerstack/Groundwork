@@ -1,86 +1,26 @@
-import type { JSONValue } from "ai";
-import type { NextRequest } from "next/server";
-import { getNamespaceConfig } from "@/lib/api-utils";
-import {
-  authenticateRequest,
-  authenticateRequestWithSession,
-} from "@/lib/api-utils/auth";
-import {
-  makeApiErrorResponse,
-  makeApiSuccessResponse,
-  notFoundResponse,
-} from "@/lib/api-utils/response";
-import { getTenantFromRequest } from "@/lib/api-utils/tenant";
-import { validateBody } from "@/lib/api-utils/validation";
+import type { CoreMessage, JSONValue } from "ai";
+import { parseRequestBody } from "@/lib/api/body";
+import { AgentsetApiError } from "@/lib/api/errors";
+import { withAuthApiHandler } from "@/lib/api/handler";
+import { makeApiSuccessResponse } from "@/lib/api/response";
 import { getNamespaceEmbeddingModel } from "@/lib/embedding";
 import { getNamespaceLanguageModel } from "@/lib/llm";
+import { NEW_MESSAGE_PROMPT } from "@/lib/prompts";
 import {
   DIGNA_NAMESPACE_ID,
   getNamespaceVectorStore,
   queryVectorStore,
   queryVectorStoreV2,
 } from "@/lib/vector-store";
+import { chatSchema } from "@/schemas/api/chat";
 import { createDataStreamResponse, embed, generateText, streamText } from "ai";
-import { z } from "zod";
-
-import { DEFAULT_SYSTEM_PROMPT, NEW_MESSAGE_PROMPT } from "./prompts";
 
 // export const runtime = "edge";
 export const preferredRegion = "iad1"; // make this closer to the DB
 export const maxDuration = 60;
 
-const schema = z
-  .object({
-    namespaceId: z.string(),
-    systemPrompt: z
-      .string()
-      .optional()
-      .default(DEFAULT_SYSTEM_PROMPT.compile()),
-    messages: z.array(z.any()),
-    stream: z.boolean().optional().default(false),
-    topK: z.number().min(1).max(100).optional().default(10),
-    rerank: z.boolean().optional().default(true),
-    rerankLimit: z.number().min(1).max(100).optional(),
-    filter: z.record(z.string(), z.any()).optional(),
-    minScore: z.number().min(0).max(1).optional(),
-    includeRelationships: z.boolean().optional().default(false),
-    includeMetadata: z.boolean().optional().default(true),
-    auth: z.boolean().optional().default(false),
-  })
-  .superRefine((val, ctx) => {
-    if (val.rerankLimit && val.rerankLimit > val.topK) {
-      ctx.addIssue({
-        path: ["rerankLimit"],
-        code: z.ZodIssueCode.too_big,
-        message: "rerankLimit cannot be larger than topK",
-        inclusive: true,
-        type: "number",
-        maximum: val.topK,
-      });
-      return false;
-    }
-
-    return true;
-  });
-
-export async function POST(request: NextRequest) {
-  const validatedBody = await validateBody(request, schema);
-  if (validatedBody.error) return validatedBody.error;
-  const body = validatedBody.data;
-
-  let orgId: string;
-  if (body.auth) {
-    const authResult = await authenticateRequestWithSession(
-      request,
-      body.namespaceId,
-    );
-    if (authResult.error) return authResult.error;
-    orgId = authResult.data.organizationId;
-  } else {
-    const authResult = await authenticateRequest(request);
-    if (authResult.error) return authResult.error;
-    orgId = authResult.data.organizationId;
-  }
+export const POST = withAuthApiHandler(async ({ req, namespace, tenantId }) => {
+  const body = await chatSchema.parseAsync(await parseRequestBody(req));
 
   const messagesWithoutQuery = body.messages.slice(0, -1);
   const query =
@@ -89,18 +29,11 @@ export async function POST(request: NextRequest) {
       : null;
 
   if (!query) {
-    return makeApiErrorResponse({
+    throw new AgentsetApiError({
+      code: "bad_request",
       message: "No query provided",
-      status: 400,
     });
   }
-
-  const namespace = await getNamespaceConfig(body.namespaceId, orgId);
-  if (!namespace) {
-    return notFoundResponse("Namespace not found");
-  }
-
-  const tenantId = getTenantFromRequest(request);
 
   // TODO: if the embedding model is managed, track the usage
   const [embeddingModel, vectorStore, languageModel] = await Promise.all([
@@ -141,13 +74,13 @@ export async function POST(request: NextRequest) {
   }
 
   if (!data) {
-    return makeApiErrorResponse({
+    throw new AgentsetApiError({
+      code: "internal_server_error",
       message: "Failed to parse chunks",
-      status: 500,
     });
   }
 
-  const newMessages = [
+  const newMessages: CoreMessage[] = [
     { role: "system", content: body.systemPrompt },
     ...messagesWithoutQuery,
     {
@@ -191,4 +124,4 @@ export async function POST(request: NextRequest) {
       sources: data,
     },
   });
-}
+});

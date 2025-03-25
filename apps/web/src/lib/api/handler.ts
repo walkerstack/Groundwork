@@ -6,10 +6,12 @@ import {
 
 import type { Namespace, Organization } from "@agentset/db";
 
-import { getApiKeyScopeAndOrganizationId } from "../api-utils";
-import { getTenantFromRequest } from "../api-utils/tenant";
+import type { Session } from "../auth-types";
 import { tryCatch } from "../error";
 import { supabase } from "../supabase";
+import { getApiKeyInfo } from "./api-key";
+import { authenticateRequestSession } from "./session";
+import { getTenantFromRequest } from "./tenant";
 import { getSearchParams } from "./utils";
 
 interface HandlerParams {
@@ -25,6 +27,15 @@ interface Handler {
   (params: HandlerParams): Promise<Response>;
 }
 
+interface AuthHandler {
+  (
+    params: Omit<HandlerParams, "organization" | "apiScope"> & {
+      session: Session;
+      namespace: Namespace;
+    },
+  ): Promise<Response>;
+}
+
 interface NamespaceHandler {
   (
     params: HandlerParams & {
@@ -32,6 +43,49 @@ interface NamespaceHandler {
     },
   ): Promise<Response>;
 }
+
+export const withAuthApiHandler = (
+  handler: AuthHandler,
+  { requireNamespace = true }: { requireNamespace?: boolean } = {},
+) => {
+  return async (
+    req: NextRequest,
+    { params }: { params: Promise<Record<string, string> | undefined> },
+  ) => {
+    const routeParams = await params;
+    const searchParams = getSearchParams(req.url);
+
+    const namespaceId = searchParams.namespaceId;
+    const headers = {};
+
+    try {
+      if (requireNamespace && !namespaceId) {
+        throw new AgentsetApiError({
+          code: "bad_request",
+          message: "Namespace ID is required",
+        });
+      }
+
+      const tenantId = getTenantFromRequest(req);
+      const { namespace, session } = await authenticateRequestSession(
+        req,
+        namespaceId,
+      );
+
+      return await handler({
+        req,
+        params: routeParams ?? {},
+        searchParams,
+        namespace,
+        session,
+        tenantId,
+      });
+    } catch (error) {
+      console.error(error);
+      return handleAndReturnErrorResponse(error, headers);
+    }
+  };
+};
 
 export const withApiHandler = (handler: Handler) => {
   return async (
@@ -64,7 +118,7 @@ export const withApiHandler = (handler: Handler) => {
         });
       }
 
-      const orgApiKey = await tryCatch(getApiKeyScopeAndOrganizationId(apiKey));
+      const orgApiKey = await tryCatch(getApiKeyInfo(apiKey));
       if (!orgApiKey.data) {
         throw new AgentsetApiError({
           code: "unauthorized",

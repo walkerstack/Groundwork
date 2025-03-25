@@ -1,6 +1,6 @@
-import { makeApiSuccessResponse } from "@/lib/api-utils/response";
 import { parseRequestBody } from "@/lib/api/body";
 import { withApiHandler } from "@/lib/api/handler";
+import { makeApiSuccessResponse } from "@/lib/api/response";
 import { createNamespaceSchema } from "@/schemas/api/namespace";
 import { createNamespace } from "@/services/namespaces/create";
 
@@ -19,8 +19,9 @@ export const GET = withApiHandler(async ({ organization }) => {
 });
 
 export const POST = withApiHandler(async ({ organization, req }) => {
-  const body = await parseRequestBody(req);
-  const parsed = await createNamespaceSchema.parseAsync(body);
+  const parsed = await createNamespaceSchema.parseAsync(
+    await parseRequestBody(req),
+  );
 
   // TODO: check apiScope
   const namespace = await createNamespace({

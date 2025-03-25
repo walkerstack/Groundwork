@@ -1,5 +1,5 @@
-import { makeApiSuccessResponse } from "@/lib/api-utils/response";
 import { withNamespaceApiHandler } from "@/lib/api/handler";
+import { makeApiSuccessResponse } from "@/lib/api/response";
 import { deleteNamespace } from "@/services/namespaces/delete";
 
 export const GET = withNamespaceApiHandler(async ({ namespace }) => {

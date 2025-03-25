@@ -1,6 +1,6 @@
-import { makeApiSuccessResponse } from "@/lib/api-utils/response";
 import { AgentsetApiError } from "@/lib/api/errors";
 import { withNamespaceApiHandler } from "@/lib/api/handler";
+import { makeApiSuccessResponse } from "@/lib/api/response";
 import {
   deleteDocument,
   deleteDocumentSchema,
