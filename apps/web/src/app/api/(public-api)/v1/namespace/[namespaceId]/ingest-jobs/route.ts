@@ -6,7 +6,7 @@ import {
 } from "@/services/ingest-jobs/all";
 
 export const GET = withNamespaceApiHandler(
-  async ({ searchParams, namespace, tenantId }) => {
+  async ({ searchParams, namespace, tenantId, headers }) => {
     const validatedBody = await getAllIngestJobsSchema.parseAsync(searchParams);
 
     const data = await getAllIngestJobs({
@@ -17,6 +17,7 @@ export const GET = withNamespaceApiHandler(
 
     return makeApiSuccessResponse({
       data,
+      headers,
     });
   },
 );

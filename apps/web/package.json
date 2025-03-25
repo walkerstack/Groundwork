@@ -54,6 +54,7 @@
     "@trpc/react-query": "catalog:",
     "@trpc/server": "catalog:",
     "@upstash/qstash": "^2.7.22",
+    "@upstash/ratelimit": "^2.0.5",
     "@upstash/redis": "^1.34.6",
     "@upstash/workflow": "^0.2.12",
     "add": "^2.0.6",

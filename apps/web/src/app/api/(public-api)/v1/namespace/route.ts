@@ -6,7 +6,7 @@ import { createNamespace } from "@/services/namespaces/create";
 
 import { db } from "@agentset/db";
 
-export const GET = withApiHandler(async ({ organization }) => {
+export const GET = withApiHandler(async ({ organization, headers }) => {
   const namespaces = await db.namespace.findMany({
     where: {
       organizationId: organization.id,
@@ -15,10 +15,11 @@ export const GET = withApiHandler(async ({ organization }) => {
 
   return makeApiSuccessResponse({
     data: namespaces,
+    headers,
   });
 });
 
-export const POST = withApiHandler(async ({ organization, req }) => {
+export const POST = withApiHandler(async ({ organization, req, headers }) => {
   const parsed = await createNamespaceSchema.parseAsync(
     await parseRequestBody(req),
   );
@@ -31,5 +32,6 @@ export const POST = withApiHandler(async ({ organization, req }) => {
 
   return makeApiSuccessResponse({
     data: namespace,
+    headers,
   });
 });

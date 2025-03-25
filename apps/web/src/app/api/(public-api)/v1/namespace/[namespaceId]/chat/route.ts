@@ -20,7 +20,7 @@ export const preferredRegion = "iad1"; // make this closer to the DB
 export const maxDuration = 60;
 
 export const POST = withNamespaceApiHandler(
-  async ({ req, namespace, tenantId }) => {
+  async ({ req, namespace, tenantId, headers }) => {
     const body = await chatSchema.parseAsync(await parseRequestBody(req));
 
     const messagesWithoutQuery = body.messages.slice(0, -1);
@@ -124,6 +124,7 @@ export const POST = withNamespaceApiHandler(
         text: response.text,
         sources: data,
       },
+      headers,
     });
   },
 );

@@ -6,7 +6,7 @@ import {
 } from "@/services/documents/all";
 
 export const GET = withNamespaceApiHandler(
-  async ({ searchParams, namespace, tenantId }) => {
+  async ({ searchParams, namespace, tenantId, headers }) => {
     const validatedParams =
       await getAllDocumentsSchema.parseAsync(searchParams);
 
@@ -18,6 +18,7 @@ export const GET = withNamespaceApiHandler(
 
     return makeApiSuccessResponse({
       data,
+      headers,
     });
   },
 );

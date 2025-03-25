@@ -53,6 +53,7 @@ const speakeasyErrorOverrides: Record<z.infer<typeof ErrorCode>, string> = {
 };
 
 const _ErrorSchema = z.object({
+  success: z.literal(false),
   error: z.object({
     code: ErrorCode.openapi({
       description: "A short code indicating the error code returned.",
@@ -96,7 +97,7 @@ export class AgentsetApiError extends Error {
 
 const docErrorUrl = `${docsBase}/api-reference/errors`;
 
-export function fromZodError(error: ZodError): ErrorResponse {
+export function fromZodError(error: ZodError): Pick<ErrorResponse, "error"> {
   return {
     error: {
       code: "unprocessable_entity",
@@ -124,7 +125,9 @@ export function fromZodError(error: ZodError): ErrorResponse {
   };
 }
 
-export function handleApiError(error: any): ErrorResponse & { status: number } {
+export function handleApiError(
+  error: any,
+): Pick<ErrorResponse, "error"> & { status: number } {
   console.error("API error occurred", error.message);
 
   // Zod errors
@@ -180,7 +183,10 @@ export function handleAndReturnErrorResponse(
   headers?: Record<string, string>,
 ) {
   const { error, status } = handleApiError(err);
-  return NextResponse.json<ErrorResponse>({ error }, { headers, status });
+  return NextResponse.json<ErrorResponse>(
+    { success: false, error },
+    { headers, status },
+  );
 }
 
 export const errorSchemaFactory = (
@@ -195,6 +201,10 @@ export const errorSchemaFactory = (
           "x-speakeasy-name-override": speakeasyErrorOverrides[code],
           type: "object",
           properties: {
+            success: {
+              type: "boolean",
+              example: false,
+            },
             error: {
               type: "object",
               properties: {
@@ -222,7 +232,7 @@ export const errorSchemaFactory = (
               required: ["code", "message"],
             },
           },
-          required: ["error"],
+          required: ["success", "error"],
         },
       },
     },

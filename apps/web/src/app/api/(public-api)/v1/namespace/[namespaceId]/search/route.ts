@@ -15,7 +15,7 @@ import { embed } from "ai";
 export const preferredRegion = "iad1"; // make this closer to the DB
 
 export const POST = withNamespaceApiHandler(
-  async ({ req, namespace, tenantId }) => {
+  async ({ req, namespace, tenantId, headers }) => {
     const body = await queryVectorStoreSchema.parseAsync(
       await parseRequestBody(req),
     );
@@ -59,6 +59,7 @@ export const POST = withNamespaceApiHandler(
 
     return makeApiSuccessResponse({
       data,
+      headers,
     });
   },
 );
