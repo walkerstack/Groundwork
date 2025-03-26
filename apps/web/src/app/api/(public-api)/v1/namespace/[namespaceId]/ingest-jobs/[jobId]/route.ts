@@ -1,25 +1,42 @@
 import { AgentsetApiError } from "@/lib/api/errors";
 import { withNamespaceApiHandler } from "@/lib/api/handler";
+import { normalizeId, prefixId } from "@/lib/api/ids";
 import { makeApiSuccessResponse } from "@/lib/api/response";
-import {
-  deleteIngestJob,
-  deleteIngestJobSchema,
-} from "@/services/ingest-jobs/delete";
-import { getIngestJob, getIngestJobSchema } from "@/services/ingest-jobs/get";
+import { IngestJobSchema } from "@/schemas/api/ingest-job";
+import { deleteIngestJob } from "@/services/ingest-jobs/delete";
 
-import { db } from "@agentset/db";
+import { db, IngestJobStatus } from "@agentset/db";
 
 export const GET = withNamespaceApiHandler(
   async ({ params, namespace, headers }) => {
-    const jobId = params.jobId;
-    const body = await getIngestJobSchema.parseAsync({
-      jobId,
+    const jobId = normalizeId(params.jobId ?? "", "job_");
+    if (!jobId) {
+      throw new AgentsetApiError({
+        code: "bad_request",
+        message: "Invalid job id",
+      });
+    }
+
+    const data = await db.ingestJob.findUnique({
+      where: {
+        id: jobId,
+        namespaceId: namespace.id,
+      },
     });
 
-    const data = await getIngestJob({ ...body, namespaceId: namespace.id });
+    if (!data) {
+      throw new AgentsetApiError({
+        code: "not_found",
+        message: "Ingest job not found",
+      });
+    }
 
     return makeApiSuccessResponse({
-      data,
+      data: IngestJobSchema.parse({
+        ...data,
+        id: prefixId(data.id, "job_"),
+        namespaceId: prefixId(data.namespaceId, "ns_"),
+      }),
       headers,
     });
   },
@@ -27,31 +44,50 @@ export const GET = withNamespaceApiHandler(
 
 export const DELETE = withNamespaceApiHandler(
   async ({ params, namespace, headers }) => {
-    const jobId = params.jobId;
-    const body = await deleteIngestJobSchema.parseAsync({
-      jobId,
-    });
+    const jobId = normalizeId(params.jobId ?? "", "job_");
+    if (!jobId) {
+      throw new AgentsetApiError({
+        code: "bad_request",
+        message: "Invalid job id",
+      });
+    }
 
     const ingestJob = await db.ingestJob.findUnique({
       where: {
-        id: body.jobId,
+        id: jobId,
         namespaceId: namespace.id,
       },
       select: {
         id: true,
+        status: true,
       },
     });
 
-    if (!ingestJob)
+    if (!ingestJob) {
       throw new AgentsetApiError({
         code: "not_found",
         message: "Ingest job not found",
       });
+    }
 
-    const data = await deleteIngestJob(body);
+    if (
+      ingestJob.status !== IngestJobStatus.QUEUED_FOR_DELETE &&
+      ingestJob.status !== IngestJobStatus.DELETING
+    ) {
+      throw new AgentsetApiError({
+        code: "bad_request",
+        message: "Ingest job is already being deleted",
+      });
+    }
+
+    const data = await deleteIngestJob(jobId);
 
     return makeApiSuccessResponse({
-      data,
+      data: IngestJobSchema.parse({
+        ...data,
+        id: prefixId(data.id, "job_"),
+        namespaceId: prefixId(data.namespaceId, "ns_"),
+      }),
       headers,
     });
   },

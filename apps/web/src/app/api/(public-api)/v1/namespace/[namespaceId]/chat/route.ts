@@ -1,8 +1,8 @@
 import type { CoreMessage, JSONValue } from "ai";
-import { parseRequestBody } from "@/lib/api/body";
 import { AgentsetApiError } from "@/lib/api/errors";
 import { withNamespaceApiHandler } from "@/lib/api/handler";
 import { makeApiSuccessResponse } from "@/lib/api/response";
+import { parseRequestBody } from "@/lib/api/utils";
 import { getNamespaceEmbeddingModel } from "@/lib/embedding";
 import { getNamespaceLanguageModel } from "@/lib/llm";
 import { NEW_MESSAGE_PROMPT } from "@/lib/prompts";

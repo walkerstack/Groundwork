@@ -29,7 +29,7 @@ export const withApiHandler = (handler: Handler) => {
     { params }: { params: Promise<Record<string, string> | undefined> },
   ) => {
     const routeParams = await params;
-    const searchParams = getSearchParams(req.url);
+    const searchParams = getSearchParams(req);
 
     let apiKey: string | undefined = undefined;
     let headers = {};

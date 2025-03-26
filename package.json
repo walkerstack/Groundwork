@@ -13,6 +13,7 @@
     "db:studio": "turbo -F @agentset/db db:studio",
     "db:migrate": "turbo -F @agentset/db db:migrate",
     "db:generate": "turbo -F @agentset/db db:generate",
+    "generate-openapi": "turbo -F @agentset/web generate-openapi",
     "dev": "turbo watch dev --continue",
     "dev:web": "turbo watch dev -F @agentset/web...",
     "format": "turbo run format --continue -- --cache --cache-location .cache/.prettiercache",

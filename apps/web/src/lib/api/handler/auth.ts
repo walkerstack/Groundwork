@@ -5,6 +5,7 @@ import type { Namespace } from "@agentset/db";
 
 import type { HandlerParams } from "./base";
 import { AgentsetApiError, handleAndReturnErrorResponse } from "../errors";
+import { ratelimit } from "../rate-limit";
 import { authenticateRequestSession } from "../session";
 import { getTenantFromRequest } from "../tenant";
 import { getSearchParams } from "../utils";
@@ -27,10 +28,10 @@ export const withAuthApiHandler = (
     { params }: { params: Promise<Record<string, string> | undefined> },
   ) => {
     const routeParams = await params;
-    const searchParams = getSearchParams(req.url);
+    const searchParams = getSearchParams(req);
 
     const namespaceId = searchParams.namespaceId;
-    const headers = {};
+    let headers = {};
 
     try {
       if (requireNamespace && !namespaceId) {
@@ -45,6 +46,28 @@ export const withAuthApiHandler = (
         req,
         namespaceId,
       );
+
+      // TODO: get limit from plan
+      // const rateLimit = token.rateLimit || 600;
+      const rateLimit = 600;
+      const { success, limit, reset, remaining } = await ratelimit(
+        rateLimit,
+        "1 m",
+      ).limit(`user:${session.user.id}`);
+
+      headers = {
+        "Retry-After": reset.toString(),
+        "X-RateLimit-Limit": limit.toString(),
+        "X-RateLimit-Remaining": remaining.toString(),
+        "X-RateLimit-Reset": reset.toString(),
+      };
+
+      if (!success) {
+        throw new AgentsetApiError({
+          code: "rate_limit_exceeded",
+          message: "Too many requests.",
+        });
+      }
 
       return await handler({
         req,

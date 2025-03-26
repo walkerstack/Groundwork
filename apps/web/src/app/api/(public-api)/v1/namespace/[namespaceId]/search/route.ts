@@ -1,6 +1,6 @@
-import { parseRequestBody } from "@/lib/api/body";
 import { withNamespaceApiHandler } from "@/lib/api/handler";
 import { makeApiSuccessResponse } from "@/lib/api/response";
+import { parseRequestBody } from "@/lib/api/utils";
 import { getNamespaceEmbeddingModel } from "@/lib/embedding";
 import {
   DIGNA_NAMESPACE_ID,

@@ -17,7 +17,8 @@
     "preview": "next build && next start",
     "start": "pnpm with-env next start",
     "typecheck": "tsc --noEmit",
-    "with-env": "dotenv -e ../../.env --"
+    "with-env": "dotenv -e ../../.env --",
+    "generate-openapi": "tsx ./scripts/generate-openapi.ts"
   },
   "dependencies": {
     "@agentset/db": "workspace:*",
@@ -106,6 +107,7 @@
     "postcss": "^8.4.39",
     "prettier": "catalog:",
     "tailwindcss": "catalog:",
+    "tsx": "^4.19.3",
     "typescript": "catalog:",
     "vitest": "^3.0.9"
   },

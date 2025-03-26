@@ -3,13 +3,6 @@
 import type { BadgeProps } from "@/components/ui/badge";
 import type { ColumnDef } from "@tanstack/react-table";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import {
   Tooltip,
   TooltipContent,
@@ -18,24 +11,16 @@ import {
 } from "@/components/ui/tooltip";
 import { capitalize } from "@/lib/string-utils";
 import { formatBytes, formatMs, formatNumber } from "@/lib/utils";
-import { api } from "@/trpc/react";
-import {
-  BookTextIcon,
-  Code2Icon,
-  CopyIcon,
-  EllipsisVerticalIcon,
-  FileTextIcon,
-  ImageIcon,
-  Trash2Icon,
-} from "lucide-react";
-import { toast } from "sonner";
+import { BookTextIcon, Code2Icon, FileTextIcon, ImageIcon } from "lucide-react";
 
 import type { Document } from "@agentset/db";
 import { DocumentStatus } from "@agentset/db";
 
+import { DocumentActions } from "./actions";
+
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
-interface DocumentCol {
+export interface DocumentCol {
   id: string;
   status: DocumentStatus;
   name?: string | null;
@@ -201,49 +186,6 @@ export const columns: ColumnDef<DocumentCol>[] = [
   },
   {
     id: "actions",
-    cell: ({ row }) => {
-      const utils = api.useUtils();
-      const { isPending, mutate: deleteDocument } =
-        api.document.delete.useMutation({
-          onSuccess: () => {
-            toast.success("Document deleted");
-            void utils.document.all.invalidate();
-          },
-        });
-
-      const copyId = async () => {
-        await navigator.clipboard.writeText(row.original.id);
-        toast.success("Copied ID");
-      };
-
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button size="icon" variant="ghost">
-              <EllipsisVerticalIcon className="size-4" />
-            </Button>
-          </DropdownMenuTrigger>
-
-          <DropdownMenuContent>
-            <DropdownMenuItem onClick={copyId}>
-              <CopyIcon className="size-4" />
-              Copy ID
-            </DropdownMenuItem>
-
-            <DropdownMenuItem
-              disabled={
-                isPending ||
-                row.original.status === DocumentStatus.DELETING ||
-                row.original.status === DocumentStatus.QUEUED_FOR_DELETE
-              }
-              onClick={() => deleteDocument({ documentId: row.original.id })}
-            >
-              <Trash2Icon className="size-4" />
-              Delete
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
-    },
+    cell: ({ row }) => <DocumentActions row={row} />,
   },
 ];

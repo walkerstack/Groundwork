@@ -28,16 +28,18 @@ export default function TextForm({ onSuccess }: { onSuccess: () => void }) {
     resolver: zodResolver(schema),
   });
 
-  const { mutateAsync: ingestText, isPending: isTextPending } =
-    api.ingestJob.ingestText.useMutation({
-      onSuccess: onSuccess,
-    });
+  const { mutateAsync, isPending } = api.ingestJob.ingest.useMutation({
+    onSuccess: onSuccess,
+  });
 
   const handleTextSubmit = async (data: z.infer<typeof schema>) => {
-    await ingestText({
+    await mutateAsync({
       namespaceId: activeNamespace.id,
-      name: data.name,
-      text: data.text,
+      payload: {
+        type: "TEXT",
+        name: data.name,
+        text: data.text,
+      },
     });
   };
 
@@ -86,7 +88,7 @@ export default function TextForm({ onSuccess }: { onSuccess: () => void }) {
         </div>
 
         <DialogFooter>
-          <Button type="submit" isLoading={isTextPending}>
+          <Button type="submit" isLoading={isPending}>
             Ingest Text
           </Button>
         </DialogFooter>

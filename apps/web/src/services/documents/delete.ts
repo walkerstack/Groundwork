@@ -1,33 +1,25 @@
 import { triggerDeleteDocumentJob } from "@/lib/workflow";
-import { z } from "zod";
 
 import { db, DocumentStatus } from "@agentset/db";
 
-export const deleteDocumentSchema = z.object({
-  documentId: z.string(),
-});
-
-export const deleteDocument = async ({
-  documentId,
-}: z.infer<typeof deleteDocumentSchema>) => {
-  const doc = await db.document.update({
+export const deleteDocument = async (documentId: string) => {
+  const updatedDoc = await db.document.update({
     where: { id: documentId },
     data: {
       status: DocumentStatus.QUEUED_FOR_DELETE,
     },
-    select: { id: true },
   });
 
   const { workflowRunId } = await triggerDeleteDocumentJob({
-    documentId: doc.id,
+    documentId: updatedDoc.id,
   });
 
-  const updatedDocument = await db.document.update({
-    where: { id: doc.id },
+  await db.document.update({
+    where: { id: updatedDoc.id },
     data: {
       workflowRunsIds: { push: workflowRunId },
     },
   });
 
-  return updatedDocument;
+  return updatedDoc;
 };

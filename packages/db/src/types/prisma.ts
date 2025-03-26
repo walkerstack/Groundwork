@@ -3,19 +3,19 @@
 type IngestJobPayloadText = {
   type: "TEXT";
   text: string;
-  name?: string;
+  name?: string | null;
 };
 
 type IngestJobPayloadFile = {
   type: "FILE";
   fileUrl: string;
-  name?: string;
+  name?: string | null;
 };
 
 type IngestJobPayloadManagedFile = {
   type: "MANAGED_FILE";
   key: string;
-  name?: string;
+  name?: string | null;
 };
 
 type DocPayload =
@@ -125,7 +125,7 @@ declare global {
       | {
           provider: "AZURE_OPENAI";
           model: OpenAIEmbeddingModel;
-          resourceName: string;
+          baseUrl: string;
           deployment: string;
           apiKey: string;
           apiVersion?: string;

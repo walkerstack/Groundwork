@@ -1,29 +1,44 @@
 import { AgentsetApiError } from "@/lib/api/errors";
 import { withNamespaceApiHandler } from "@/lib/api/handler";
+import { normalizeId, prefixId } from "@/lib/api/ids";
 import { makeApiSuccessResponse } from "@/lib/api/response";
-import {
-  deleteDocument,
-  deleteDocumentSchema,
-} from "@/services/documents/delete";
-import { getDocument, getDocumentSchema } from "@/services/documents/get";
+import { DocumentSchema } from "@/schemas/api/document";
+import { deleteDocument } from "@/services/documents/delete";
 
-import { db } from "@agentset/db";
+import { db, DocumentStatus } from "@agentset/db";
 
 export const GET = withNamespaceApiHandler(
   async ({ params, namespace, headers }) => {
-    const documentId = params.documentId as string;
+    const documentId = normalizeId(params.documentId ?? "", "doc_");
+    if (!documentId) {
+      throw new AgentsetApiError({
+        code: "bad_request",
+        message: "Invalid document ID",
+      });
+    }
 
-    const validatedBody = await getDocumentSchema.parseAsync({
-      documentId,
+    const doc = await db.document.findUnique({
+      where: {
+        id: documentId,
+        ingestJob: {
+          namespaceId: namespace.id,
+        },
+      },
     });
 
-    const data = await getDocument({
-      ...validatedBody,
-      namespaceId: namespace.id,
-    });
+    if (!doc) {
+      throw new AgentsetApiError({
+        code: "not_found",
+        message: "Document not found",
+      });
+    }
 
     return makeApiSuccessResponse({
-      data,
+      data: DocumentSchema.parse({
+        ...doc,
+        id: prefixId(doc.id, "doc_"),
+        ingestJobId: prefixId(doc.ingestJobId, "job_"),
+      }),
       headers,
     });
   },
@@ -31,35 +46,53 @@ export const GET = withNamespaceApiHandler(
 
 export const DELETE = withNamespaceApiHandler(
   async ({ params, namespace, headers }) => {
-    const documentId = params.documentId as string;
-    const validatedBody = await deleteDocumentSchema.parseAsync({
-      documentId,
-    });
+    const documentId = normalizeId(params.documentId ?? "", "doc_");
+    if (!documentId) {
+      throw new AgentsetApiError({
+        code: "bad_request",
+        message: "Invalid document ID",
+      });
+    }
 
     // TODO: check apiScope
-
     const document = await db.document.findUnique({
       where: {
-        id: validatedBody.documentId,
+        id: documentId,
         ingestJob: {
           namespaceId: namespace.id,
         },
       },
       select: {
         id: true,
+        status: true,
       },
     });
 
-    if (!document)
+    if (!document) {
       throw new AgentsetApiError({
         code: "not_found",
         message: "Document not found",
       });
+    }
 
-    const data = await deleteDocument(validatedBody);
+    if (
+      document.status === DocumentStatus.QUEUED_FOR_DELETE ||
+      document.status === DocumentStatus.DELETING
+    ) {
+      throw new AgentsetApiError({
+        code: "bad_request",
+        message: "Document is already being deleted",
+      });
+    }
+
+    const data = await deleteDocument(document.id);
 
     return makeApiSuccessResponse({
-      data,
+      data: DocumentSchema.parse({
+        ...data,
+        id: prefixId(data.id, "doc_"),
+        ingestJobId: prefixId(data.ingestJobId, "job_"),
+      }),
       headers,
     });
   },
