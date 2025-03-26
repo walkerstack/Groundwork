@@ -1,14 +1,53 @@
 import z from "@/lib/zod";
 
 export const baseQueryVectorStoreSchema = z.object({
-  query: z.string(),
-  topK: z.number().min(1).max(100).optional().default(10),
-  rerank: z.boolean().optional().default(true),
-  rerankLimit: z.number().min(1).max(100).optional(),
-  filter: z.record(z.string(), z.any()).optional(),
-  minScore: z.number().min(0).max(1).optional(),
-  includeRelationships: z.boolean().optional().default(false),
-  includeMetadata: z.boolean().optional().default(true),
+  query: z.string().describe("The query to search for."),
+  topK: z
+    .number()
+    .min(1)
+    .max(100)
+    .optional()
+    .default(10)
+    .describe(
+      "The number of results to fetch from the vector store. Defaults to `10`.",
+    ),
+  rerank: z
+    .boolean()
+    .optional()
+    .default(true)
+    .describe("Whether to rerank the results. Defaults to `true`."),
+  rerankLimit: z
+    .number()
+    .min(1)
+    .max(100)
+    .optional()
+    .describe(
+      "The number of results to return after reranking. Defaults to `topK`.",
+    ),
+  filter: z
+    .record(z.string(), z.any())
+    .optional()
+    .describe("A filter to apply to the results."),
+  minScore: z
+    .number()
+    .min(0)
+    .max(1)
+    .optional()
+    .describe("The minimum score to return."),
+  includeRelationships: z
+    .boolean()
+    .optional()
+    .default(false)
+    .describe(
+      "Whether to include relationships in the results. Defaults to `false`.",
+    ),
+  includeMetadata: z
+    .boolean()
+    .optional()
+    .default(true)
+    .describe(
+      "Whether to include metadata in the results. Defaults to `true`.",
+    ),
 });
 
 export const refineRereankLimit = <

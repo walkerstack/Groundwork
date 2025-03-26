@@ -7,11 +7,11 @@ import { listNamespaces } from "./list-namespaces";
 import { updateNamespace } from "./update-namespace";
 
 export const namespacePaths: ZodOpenApiPathsObject = {
-  "/namespace": {
+  "/v1/namespace": {
     get: listNamespaces,
     post: createNamespace,
   },
-  "/namespace/{namespaceId}": {
+  "/v1/namespace/{namespaceId}": {
     get: getNamespace,
     patch: updateNamespace,
     delete: deleteNamespace,

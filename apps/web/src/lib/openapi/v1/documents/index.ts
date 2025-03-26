@@ -5,10 +5,10 @@ import { getDocument } from "./get-document";
 import { listDocuments } from "./list-documents";
 
 export const documentsPaths: ZodOpenApiPathsObject = {
-  "/namespace/{namespaceId}/documents": {
+  "/v1/namespace/{namespaceId}/documents": {
     get: listDocuments,
   },
-  "/namespace/{namespaceId}/documents/{documentId}": {
+  "/v1/namespace/{namespaceId}/documents/{documentId}": {
     get: getDocument,
     delete: deleteDocument,
   },

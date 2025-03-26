@@ -1,3 +1,4 @@
+import { MessageSchema } from "@/schemas/api/chat";
 import { DocumentSchema, DocumentStatusSchema } from "@/schemas/api/document";
 import {
   IngestJobSchema,
@@ -6,10 +7,8 @@ import {
 import { NamespaceSchema } from "@/schemas/api/namespace";
 import { createDocument } from "zod-openapi";
 
-import { documentsPaths } from "./documents";
-import { ingestJobsPaths } from "./ingest-job";
-import { namespacePaths } from "./namespace";
 import { openApiErrorResponses } from "./responses";
+import { v1Paths } from "./v1";
 
 export const document = createDocument({
   openapi: "3.0.3",
@@ -34,9 +33,7 @@ export const document = createDocument({
     },
   ],
   paths: {
-    namespacePaths,
-    ingestJobsPaths,
-    documentsPaths,
+    ...v1Paths,
   },
   components: {
     schemas: {
@@ -45,6 +42,7 @@ export const document = createDocument({
       IngestJobStatusSchema,
       DocumentSchema,
       DocumentStatusSchema,
+      MessageSchema,
     },
     securitySchemes: {
       token: {

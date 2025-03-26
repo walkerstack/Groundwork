@@ -7,9 +7,7 @@ import { getNamespaceEmbeddingModel } from "@/lib/embedding";
 import { getNamespaceLanguageModel } from "@/lib/llm";
 import { NEW_MESSAGE_PROMPT } from "@/lib/prompts";
 import {
-  DIGNA_NAMESPACE_ID,
   getNamespaceVectorStore,
-  queryVectorStore,
   queryVectorStoreV2,
 } from "@/lib/vector-store";
 import { chatSchema } from "@/schemas/api/chat";
@@ -26,7 +24,7 @@ export const POST = withNamespaceApiHandler(
     const messagesWithoutQuery = body.messages.slice(0, -1);
     const query =
       body.messages.length > 0
-        ? (body.messages[body.messages.length - 1]!.content as string)
+        ? body.messages[body.messages.length - 1]!.content
         : null;
 
     if (!query) {
@@ -49,30 +47,16 @@ export const POST = withNamespaceApiHandler(
     });
 
     // TODO: track the usage
-    let data;
-    if (namespace.id === DIGNA_NAMESPACE_ID) {
-      data = await queryVectorStore(vectorStore, embedding.embedding, {
-        topK: body.topK,
-        minScore: body.minScore,
-        filter: body.filter,
-        includeMetadata: true,
-        includeRelationships: body.includeRelationships,
-        rerankLimit: body.rerankLimit,
-        query: query,
-        rerank: body.rerank,
-      });
-    } else {
-      data = await queryVectorStoreV2(vectorStore, embedding.embedding, {
-        topK: body.topK,
-        minScore: body.minScore,
-        filter: body.filter,
-        includeMetadata: true,
-        includeRelationships: body.includeRelationships,
-        rerankLimit: body.rerankLimit,
-        query: query,
-        rerank: body.rerank,
-      });
-    }
+    const data = await queryVectorStoreV2(vectorStore, embedding.embedding, {
+      topK: body.topK,
+      minScore: body.minScore,
+      filter: body.filter,
+      includeMetadata: true,
+      includeRelationships: body.includeRelationships,
+      rerankLimit: body.rerankLimit,
+      query: query,
+      rerank: body.rerank,
+    });
 
     if (!data) {
       throw new AgentsetApiError({

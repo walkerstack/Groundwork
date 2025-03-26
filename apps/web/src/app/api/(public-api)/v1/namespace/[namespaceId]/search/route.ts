@@ -3,9 +3,7 @@ import { makeApiSuccessResponse } from "@/lib/api/response";
 import { parseRequestBody } from "@/lib/api/utils";
 import { getNamespaceEmbeddingModel } from "@/lib/embedding";
 import {
-  DIGNA_NAMESPACE_ID,
   getNamespaceVectorStore,
-  queryVectorStore,
   queryVectorStoreV2,
 } from "@/lib/vector-store";
 import { queryVectorStoreSchema } from "@/schemas/api/query";
@@ -32,30 +30,16 @@ export const POST = withNamespaceApiHandler(
     });
 
     // TODO: track the usage
-    let data;
-    if (namespace.id === DIGNA_NAMESPACE_ID) {
-      data = await queryVectorStore(vectorStore, embedding.embedding, {
-        topK: body.topK,
-        minScore: body.minScore,
-        filter: body.filter,
-        includeMetadata: body.includeMetadata,
-        includeRelationships: body.includeRelationships,
-        rerankLimit: body.rerankLimit,
-        query: body.query,
-        rerank: body.rerank,
-      });
-    } else {
-      data = await queryVectorStoreV2(vectorStore, embedding.embedding, {
-        topK: body.topK,
-        minScore: body.minScore,
-        filter: body.filter,
-        includeMetadata: body.includeMetadata,
-        includeRelationships: body.includeRelationships,
-        rerankLimit: body.rerankLimit,
-        query: body.query,
-        rerank: body.rerank,
-      });
-    }
+    const data = await queryVectorStoreV2(vectorStore, embedding.embedding, {
+      topK: body.topK,
+      minScore: body.minScore,
+      filter: body.filter,
+      includeMetadata: body.includeMetadata,
+      includeRelationships: body.includeRelationships,
+      rerankLimit: body.rerankLimit,
+      query: body.query,
+      rerank: body.rerank,
+    });
 
     return makeApiSuccessResponse({
       data,

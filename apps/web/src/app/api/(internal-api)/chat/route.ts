@@ -26,7 +26,7 @@ export const POST = withAuthApiHandler(
     const messagesWithoutQuery = body.messages.slice(0, -1);
     const query =
       body.messages.length > 0
-        ? (body.messages[body.messages.length - 1]!.content as string)
+        ? body.messages[body.messages.length - 1]!.content
         : null;
 
     if (!query) {

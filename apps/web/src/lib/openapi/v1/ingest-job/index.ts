@@ -6,11 +6,11 @@ import { getIngestJobInfo } from "./get-job";
 import { listIngestJobs } from "./list-jobs";
 
 export const ingestJobsPaths: ZodOpenApiPathsObject = {
-  "/namespace/{namespaceId}/ingest-jobs": {
+  "/v1/namespace/{namespaceId}/ingest-jobs": {
     get: listIngestJobs,
     post: createIngestJob,
   },
-  "/namespace/{namespaceId}/ingest-jobs/{jobId}": {
+  "/v1/namespace/{namespaceId}/ingest-jobs/{jobId}": {
     get: getIngestJobInfo,
     delete: deleteIngestJob,
   },
