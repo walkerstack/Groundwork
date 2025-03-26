@@ -27,6 +27,11 @@ export const listIngestJobs: ZodOpenApiOperationObject = {
   description:
     "Retrieve a paginated list of ingest jobs for the authenticated organization.",
   requestParams: {
+    path: z.object({
+      namespaceId: z
+        .string()
+        .describe("The id of the namespace to create the ingest job for."),
+    }),
     query: getIngestionJobsSchema,
     header: tenantHeaderSchema,
   },

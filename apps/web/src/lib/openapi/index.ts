@@ -4,7 +4,11 @@ import {
   IngestJobSchema,
   IngestJobStatusSchema,
 } from "@/schemas/api/ingest-job";
-import { NamespaceSchema } from "@/schemas/api/namespace";
+import {
+  EmbeddingConfigSchema,
+  NamespaceSchema,
+  VectorStoreSchema,
+} from "@/schemas/api/namespace";
 import { createDocument } from "zod-openapi";
 
 import { openApiErrorResponses } from "./responses";
@@ -37,6 +41,8 @@ export const document = createDocument({
   },
   components: {
     schemas: {
+      EmbeddingConfigSchema,
+      VectorStoreSchema,
       NamespaceSchema,
       IngestJobSchema,
       IngestJobStatusSchema,

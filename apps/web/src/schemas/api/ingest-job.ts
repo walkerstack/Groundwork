@@ -7,31 +7,48 @@ import { paginationSchema } from "./pagination";
 const nameSchema = z
   .string()
   .nullable()
+  .optional()
   .default(null)
   .describe("The name of the ingest job.");
 
-export const textPayloadSchema = z.object({
-  type: z.literal("TEXT"),
-  text: z.string().describe("The text to ingest."),
-  name: nameSchema,
-});
+export const textPayloadSchema = z
+  .object({
+    type: z.literal("TEXT"),
+    text: z.string().describe("The text to ingest."),
+    name: nameSchema,
+  })
+  .openapi({
+    title: "Text Payload",
+  });
 
-export const filePayloadSchema = z.object({
-  type: z.literal("FILE"),
-  fileUrl: z.string().describe("The URL of the file to ingest."),
-  name: nameSchema,
-});
+export const filePayloadSchema = z
+  .object({
+    type: z.literal("FILE"),
+    fileUrl: z.string().describe("The URL of the file to ingest."),
+    name: nameSchema,
+  })
+  .openapi({
+    title: "URL Payload",
+  });
 
-export const managedFilePayloadSchema = z.object({
-  type: z.literal("MANAGED_FILE"),
-  key: z.string().describe("The key of the managed file to ingest."),
-  name: nameSchema,
-});
+export const managedFilePayloadSchema = z
+  .object({
+    type: z.literal("MANAGED_FILE"),
+    key: z.string().describe("The key of the managed file to ingest."),
+    name: nameSchema,
+  })
+  .openapi({
+    title: "Managed File Payload",
+  });
 
-export const urlsPayloadSchema = z.object({
-  type: z.literal("URLS"),
-  urls: z.array(z.string().url()).describe("The URLs to ingest."),
-});
+export const urlsPayloadSchema = z
+  .object({
+    type: z.literal("URLS"),
+    urls: z.array(z.string().url()).describe("The URLs to ingest."),
+  })
+  .openapi({
+    title: "URLs Payload",
+  });
 
 export const ingestJobPayloadSchema = z
   .discriminatedUnion("type", [

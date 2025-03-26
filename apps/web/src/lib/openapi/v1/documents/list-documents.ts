@@ -24,6 +24,11 @@ export const listDocuments: ZodOpenApiOperationObject = {
   description:
     "Retrieve a paginated list of documents for the authenticated organization.",
   requestParams: {
+    path: z.object({
+      namespaceId: z
+        .string()
+        .describe("The id of the namespace to create the ingest job for."),
+    }),
     query: getDocumentsSchema,
     header: tenantHeaderSchema,
   },
