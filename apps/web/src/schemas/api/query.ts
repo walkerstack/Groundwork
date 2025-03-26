@@ -51,7 +51,8 @@ export const baseQueryVectorStoreSchema = z.object({
 });
 
 export const refineRereankLimit = <
-  T extends (typeof baseQueryVectorStoreSchema)["shape"] & z.ZodRawShape,
+  T extends Partial<(typeof baseQueryVectorStoreSchema)["shape"]> &
+    z.ZodRawShape,
   Out extends {
     rerankLimit?: number;
     topK: number;

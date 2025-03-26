@@ -9,8 +9,9 @@ export function useNamespaceChat() {
     id: "chat",
     api: `/api/chat?namespaceId=${activeNamespace.id}`,
     body: {
-      topK: 5,
-      stream: true,
+      topK: 15,
+      rerankLimit: 5,
+      rerank: true,
     },
     experimental_throttle: 100,
     sendExtraMessageFields: true,

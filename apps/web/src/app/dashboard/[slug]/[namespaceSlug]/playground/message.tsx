@@ -1,25 +1,23 @@
 "use client";
 
+import type { UseChatHelpers } from "@ai-sdk/react";
 import type { UIMessage } from "ai";
-
-import { AnimatePresence, motion } from "framer-motion";
 import { memo, useState } from "react";
-
-import { Markdown } from "./markdown";
-import { MessageActions } from "./message-actions";
-
-import equal from "fast-deep-equal";
-import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { cn } from "@/lib/utils";
+import equal from "fast-deep-equal";
+import { AnimatePresence, motion } from "framer-motion";
+import { PencilIcon, SparklesIcon } from "lucide-react";
+
+import { Markdown } from "./markdown";
+import { MessageActions } from "./message-actions";
 import { MessageEditor } from "./message-editor";
 import { MessageReasoning } from "./message-reasoning";
-import { UseChatHelpers } from "@ai-sdk/react";
-import { PencilIcon, SparklesIcon } from "lucide-react";
 
 // import { PreviewAttachment } from "./preview-attachment";
 // import { Weather } from "./weather";
@@ -87,7 +85,7 @@ const PurePreviewMessage = ({
               </div>
             )} */}
 
-            {message.parts?.map((part, index) => {
+            {message.parts.map((part, index) => {
               const { type } = part;
               const key = `message-${message.id}-part-${index}`;
 
@@ -130,7 +128,13 @@ const PurePreviewMessage = ({
                             message.role === "user",
                         })}
                       >
-                        <Markdown>{part.text}</Markdown>
+                        <Markdown
+                          annotations={
+                            message.annotations as Record<string, unknown>[]
+                          }
+                        >
+                          {part.text}
+                        </Markdown>
                       </div>
                     </div>
                   );

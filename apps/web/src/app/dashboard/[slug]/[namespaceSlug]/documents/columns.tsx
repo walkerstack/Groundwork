@@ -134,7 +134,7 @@ export const columns: ColumnDef<DocumentCol>[] = [
     },
   },
   {
-    accessorKey: "totalCharacters",
+    accessorKey: "totalTokens",
     header: "Total Tokens",
     cell: ({ row }) => {
       return <p>{formatNumber(row.original.totalTokens, "compact")}</p>;

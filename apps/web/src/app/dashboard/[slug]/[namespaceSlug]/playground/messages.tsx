@@ -1,11 +1,12 @@
-import { UIMessage } from "ai";
-import { PreviewMessage, ThinkingMessage } from "./message";
-import { useScrollToBottom } from "@/hooks/use-scroll-to-bottom";
-import { Overview } from "./overview";
+import type { UseChatHelpers } from "@ai-sdk/react";
+import type { UIMessage } from "ai";
 import { memo } from "react";
+import { useScrollToBottom } from "@/hooks/use-scroll-to-bottom";
 // import { Vote } from '@/lib/db/schema';
 import equal from "fast-deep-equal";
-import { UseChatHelpers } from "@ai-sdk/react";
+
+import { PreviewMessage, ThinkingMessage } from "./message";
+import { Overview } from "./overview";
 
 interface MessagesProps {
   chatId: string;

@@ -20,7 +20,7 @@ export const MessageSchema = z
   });
 
 export const chatSchema = refineRereankLimit(
-  baseQueryVectorStoreSchema.extend({
+  baseQueryVectorStoreSchema.omit({ query: true }).extend({
     systemPrompt: z
       .string()
       .optional()
