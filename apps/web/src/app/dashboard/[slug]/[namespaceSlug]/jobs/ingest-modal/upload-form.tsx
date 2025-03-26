@@ -49,8 +49,8 @@ export default function UploadForm({ onSuccess }: { onSuccess: () => void }) {
     namespaceId: activeNamespace.id,
   });
 
-  const { mutateAsync: ingestFile, isPending: isFilePending } =
-    api.ingestJob.ingestManagedFile.useMutation({
+  const { mutateAsync, isPending: isFilePending } =
+    api.ingestJob.ingest.useMutation({
       onSuccess: onSuccess,
     });
 
@@ -58,10 +58,13 @@ export default function UploadForm({ onSuccess }: { onSuccess: () => void }) {
     const uploadedFile = await onUpload(data.files[0]!);
     if (!uploadedFile) return;
 
-    await ingestFile({
+    await mutateAsync({
       namespaceId: activeNamespace.id,
-      name: data.name ?? uploadedFile.name,
-      key: uploadedFile.key,
+      payload: {
+        type: "MANAGED_FILE",
+        name: data.name ?? uploadedFile.name,
+        key: uploadedFile.key,
+      },
     });
   };
 

@@ -33,8 +33,12 @@ export const getNamespaceEmbeddingModel = async (
     case "AZURE_OPENAI": {
       const { createAzure } = await import("@ai-sdk/azure");
 
-      const { apiKey, resourceName, deployment, apiVersion } = config;
-      const azure = createAzure({ apiKey, resourceName, apiVersion });
+      const { apiKey, baseUrl, deployment, apiVersion } = config;
+      const azure = createAzure({
+        apiKey,
+        apiVersion,
+        baseURL: baseUrl,
+      });
       return azure.textEmbeddingModel(deployment);
     }
 

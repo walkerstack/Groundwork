@@ -32,15 +32,17 @@ export default function UrlsForm({ onSuccess }: { onSuccess: () => void }) {
     },
   });
 
-  const { mutateAsync: ingestUrls, isPending: isUrlsPending } =
-    api.ingestJob.ingestUrls.useMutation({
-      onSuccess,
-    });
+  const { mutateAsync, isPending } = api.ingestJob.ingest.useMutation({
+    onSuccess,
+  });
 
   const handleUrlsSubmit = async (data: z.infer<typeof schema>) => {
-    await ingestUrls({
+    await mutateAsync({
       namespaceId: activeNamespace.id,
-      urls: data.urls,
+      payload: {
+        type: "URLS",
+        urls: data.urls,
+      },
     });
   };
 
@@ -109,7 +111,7 @@ export default function UrlsForm({ onSuccess }: { onSuccess: () => void }) {
         </div>
 
         <DialogFooter>
-          <Button type="submit" isLoading={isUrlsPending}>
+          <Button type="submit" isLoading={isPending}>
             Ingest URLs
           </Button>
         </DialogFooter>

@@ -13,9 +13,17 @@ const BATCH_SIZE = 30;
 
 export const { POST } = serve<{
   jobId: string;
+  deleteNamespaceWhenDone?: boolean;
 }>(
   async (context) => {
-    const { namespace: _ns, ...ingestJob } = await context.run(
+    const shouldDeleteNamespace = await context.run(
+      "should-delete-namespace",
+      () => {
+        return context.requestPayload.deleteNamespaceWhenDone ?? false;
+      },
+    );
+
+    const { namespace, ...ingestJob } = await context.run(
       "get-config",
       async () => {
         const { jobId } = context.requestPayload;
@@ -123,6 +131,21 @@ export const { POST } = serve<{
         await db.ingestJob.delete({
           where: { id: ingestJob.id },
         });
+      });
+    }
+
+    if (shouldDeleteNamespace) {
+      await context.run("check-and-delete-namespace", async () => {
+        const job = await db.ingestJob.findFirst({
+          where: { namespaceId: namespace.id },
+        });
+
+        if (!job) {
+          await db.namespace.delete({ where: { id: namespace.id } });
+          return true;
+        }
+
+        return false;
       });
     }
   },

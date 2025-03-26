@@ -57,12 +57,20 @@ export const triggerDeleteDocumentJob = async ({
   });
 };
 
-export const triggerDeleteIngestJob = async ({ jobId }: { jobId: string }) => {
+export const triggerDeleteIngestJob = async (body: {
+  jobId: string;
+  deleteNamespaceWhenDone?: boolean;
+}) => {
   return workflowClient.trigger({
     url: `${getBaseUrl()}/api/workflows/delete-ingest-job`,
-    body: {
-      jobId,
-    },
+    body,
+  });
+};
+
+export const triggerDeleteNamespace = async (body: { namespaceId: string }) => {
+  return workflowClient.trigger({
+    url: `${getBaseUrl()}/api/workflows/delete-namespace`,
+    body,
   });
 };
 

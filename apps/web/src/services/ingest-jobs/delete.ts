@@ -2,51 +2,22 @@ import { triggerDeleteIngestJob } from "@/lib/workflow";
 
 import { db, IngestJobStatus } from "@agentset/db";
 
-export const deleteIngestJob = async ({
-  jobId,
-  userId,
-}: {
-  jobId: string;
-  userId?: string;
-}) => {
-  const ingestJob = await db.ingestJob.findUnique({
-    where: {
-      id: jobId,
-      ...(userId
-        ? {
-            namespace: {
-              organization: {
-                members: {
-                  some: { userId, role: { in: ["admin", "owner"] } },
-                },
-              },
-            },
-          }
-        : {}),
-    },
-    select: {
-      id: true,
-    },
-  });
-
-  if (!ingestJob) return null;
-
-  await db.ingestJob.update({
-    where: { id: ingestJob.id },
+export const deleteIngestJob = async (jobId: string) => {
+  const job = await db.ingestJob.update({
+    where: { id: jobId },
     data: {
       status: IngestJobStatus.QUEUED_FOR_DELETE,
     },
-    select: { id: true },
   });
 
-  const { workflowRunId } = await triggerDeleteIngestJob({ jobId });
+  const { workflowRunId } = await triggerDeleteIngestJob({ jobId: job.id });
   await db.ingestJob.update({
-    where: { id: ingestJob.id },
+    where: { id: job.id },
     data: {
       workflowRunsIds: { push: workflowRunId },
     },
     select: { id: true },
   });
 
-  return ingestJob;
+  return job;
 };

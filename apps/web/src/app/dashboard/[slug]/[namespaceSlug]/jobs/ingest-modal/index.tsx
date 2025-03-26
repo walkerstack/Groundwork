@@ -42,9 +42,7 @@ export function IngestModal() {
     toast.success("URL ingestion job created");
   };
 
-  const isPending =
-    utils.ingestJob.ingestFile.isMutating() > 0 ||
-    utils.ingestJob.ingestText.isMutating() > 0;
+  const isPending = utils.ingestJob.ingest.isMutating() > 0;
 
   return (
     <Dialog

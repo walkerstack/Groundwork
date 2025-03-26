@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect } from "react";
+import { Fragment, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { DialogFooter } from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
@@ -13,7 +14,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { authClient } from "@/lib/auth-client";
 import { toSlug } from "@/lib/slug";
-import { cn } from "@/lib/utils";
 import { useRouter } from "@bprogress/next/app";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
@@ -40,9 +40,12 @@ const formSchema = z.object({
 });
 
 export function CreateOrgForm({
-  className,
-  ...props
-}: React.ComponentPropsWithoutRef<"div">) {
+  isDialog,
+  onSuccess,
+}: {
+  isDialog?: boolean;
+  onSuccess?: () => void;
+}) {
   const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema, undefined, { mode: "async" }),
@@ -69,6 +72,8 @@ export function CreateOrgForm({
       },
       onSuccess: (data) => {
         router.push(`/dashboard/${data.slug}`);
+        onSuccess?.();
+        form.reset();
       },
       onError: (error) => {
         console.error(error);
@@ -88,46 +93,44 @@ export function CreateOrgForm({
     await createOrganization(values);
   };
 
+  const SubmitWrapper = isDialog ? DialogFooter : Fragment;
+
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <div className="flex flex-col items-center gap-2">
-        <h1 className="text-xl font-bold">Create your first organization</h1>
-      </div>
-
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)}>
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)}>
+        <div className="flex flex-col gap-6">
           <div className="flex flex-col gap-6">
-            <div className="flex flex-col gap-6">
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Name</FormLabel>
-                    <FormControl>
-                      <Input placeholder="My Organization" {...field} />
-                    </FormControl>
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Name</FormLabel>
+                  <FormControl>
+                    <Input placeholder="My Organization" {...field} />
+                  </FormControl>
 
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-              <FormField
-                control={form.control}
-                name="slug"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Slug</FormLabel>
-                    <FormControl>
-                      <Input placeholder="my-organization" {...field} />
-                    </FormControl>
+            <FormField
+              control={form.control}
+              name="slug"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Slug</FormLabel>
+                  <FormControl>
+                    <Input placeholder="my-organization" {...field} />
+                  </FormControl>
 
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
+            <SubmitWrapper>
               <Button
                 type="submit"
                 className="w-full"
@@ -135,10 +138,10 @@ export function CreateOrgForm({
               >
                 Create
               </Button>
-            </div>
+            </SubmitWrapper>
           </div>
-        </form>
-      </Form>
-    </div>
+        </div>
+      </form>
+    </Form>
   );
 }

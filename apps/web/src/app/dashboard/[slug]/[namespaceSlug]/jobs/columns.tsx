@@ -3,25 +3,17 @@
 import type { BadgeProps } from "@/components/ui/badge";
 import type { ColumnDef } from "@tanstack/react-table";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { capitalize } from "@/lib/string-utils";
 import { formatMs } from "@/lib/utils";
-import { api } from "@/trpc/react";
-import { CopyIcon, EllipsisVerticalIcon, Trash2Icon } from "lucide-react";
-import { toast } from "sonner";
 
 import type { IngestJob } from "@agentset/db";
 import { IngestJobStatus } from "@agentset/db";
 
+import { JobActions } from "./actions";
+
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
-export interface Job {
+export interface JobCol {
   id: string;
   status: IngestJobStatus;
   payload: IngestJob["payload"];
@@ -60,7 +52,7 @@ const formatDate = (date: Date | string) => {
   return new Date(date).toLocaleString();
 };
 
-export const columns: ColumnDef<Job>[] = [
+export const columns: ColumnDef<JobCol>[] = [
   {
     accessorKey: "payload",
     header: "Type",
@@ -130,50 +122,6 @@ export const columns: ColumnDef<Job>[] = [
   },
   {
     id: "actions",
-    cell: ({ row }) => {
-      const utils = api.useUtils();
-      const { mutate: deleteJob, isPending } = api.ingestJob.delete.useMutation(
-        {
-          onSuccess: () => {
-            toast.success("Ingest job deleted");
-            void utils.ingestJob.all.invalidate();
-          },
-        },
-      );
-
-      const copyId = async () => {
-        await navigator.clipboard.writeText(row.original.id);
-        toast.success("Copied ID");
-      };
-
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button size="icon" variant="ghost">
-              <EllipsisVerticalIcon className="size-4" />
-            </Button>
-          </DropdownMenuTrigger>
-
-          <DropdownMenuContent>
-            <DropdownMenuItem onClick={copyId}>
-              <CopyIcon className="size-4" />
-              Copy ID
-            </DropdownMenuItem>
-
-            <DropdownMenuItem
-              disabled={
-                isPending ||
-                row.original.status === IngestJobStatus.DELETING ||
-                row.original.status === IngestJobStatus.QUEUED_FOR_DELETE
-              }
-              onClick={() => deleteJob({ jobId: row.original.id })}
-            >
-              <Trash2Icon className="size-4" />
-              Delete
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
-    },
+    cell: ({ row }) => <JobActions row={row} />,
   },
 ];

@@ -1,15 +1,20 @@
-import { z } from "zod";
+import type z from "@/lib/zod";
+import type { paginationSchema } from "@/schemas/api/pagination";
+import { normalizeId } from "@/lib/api/ids";
 
-export const paginationSchema = z.object({
-  cursor: z.string().optional(),
-  cursorDirection: z.enum(["forward", "backward"]).default("forward"),
-  perPage: z.coerce.number().min(1).max(100).optional().default(30),
-});
-
-export const getPaginationArgs = (input: z.infer<typeof paginationSchema>) => {
+export const getPaginationArgs = (
+  input: z.infer<typeof paginationSchema>,
+  cursorPrefix?: Parameters<typeof normalizeId>[1],
+) => {
   return {
     take: (input.perPage + 1) * (input.cursorDirection === "forward" ? 1 : -1),
-    cursor: input.cursor ? { id: input.cursor } : undefined,
+    cursor: input.cursor
+      ? {
+          id: cursorPrefix
+            ? normalizeId(input.cursor, cursorPrefix)
+            : input.cursor,
+        }
+      : undefined,
   };
 };
 
