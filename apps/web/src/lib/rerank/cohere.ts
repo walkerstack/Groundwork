@@ -1,10 +1,12 @@
+import type { BaseNode, Metadata } from "llamaindex";
 import { env } from "@/env";
 import { CohereClient } from "cohere-ai";
+import { MetadataMode } from "llamaindex";
 
 import { tryCatch } from "../error";
 
 interface BaseRerankDocument {
-  text: string;
+  node: BaseNode<Metadata>;
 }
 
 interface RerankOptions {
@@ -13,7 +15,7 @@ interface RerankOptions {
   cohereApiKey?: string;
 }
 
-type RerankResult<T extends BaseRerankDocument> = T & {
+export type RerankResult<T extends BaseRerankDocument> = T & {
   rerankScore?: number;
 };
 
@@ -29,7 +31,7 @@ export async function rerankResults<T extends BaseRerankDocument>(
 
   const { data: rerankResults, error } = await tryCatch(
     client.v2.rerank({
-      documents: results.map((doc) => doc.text),
+      documents: results.map((doc) => doc.node.getContent(MetadataMode.NONE)),
       query: options.query,
       topN: options.limit,
       model: "rerank-v3.5",

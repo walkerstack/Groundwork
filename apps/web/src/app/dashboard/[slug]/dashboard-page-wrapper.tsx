@@ -6,15 +6,17 @@ export default function DashboardPageWrapper({
   children,
   title,
   className,
+  actions,
 }: {
   children: React.ReactNode;
   title: string;
   className?: string;
+  actions?: React.ReactNode;
 }) {
   return (
     <>
-      <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
-        <div className="flex w-full items-center gap-1 px-4 lg:gap-2 lg:px-6">
+      <header className="flex h-16 shrink-0 items-center justify-between gap-2 px-4 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 lg:px-6">
+        <div className="flex w-full items-center gap-1 lg:gap-2">
           <SidebarTrigger className="-ml-1" />
           <Separator
             orientation="vertical"
@@ -22,6 +24,8 @@ export default function DashboardPageWrapper({
           />
           <h1 className="text-base font-medium">{title}</h1>
         </div>
+
+        {actions}
       </header>
 
       <div className={cn("flex flex-1 flex-col p-4 pt-10", className)}>

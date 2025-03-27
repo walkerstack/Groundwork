@@ -1,6 +1,7 @@
-import { Input } from "@/components/ui/input";
-import { useNamespaceChat } from "./use-chat";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+
+import { useNamespaceChat } from "./use-chat";
 
 export default function ChatForm() {
   const { input, handleSubmit, handleInputChange, status } = useNamespaceChat();

@@ -13,3 +13,6 @@ export const capitalize = (str?: string | null) => {
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
 };
+
+export const filterFalsy = <T>(arr: T[]): NonNullable<T>[] =>
+  arr.filter(Boolean) as NonNullable<T>[];

@@ -3,15 +3,11 @@ import { AgentsetApiError } from "@/lib/api/errors";
 import { withNamespaceApiHandler } from "@/lib/api/handler";
 import { makeApiSuccessResponse } from "@/lib/api/response";
 import { parseRequestBody } from "@/lib/api/utils";
-import { getNamespaceEmbeddingModel } from "@/lib/embedding";
 import { getNamespaceLanguageModel } from "@/lib/llm";
 import { NEW_MESSAGE_PROMPT } from "@/lib/prompts";
-import {
-  getNamespaceVectorStore,
-  queryVectorStoreV2,
-} from "@/lib/vector-store";
+import { queryVectorStoreV2 } from "@/lib/vector-store";
 import { chatSchema } from "@/schemas/api/chat";
-import { createDataStreamResponse, embed, generateText, streamText } from "ai";
+import { createDataStreamResponse, generateText, streamText } from "ai";
 
 // export const runtime = "edge";
 export const preferredRegion = "iad1"; // make this closer to the DB
@@ -34,27 +30,16 @@ export const POST = withNamespaceApiHandler(
       });
     }
 
-    // TODO: if the embedding model is managed, track the usage
-    const [embeddingModel, vectorStore, languageModel] = await Promise.all([
-      getNamespaceEmbeddingModel(namespace),
-      getNamespaceVectorStore(namespace, tenantId),
-      getNamespaceLanguageModel(), // TODO: pass namespace config
-    ]);
-
-    const embedding = await embed({
-      model: embeddingModel,
-      value: query,
-    });
-
-    // TODO: track the usage
-    const data = await queryVectorStoreV2(vectorStore, embedding.embedding, {
+    const languageModel = await getNamespaceLanguageModel(); // TODO: pass namespace config
+    const data = await queryVectorStoreV2(namespace, {
+      query,
+      tenantId,
       topK: body.topK,
       minScore: body.minScore,
       filter: body.filter,
-      includeMetadata: true,
+      includeMetadata: body.includeMetadata,
       includeRelationships: body.includeRelationships,
       rerankLimit: body.rerankLimit,
-      query: query,
       rerank: body.rerank,
     });
 
@@ -83,14 +68,13 @@ export const POST = withNamespaceApiHandler(
       // add the sources to the stream
       return createDataStreamResponse({
         execute: (dataStream) => {
+          dataStream.writeMessageAnnotation({
+            agentset_sources: data,
+          } as unknown as JSONValue);
+
           const messageStream = streamText({
             model: languageModel,
             messages: newMessages,
-            onFinish: () => {
-              dataStream.writeMessageAnnotation({
-                agentset_sources: data,
-              } as JSONValue);
-            },
           });
 
           messageStream.mergeIntoDataStream(dataStream);

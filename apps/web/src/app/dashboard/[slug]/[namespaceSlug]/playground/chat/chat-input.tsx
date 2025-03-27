@@ -1,28 +1,20 @@
 "use client";
 
+import type { UseChatHelpers } from "@ai-sdk/react";
 import type { Attachment, Message } from "ai";
 import type React from "react";
-import {
-  useRef,
-  useEffect,
-  useState,
-  useCallback,
-  type Dispatch,
-  type SetStateAction,
-  type ChangeEvent,
-  memo,
-} from "react";
-import { toast } from "sonner";
-import { useLocalStorage, useWindowSize } from "usehooks-ts";
-
+import type { ChangeEvent, Dispatch, SetStateAction } from "react";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { cn } from "@/lib/utils";
+import { UseChatOptions } from "@ai-sdk/react";
 // import { PreviewAttachment } from './preview-attachment';
 // import { SuggestedActions } from './suggested-actions';
 import equal from "fast-deep-equal";
-import { UseChatHelpers, UseChatOptions } from "@ai-sdk/react";
-import { cn } from "@/lib/utils";
 import { ArrowUpIcon, StopCircleIcon } from "lucide-react";
+import { toast } from "sonner";
+import { useLocalStorage, useWindowSize } from "usehooks-ts";
 
 function PureMultimodalInput({
   chatId,

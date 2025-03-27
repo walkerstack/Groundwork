@@ -2,15 +2,12 @@ import type { CoreMessage, JSONValue } from "ai";
 import { AgentsetApiError } from "@/lib/api/errors";
 import { withAuthApiHandler } from "@/lib/api/handler";
 import { parseRequestBody } from "@/lib/api/utils";
-import { getNamespaceEmbeddingModel } from "@/lib/embedding";
 import { getNamespaceLanguageModel } from "@/lib/llm";
 import { NEW_MESSAGE_PROMPT } from "@/lib/prompts";
-import {
-  getNamespaceVectorStore,
-  queryVectorStoreV2,
-} from "@/lib/vector-store";
+import { queryVectorStoreV2 } from "@/lib/vector-store";
+import z from "@/lib/zod";
 import { chatSchema } from "@/schemas/api/chat";
-import { createDataStreamResponse, embed, streamText } from "ai";
+import { createDataStreamResponse, streamText } from "ai";
 
 // export const runtime = "edge";
 export const preferredRegion = "iad1"; // make this closer to the DB
@@ -18,7 +15,12 @@ export const maxDuration = 60;
 
 export const POST = withAuthApiHandler(
   async ({ req, namespace, tenantId, headers }) => {
-    const body = await chatSchema.parseAsync(await parseRequestBody(req));
+    const body = await z
+      .object({
+        temperature: z.number().optional(),
+      })
+      .and(chatSchema)
+      .parseAsync(await parseRequestBody(req));
 
     const messagesWithoutQuery = body.messages.slice(0, -1);
     const query =
@@ -33,27 +35,18 @@ export const POST = withAuthApiHandler(
       });
     }
 
-    // TODO: if the embedding model is managed, track the usage
-    const [embeddingModel, vectorStore, languageModel] = await Promise.all([
-      getNamespaceEmbeddingModel(namespace),
-      getNamespaceVectorStore(namespace, tenantId),
-      getNamespaceLanguageModel(), // TODO: pass namespace config
-    ]);
-
-    const embedding = await embed({
-      model: embeddingModel,
-      value: query,
-    });
+    const languageModel = await getNamespaceLanguageModel(); // TODO: pass namespace config
 
     // TODO: track the usage
-    const data = await queryVectorStoreV2(vectorStore, embedding.embedding, {
+    const data = await queryVectorStoreV2(namespace, {
+      query: query,
+      tenantId,
       topK: body.topK,
       minScore: body.minScore,
       filter: body.filter,
-      includeMetadata: true,
+      includeMetadata: body.includeMetadata,
       includeRelationships: body.includeRelationships,
       rerankLimit: body.rerankLimit,
-      query: query,
       rerank: body.rerank,
     });
 
@@ -81,14 +74,14 @@ export const POST = withAuthApiHandler(
     // add the sources to the stream
     return createDataStreamResponse({
       execute: (dataStream) => {
+        dataStream.writeMessageAnnotation({
+          agentset_sources: data as unknown as JSONValue,
+        });
+
         const messageStream = streamText({
           model: languageModel,
           messages: newMessages,
-          onFinish: () => {
-            dataStream.writeMessageAnnotation({
-              agentset_sources: data,
-            } as JSONValue);
-          },
+          temperature: body.temperature,
         });
 
         messageStream.mergeIntoDataStream(dataStream);
