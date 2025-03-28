@@ -1,7 +1,7 @@
 import type {
   ListResponse,
-  RecordMetadata,
   QueryResponse,
+  RecordMetadata,
 } from "@pinecone-database/pinecone";
 
 export class Pinecone {
@@ -57,10 +57,12 @@ export class Pinecone {
     return json as T;
   }
 
-  async list(params: {
-    prefix?: string;
-    paginationToken?: string;
-  }): Promise<ListResponse> {
+  async list(
+    params: {
+      prefix?: string;
+      paginationToken?: string;
+    } = {},
+  ): Promise<ListResponse> {
     return this.makeRequest<ListResponse>("GET", "/vectors/list", params);
   }
 
@@ -109,5 +111,13 @@ export class Pinecone {
     return this.makeRequest<{ success: boolean }>("POST", `/vectors/delete`, {
       deleteAll: true,
     });
+  }
+
+  async getDimensions() {
+    const response = await this.makeRequest<{ dimensions: number }>(
+      "GET",
+      "/describe_index_stats",
+    );
+    return response.dimensions;
   }
 }

@@ -14,7 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useNamespace } from "@/contexts/namespace-context";
 import { DEFAULT_SYSTEM_PROMPT } from "@/lib/prompts";
-import { SettingsIcon } from "lucide-react";
+import { Settings2Icon } from "lucide-react";
 import { toast } from "sonner";
 
 import { useChatSettings } from "./chat/chat-settings.store";
@@ -73,16 +73,16 @@ export default function ChatSettings() {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="outline">
-          <SettingsIcon className="size-4" />
-          Settings
+          <Settings2Icon className="size-4" />
+          Parameters
         </Button>
       </DialogTrigger>
 
       <DialogContent className="overflow-y-auto sm:max-w-xl">
         <DialogHeader>
-          <DialogTitle>Settings</DialogTitle>
+          <DialogTitle>Parameters</DialogTitle>
           <DialogDescription>
-            Customize the settings for the chat.
+            Customize the parameters for the chat.
           </DialogDescription>
         </DialogHeader>
 

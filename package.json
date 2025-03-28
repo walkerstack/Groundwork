@@ -16,6 +16,7 @@
     "generate-openapi": "turbo -F @agentset/web generate-openapi",
     "dev": "turbo watch dev --continue",
     "dev:web": "turbo watch dev -F @agentset/web...",
+    "dev:emails": "turbo watch dev -F @agentset/emails...",
     "format": "turbo run format --continue -- --cache --cache-location .cache/.prettiercache",
     "format:fix": "turbo run format --continue -- --write --cache --cache-location .cache/.prettiercache",
     "lint": "turbo run lint --continue -- --cache --cache-location .cache/.eslintcache",

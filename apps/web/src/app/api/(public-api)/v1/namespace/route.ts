@@ -8,6 +8,10 @@ import {
   NamespaceSchema,
 } from "@/schemas/api/namespace";
 import { createNamespace } from "@/services/namespaces/create";
+import {
+  validateEmbeddingModel,
+  validateVectorStoreConfig,
+} from "@/services/namespaces/validate";
 
 import { db, Prisma } from "@agentset/db";
 
@@ -37,6 +41,27 @@ export const POST = withApiHandler(async ({ organization, req, headers }) => {
   const parsed = await createNamespaceSchema.parseAsync(
     await parseRequestBody(req),
   );
+
+  const { success: isValidVectorStore, error: vectorStoreError } =
+    await validateVectorStoreConfig(
+      parsed.vectorStoreConfig,
+      parsed.embeddingConfig,
+    );
+  if (!isValidVectorStore) {
+    throw new AgentsetApiError({
+      code: "bad_request",
+      message: vectorStoreError,
+    });
+  }
+
+  const { success: isValidEmbedding, error: embeddingError } =
+    await validateEmbeddingModel(parsed.embeddingConfig);
+  if (!isValidEmbedding) {
+    throw new AgentsetApiError({
+      code: "bad_request",
+      message: embeddingError,
+    });
+  }
 
   try {
     // TODO: check apiScope
