@@ -5,9 +5,9 @@ import { parseRequestBody } from "@/lib/api/utils";
 import { getNamespaceLanguageModel } from "@/lib/llm";
 import { NEW_MESSAGE_PROMPT } from "@/lib/prompts";
 import { queryVectorStoreV2 } from "@/lib/vector-store";
-import z from "@/lib/zod";
-import { chatSchema } from "@/schemas/api/chat";
 import { createDataStreamResponse, streamText } from "ai";
+
+import { chatSchema } from "./schema";
 
 // export const runtime = "edge";
 export const preferredRegion = "iad1"; // make this closer to the DB
@@ -15,17 +15,12 @@ export const maxDuration = 60;
 
 export const POST = withAuthApiHandler(
   async ({ req, namespace, tenantId, headers }) => {
-    const body = await z
-      .object({
-        temperature: z.number().optional(),
-      })
-      .and(chatSchema)
-      .parseAsync(await parseRequestBody(req));
+    const body = await chatSchema.parseAsync(await parseRequestBody(req));
 
     const messagesWithoutQuery = body.messages.slice(0, -1);
     const query =
       body.messages.length > 0
-        ? body.messages[body.messages.length - 1]!.content
+        ? (body.messages[body.messages.length - 1]!.content as string)
         : null;
 
     if (!query) {
@@ -35,7 +30,8 @@ export const POST = withAuthApiHandler(
       });
     }
 
-    const languageModel = await getNamespaceLanguageModel(); // TODO: pass namespace config
+    // TODO: pass namespace config
+    const languageModel = await getNamespaceLanguageModel();
 
     // TODO: track the usage
     const data = await queryVectorStoreV2(namespace, {
@@ -58,7 +54,6 @@ export const POST = withAuthApiHandler(
     }
 
     const newMessages: CoreMessage[] = [
-      { role: "system", content: body.systemPrompt },
       ...messagesWithoutQuery,
       {
         role: "user",
@@ -80,6 +75,7 @@ export const POST = withAuthApiHandler(
 
         const messageStream = streamText({
           model: languageModel,
+          system: body.systemPrompt,
           messages: newMessages,
           temperature: body.temperature,
         });

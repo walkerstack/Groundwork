@@ -1,4 +1,3 @@
-import { MessageSchema } from "@/schemas/api/chat";
 import { DocumentSchema, DocumentStatusSchema } from "@/schemas/api/document";
 import {
   IngestJobSchema,
@@ -48,7 +47,6 @@ export const document = createDocument({
       IngestJobStatusSchema,
       DocumentSchema,
       DocumentStatusSchema,
-      MessageSchema,
     },
     securitySchemes: {
       token: {

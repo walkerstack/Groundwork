@@ -1,5 +1,6 @@
 import { env } from "@/env";
-import type { LLMConfig } from "@/types/prisma";
+
+import type { LLMConfig } from "@agentset/db";
 
 export const getNamespaceLanguageModel = async (config?: LLMConfig) => {
   if (!config) {
@@ -26,8 +27,8 @@ export const getNamespaceLanguageModel = async (config?: LLMConfig) => {
     case "AZURE_OPENAI": {
       const { createAzure } = await import("@ai-sdk/azure");
 
-      const { apiKey, resourceName, deployment, apiVersion } = config;
-      const azure = createAzure({ apiKey, resourceName, apiVersion });
+      const { apiKey, baseUrl, deployment, apiVersion } = config;
+      const azure = createAzure({ apiKey, baseURL: baseUrl, apiVersion });
       return azure.languageModel(deployment);
     }
 

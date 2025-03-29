@@ -1,6 +1,6 @@
-import type { PartitionResult } from "@/types/partition";
-import { jsonToNode, ObjectType } from "llamaindex";
+import type { PartitionBatch } from "@/types/partition";
 import { nodeToMetadata } from "@llamaindex/core/vector-store";
+import { jsonToNode, ObjectType } from "llamaindex";
 
 export const makeChunk = ({
   documentId,
@@ -9,7 +9,7 @@ export const makeChunk = ({
 }: {
   documentId: string;
   embedding: number[];
-  chunk: PartitionResult["chunks"][number];
+  chunk: PartitionBatch[number];
 }) => {
   const node = chunkResultToLlamaIndex(chunk);
 
@@ -58,9 +58,7 @@ const nodeRelationshipMap = {
 //   none: MetadataMode.NONE,
 // };
 
-export const chunkResultToLlamaIndex = (
-  chunk: PartitionResult["chunks"][number],
-) => {
+export const chunkResultToLlamaIndex = (chunk: PartitionBatch[number]) => {
   const newChunk = {
     ...chunk,
     type: nodeClassNameMap[chunk.class_name as keyof typeof nodeClassNameMap],
