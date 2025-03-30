@@ -58,7 +58,7 @@ export const POST = withAuthApiHandler(
       {
         role: "user",
         content: NEW_MESSAGE_PROMPT.compile({
-          chunks: data
+          chunks: data.results
             .map((chunk, idx) => `[${idx + 1}]: ${chunk.text}`)
             .join("\n\n"),
           query,

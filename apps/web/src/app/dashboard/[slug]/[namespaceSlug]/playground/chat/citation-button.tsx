@@ -1,3 +1,4 @@
+import type { QueryVectorStoreResult } from "@/lib/vector-store/parse-v2";
 import { cn } from "@/lib/utils";
 
 import { CitationModal } from "./citation-modal";
@@ -18,13 +19,13 @@ export const CitationButton = ({
   console.log({ props, annotations });
   const idx = props["data-citation"] ? props["data-citation"] - 1 : undefined;
   const sources = annotations?.[0]?.["agentset_sources"] as
-    | Array<{ text: string; metadata?: Record<string, unknown> }>
+    | QueryVectorStoreResult
     | undefined;
 
-  if (idx === undefined || !sources || !sources[idx])
+  if (idx === undefined || !sources || !sources.results[idx])
     return <span {...props}>{children}</span>;
 
-  const source = sources[idx];
+  const source = sources.results[idx];
 
   return (
     <CitationModal

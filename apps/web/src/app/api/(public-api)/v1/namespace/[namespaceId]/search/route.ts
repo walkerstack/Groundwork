@@ -1,3 +1,4 @@
+import { AgentsetApiError } from "@/lib/api/errors";
 import { withNamespaceApiHandler } from "@/lib/api/handler";
 import { makeApiSuccessResponse } from "@/lib/api/response";
 import { parseRequestBody } from "@/lib/api/utils";
@@ -26,8 +27,15 @@ export const POST = withNamespaceApiHandler(
       rerank: body.rerank,
     });
 
+    if (!data) {
+      throw new AgentsetApiError({
+        code: "internal_server_error",
+        message: "Failed to parse vector store results",
+      });
+    }
+
     return makeApiSuccessResponse({
-      data,
+      data: data.results,
       headers,
     });
   },

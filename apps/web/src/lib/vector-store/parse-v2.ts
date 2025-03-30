@@ -5,7 +5,6 @@ import { MetadataMode } from "llamaindex";
 
 import type { Namespace } from "@agentset/db";
 
-import type { RerankResult } from "../rerank/cohere";
 import { getNamespaceVectorStore } from ".";
 import { getNamespaceEmbeddingModel } from "../embedding";
 import { filterFalsy } from "../functions";
@@ -78,7 +77,7 @@ export const queryVectorStoreV2 = async (
     );
   }
 
-  let parsedResults = filterFalsy(
+  const parsedResults = filterFalsy(
     matches.map((match) => {
       const nodeContent = match.metadata?._node_content;
       if (!nodeContent) return null;
@@ -101,19 +100,29 @@ export const queryVectorStoreV2 = async (
   }
 
   // If re-ranking is enabled and we have a query, perform reranking
-  if (options.rerank && options.query) {
-    parsedResults = await rerankResults(parsedResults, {
+  let rerankedResults: typeof parsedResults | null = null;
+  if (options.rerank) {
+    rerankedResults = await rerankResults(parsedResults, {
       limit: options.rerankLimit || options.topK,
       query: options.query,
     });
   }
 
-  const results = parsedResults as RerankResult<
-    (typeof parsedResults)[number]
-  >[];
-
-  return formatResults(results, {
-    includeMetadata: options.includeMetadata,
-    includeRelationships: options.includeRelationships,
-  });
+  return {
+    query: options.query,
+    unorderedResults: rerankedResults
+      ? formatResults(parsedResults, {
+          includeMetadata: options.includeMetadata,
+          includeRelationships: options.includeRelationships,
+        })
+      : null,
+    results: formatResults(rerankedResults ?? parsedResults, {
+      includeMetadata: options.includeMetadata,
+      includeRelationships: options.includeRelationships,
+    }),
+  };
 };
+
+export type QueryVectorStoreResult = NonNullable<
+  Awaited<ReturnType<typeof queryVectorStoreV2>>
+>;

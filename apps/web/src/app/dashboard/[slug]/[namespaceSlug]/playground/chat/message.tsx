@@ -19,12 +19,6 @@ import { MessageActions } from "./message-actions";
 import { MessageEditor } from "./message-editor";
 import { MessageReasoning } from "./message-reasoning";
 
-// import { PreviewAttachment } from "./preview-attachment";
-// import { Weather } from "./weather";
-// import type { Vote } from '@/lib/db/schema';
-// import { DocumentToolCall, DocumentToolResult } from "./document";
-// import { DocumentPreview } from "./document-preview";
-
 const PurePreviewMessage = ({
   chatId,
   message,
@@ -71,20 +65,6 @@ const PurePreviewMessage = ({
           )}
 
           <div className="flex w-full flex-col gap-4">
-            {/* {message.experimental_attachments && (
-              <div
-                data-testid={`message-attachments`}
-                className="flex flex-row justify-end gap-2"
-              >
-                {message.experimental_attachments.map((attachment) => (
-                  <PreviewAttachment
-                    key={attachment.url}
-                    attachment={attachment}
-                  />
-                ))}
-              </div>
-            )} */}
-
             {message.parts.map((part, index) => {
               const { type } = part;
               const key = `message-${message.id}-part-${index}`;
@@ -157,72 +137,72 @@ const PurePreviewMessage = ({
                 }
               }
 
-              if (type === "tool-invocation") {
-                const { toolInvocation } = part;
-                const { toolName, toolCallId, state } = toolInvocation;
+              // if (type === "tool-invocation") {
+              //   const { toolInvocation } = part;
+              //   const { toolName, toolCallId, state } = toolInvocation;
 
-                // if (state === "call") {
-                //   const { args } = toolInvocation;
+              // if (state === "call") {
+              //   const { args } = toolInvocation;
 
-                //   return (
-                //     <div
-                //       key={toolCallId}
-                //       className={cn({
-                //         skeleton: ["getWeather"].includes(toolName),
-                //       })}
-                //     >
-                //       {toolName === "getWeather" ? (
-                //         <Weather />
-                //       ) : toolName === "createDocument" ? (
-                //         <DocumentPreview isReadonly={isReadonly} args={args} />
-                //       ) : toolName === "updateDocument" ? (
-                //         <DocumentToolCall
-                //           type="update"
-                //           args={args}
-                //           isReadonly={isReadonly}
-                //         />
-                //       ) : toolName === "requestSuggestions" ? (
-                //         <DocumentToolCall
-                //           type="request-suggestions"
-                //           args={args}
-                //           isReadonly={isReadonly}
-                //         />
-                //       ) : null}
-                //     </div>
-                //   );
-                // }
+              //   return (
+              //     <div
+              //       key={toolCallId}
+              //       className={cn({
+              //         skeleton: ["getWeather"].includes(toolName),
+              //       })}
+              //     >
+              //       {toolName === "getWeather" ? (
+              //         <Weather />
+              //       ) : toolName === "createDocument" ? (
+              //         <DocumentPreview isReadonly={isReadonly} args={args} />
+              //       ) : toolName === "updateDocument" ? (
+              //         <DocumentToolCall
+              //           type="update"
+              //           args={args}
+              //           isReadonly={isReadonly}
+              //         />
+              //       ) : toolName === "requestSuggestions" ? (
+              //         <DocumentToolCall
+              //           type="request-suggestions"
+              //           args={args}
+              //           isReadonly={isReadonly}
+              //         />
+              //       ) : null}
+              //     </div>
+              //   );
+              // }
 
-                // if (state === "result") {
-                //   const { result } = toolInvocation;
+              // if (state === "result") {
+              //   const { result } = toolInvocation;
 
-                //   return (
-                //     <div key={toolCallId}>
-                //       {toolName === "getWeather" ? (
-                //         <Weather weatherAtLocation={result} />
-                //       ) : toolName === "createDocument" ? (
-                //         <DocumentPreview
-                //           isReadonly={isReadonly}
-                //           result={result}
-                //         />
-                //       ) : toolName === "updateDocument" ? (
-                //         <DocumentToolResult
-                //           type="update"
-                //           result={result}
-                //           isReadonly={isReadonly}
-                //         />
-                //       ) : toolName === "requestSuggestions" ? (
-                //         <DocumentToolResult
-                //           type="request-suggestions"
-                //           result={result}
-                //           isReadonly={isReadonly}
-                //         />
-                //       ) : (
-                //         <pre>{JSON.stringify(result, null, 2)}</pre>
-                //       )}
-                //     </div>
-                //   );
-                // }
-              }
+              //   return (
+              //     <div key={toolCallId}>
+              //       {toolName === "getWeather" ? (
+              //         <Weather weatherAtLocation={result} />
+              //       ) : toolName === "createDocument" ? (
+              //         <DocumentPreview
+              //           isReadonly={isReadonly}
+              //           result={result}
+              //         />
+              //       ) : toolName === "updateDocument" ? (
+              //         <DocumentToolResult
+              //           type="update"
+              //           result={result}
+              //           isReadonly={isReadonly}
+              //         />
+              //       ) : toolName === "requestSuggestions" ? (
+              //         <DocumentToolResult
+              //           type="request-suggestions"
+              //           result={result}
+              //           isReadonly={isReadonly}
+              //         />
+              //       ) : (
+              //         <pre>{JSON.stringify(result, null, 2)}</pre>
+              //       )}
+              //     </div>
+              //   );
+              // }
+              // }
             })}
 
             {!isReadonly && (

@@ -1,32 +1,43 @@
 "use client";
 
+import CopyButton from "@/components/ui/copy-button";
 import { cn } from "@/lib/utils";
 
 interface CodeBlockProps {
-  node?: any;
-  inline: boolean;
-  className: string;
-  children: any;
+  inline?: boolean;
+  className?: string;
+  children: string;
+  hasCopy?: boolean;
 }
 
 export function CodeBlock({
-  node: _,
-  inline,
+  inline = false,
   className,
   children,
+  hasCopy = true,
   ...props
 }: CodeBlockProps) {
   if (!inline) {
     return (
-      <div className="not-prose flex flex-col">
+      <div className={cn("not-prose relative flex flex-col")}>
+        {hasCopy && (
+          <CopyButton
+            textToCopy={children}
+            className="absolute top-2 right-2"
+          />
+        )}
+
         <pre
           {...props}
           className={cn(
             "w-full overflow-x-auto rounded-xl border border-zinc-200 p-4 text-sm text-zinc-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50",
+
             className,
           )}
         >
-          <code className="break-words whitespace-pre-wrap">{children}</code>
+          <code className="min-w-0 break-words [word-break:break-word] whitespace-pre-wrap">
+            {children}
+          </code>
         </pre>
       </div>
     );
