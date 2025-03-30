@@ -110,11 +110,8 @@ export const queryVectorStoreV2 = async (
 
   return {
     query: options.query,
-    unorderedResults: rerankedResults
-      ? formatResults(parsedResults, {
-          includeMetadata: options.includeMetadata,
-          includeRelationships: options.includeRelationships,
-        })
+    unorderedIds: rerankedResults
+      ? parsedResults.map((result) => result.id)
       : null,
     results: formatResults(rerankedResults ?? parsedResults, {
       includeMetadata: options.includeMetadata,

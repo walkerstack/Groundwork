@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import {
   Tooltip,
   TooltipContent,
-  TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { CopyIcon } from "lucide-react";
@@ -28,38 +27,36 @@ export function PureMessageActions({
   if (message.role === "user") return null;
 
   return (
-    <TooltipProvider delayDuration={0}>
-      <div className="flex flex-row gap-2">
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              className="text-muted-foreground h-fit px-2 py-1"
-              variant="outline"
-              onClick={async () => {
-                const textFromParts = message.parts
-                  ?.filter((part) => part.type === "text")
-                  .map((part) => part.text)
-                  .join("\n")
-                  .trim();
+    <div className="flex flex-row gap-2">
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            className="text-muted-foreground h-fit px-2 py-1"
+            variant="outline"
+            onClick={async () => {
+              const textFromParts = message.parts
+                ?.filter((part) => part.type === "text")
+                .map((part) => part.text)
+                .join("\n")
+                .trim();
 
-                if (!textFromParts) {
-                  toast.error("There's no text to copy!");
-                  return;
-                }
+              if (!textFromParts) {
+                toast.error("There's no text to copy!");
+                return;
+              }
 
-                await copyToClipboard(textFromParts);
-                toast.success("Copied to clipboard!");
-              }}
-            >
-              <CopyIcon className="size-4" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>Copy</TooltipContent>
-        </Tooltip>
+              await copyToClipboard(textFromParts);
+              toast.success("Copied to clipboard!");
+            }}
+          >
+            <CopyIcon className="size-4" />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>Copy</TooltipContent>
+      </Tooltip>
 
-        <MessageLogs message={message} />
-      </div>
-    </TooltipProvider>
+      <MessageLogs message={message} />
+    </div>
   );
 }
 

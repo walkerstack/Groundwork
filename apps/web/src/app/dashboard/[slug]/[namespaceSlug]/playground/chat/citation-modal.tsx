@@ -33,19 +33,25 @@ export function CitationModal({
     <Dialog>
       <DialogTrigger asChild>{trigger}</DialogTrigger>
 
-      <DialogContent className="sm:max-w-2xl">
+      <DialogContent
+        className="sm:max-w-2xl"
+        onOpenAutoFocus={(event) => {
+          event.preventDefault(); // prevents Radix from auto-focusing the first focusable
+        }}
+      >
         <DialogHeader>
           <DialogTitle>Source [{sourceIndex}]</DialogTitle>
         </DialogHeader>
+
         <div className="mt-4 max-h-[60vh] overflow-y-auto">
           <p className="text-sm whitespace-pre-wrap">{source.text}</p>
 
           {stringifiedMetadata && (
             <div className="border-border mt-6 border-t pt-6">
               <h3 className="text-xs font-medium">Metadata</h3>
-              <CodeBlock inline={false} className="mt-4 bg-gray-200">
-                {stringifiedMetadata}
-              </CodeBlock>
+              <div className="mt-2">
+                <CodeBlock>{stringifiedMetadata}</CodeBlock>
+              </div>
             </div>
           )}
         </div>

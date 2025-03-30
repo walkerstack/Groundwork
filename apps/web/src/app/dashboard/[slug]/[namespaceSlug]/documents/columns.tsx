@@ -50,16 +50,14 @@ const MimeType = ({ mimeType }: { mimeType: string }) => {
   }
 
   return (
-    <TooltipProvider delayDuration={0}>
-      <div className="flex flex-row gap-2">
-        <Tooltip>
-          <TooltipTrigger>
-            <Icon className="size-5" />
-          </TooltipTrigger>
-          <TooltipContent>{mimeType}</TooltipContent>
-        </Tooltip>
-      </div>
-    </TooltipProvider>
+    <div className="flex flex-row gap-2">
+      <Tooltip>
+        <TooltipTrigger>
+          <Icon className="size-5" />
+        </TooltipTrigger>
+        <TooltipContent>{mimeType}</TooltipContent>
+      </Tooltip>
+    </div>
   );
 };
 

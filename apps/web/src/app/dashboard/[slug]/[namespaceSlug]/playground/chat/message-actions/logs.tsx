@@ -50,17 +50,35 @@ const CollapsibleMetadata = ({ metadata }: { metadata: unknown }) => {
 
 const Chunk = ({
   chunk,
+  index,
+  originalIndex,
 }: {
   chunk: QueryVectorStoreResult["results"][number];
+  index?: number;
+  originalIndex?: number;
 }) => {
   return (
     <div className="bg-secondary rounded-md p-4">
-      <p className="text-muted-foreground text-xs">Score: {chunk.score}</p>
-      {chunk.rerankScore && (
-        <p className="text-muted-foreground text-xs">
-          Re-rank score: {chunk.rerankScore}
-        </p>
-      )}
+      <div className="flex justify-between">
+        <div>
+          <p className="text-muted-foreground text-xs">Score: {chunk.score}</p>
+          {chunk.rerankScore && (
+            <p className="text-muted-foreground text-xs">
+              Re-rank score: {chunk.rerankScore}
+            </p>
+          )}
+        </div>
+        {originalIndex !== undefined && index !== undefined ? (
+          <div>
+            <p className="text-muted-foreground text-xs">
+              Original order: {originalIndex + 1}
+            </p>
+            <p className="text-muted-foreground text-xs">
+              Current order: {index + 1}
+            </p>
+          </div>
+        ) : null}
+      </div>
       <p className="mt-2 text-sm">{chunk.text}</p>
       {chunk.metadata && <CollapsibleMetadata metadata={chunk.metadata} />}
     </div>
@@ -103,17 +121,32 @@ export default function MessageLogs({ message }: { message: Message }) {
                 <TabsContent value="query">
                   <CodeBlock>{sources.query}</CodeBlock>
                 </TabsContent>
+
                 <TabsContent value="chunks" className="flex flex-col gap-6">
-                  {(sources.unorderedResults ?? sources.results).map(
-                    (chunk) => (
+                  {(sources.unorderedIds
+                    ? sources.unorderedIds.map(
+                        (id) =>
+                          sources.results.find((result) => result.id === id)!,
+                      )
+                    : sources.results
+                  )
+                    .filter(Boolean)
+                    .map((chunk) => (
                       <Chunk key={chunk.id} chunk={chunk} />
-                    ),
-                  )}
+                    ))}
                 </TabsContent>
+
                 <TabsContent value="re-ranked" className="flex flex-col gap-6">
-                  {sources.unorderedResults ? (
-                    sources.results.map((chunk) => (
-                      <Chunk key={chunk.id} chunk={chunk} />
+                  {sources.unorderedIds ? (
+                    sources.results.map((chunk, idx) => (
+                      <Chunk
+                        key={chunk.id}
+                        chunk={chunk}
+                        index={idx}
+                        originalIndex={sources.unorderedIds!.findIndex(
+                          (id) => id === chunk.id,
+                        )}
+                      />
                     ))
                   ) : (
                     <p>Re-ranking is disabled.</p>

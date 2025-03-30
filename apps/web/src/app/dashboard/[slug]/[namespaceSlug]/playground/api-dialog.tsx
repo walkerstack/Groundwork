@@ -11,7 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useNamespace } from "@/contexts/namespace-context";
 import { useOrganization } from "@/contexts/organization-context";
 import { prefixId } from "@/lib/api/ids";
-import { Code2Icon } from "lucide-react";
+import { Code2Icon, LockIcon } from "lucide-react";
 
 import { CodeBlock } from "./chat/code-block";
 
@@ -88,24 +88,28 @@ export default function ApiDialog() {
         <DialogHeader>
           <DialogTitle>API</DialogTitle>
           <DialogDescription>
-            Use the API to query the vector store. You'll need make an{" "}
-            <a
-              href={`/dashboard/${activeOrganization.slug}/settings/api-keys`}
-              className="text-blue-500 underline"
-              target="_blank"
-            >
-              API key
-            </a>{" "}
+            Use the API to query the vector store. You'll need make an API key
             first.
           </DialogDescription>
         </DialogHeader>
 
         <Tabs>
-          <TabsList className="my-3">
-            <TabsTrigger value="curl">cURL</TabsTrigger>
-            <TabsTrigger value="sdk">Javascript</TabsTrigger>
-            <TabsTrigger value="ai-sdk">AI SDK</TabsTrigger>
-          </TabsList>
+          <div className="flex items-center justify-between">
+            <TabsList className="my-3">
+              <TabsTrigger value="curl">cURL</TabsTrigger>
+              <TabsTrigger value="sdk">Javascript</TabsTrigger>
+              <TabsTrigger value="ai-sdk">AI SDK</TabsTrigger>
+            </TabsList>
+            <Button asChild size="sm">
+              <a
+                href={`/dashboard/${activeOrganization.slug}/settings/api-keys`}
+                target="_blank"
+              >
+                <LockIcon className="size-4" />
+                Create API Key
+              </a>
+            </Button>
+          </div>
           <TabsContent value="curl">
             <CodeBlock>{prepareExample(curlExample)}</CodeBlock>
           </TabsContent>

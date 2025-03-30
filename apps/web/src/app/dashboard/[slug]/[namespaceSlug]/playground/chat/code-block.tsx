@@ -19,11 +19,11 @@ export function CodeBlock({
 }: CodeBlockProps) {
   if (!inline) {
     return (
-      <div className={cn("not-prose relative flex flex-col")}>
+      <div className="not-prose group relative flex flex-col">
         {hasCopy && (
           <CopyButton
             textToCopy={children}
-            className="absolute top-2 right-2"
+            className="absolute top-2 right-2 opacity-0 transition-opacity group-hover:opacity-100"
           />
         )}
 
