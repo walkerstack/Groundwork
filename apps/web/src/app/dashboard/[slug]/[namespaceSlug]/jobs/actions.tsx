@@ -7,6 +7,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useNamespace } from "@/contexts/namespace-context";
+import { prefixId } from "@/lib/api/ids";
 import { api } from "@/trpc/react";
 import { CopyIcon, EllipsisVerticalIcon, Trash2Icon } from "lucide-react";
 import { toast } from "sonner";
@@ -26,7 +27,7 @@ export function JobActions({ row }: { row: Row<JobCol> }) {
   });
 
   const handleCopy = async () => {
-    await navigator.clipboard.writeText(row.original.id);
+    await navigator.clipboard.writeText(prefixId(row.original.id, "job_"));
     toast.success("Copied ID");
   };
 
