@@ -1,13 +1,13 @@
 import "@/styles/globals.css";
 
+import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import { type Metadata } from "next";
-
 import { cn } from "@/lib/utils";
+
 import Providers from "./providers";
 
 export const metadata: Metadata = {
-  title: "Agentset",
+  title: { template: "%s | Agentset", absolute: "Agentset" },
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
 

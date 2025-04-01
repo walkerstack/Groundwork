@@ -11,7 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useNamespace } from "@/contexts/namespace-context";
 import { useOrganization } from "@/contexts/organization-context";
 import { prefixId } from "@/lib/api/ids";
-import { Code2Icon, LockIcon } from "lucide-react";
+import { ArrowUpRightIcon, Code2Icon } from "lucide-react";
 
 import { CodeBlock } from "./chat/code-block";
 
@@ -105,7 +105,7 @@ export default function ApiDialog() {
                 href={`/dashboard/${activeOrganization.slug}/settings/api-keys`}
                 target="_blank"
               >
-                <LockIcon className="size-4" />
+                <ArrowUpRightIcon className="size-4" />
                 Create API Key
               </a>
             </Button>

@@ -1,5 +1,11 @@
+import type { Metadata } from "next";
 import { GradientBackground } from "@/components/gradient-background";
+
 import { LoginForm } from "./login-form";
+
+export const metadata: Metadata = {
+  title: "Login",
+};
 
 export default async function Page({
   searchParams,

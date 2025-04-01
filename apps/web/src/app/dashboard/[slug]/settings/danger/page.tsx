@@ -1,4 +1,10 @@
+import type { Metadata } from "next";
+
 import { DeleteOrgButton } from "./delete-org-button";
+
+export const metadata: Metadata = {
+  title: "Danger",
+};
 
 export default function DangerSettingsPage() {
   return (

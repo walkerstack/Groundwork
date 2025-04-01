@@ -1,4 +1,10 @@
+import type { Metadata } from "next";
+
 import { CreateOrgForm } from "./create-org-form";
+
+export const metadata: Metadata = {
+  title: "Create organization",
+};
 
 export default function CreateOrganizationPage() {
   return (

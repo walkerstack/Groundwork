@@ -1,9 +1,15 @@
-import { auth } from "@/lib/auth";
-import ActiveSessions from "./active-sessions";
-import EditUser from "./edit-user";
+import type { Metadata } from "next";
 import { headers } from "next/headers";
 import Link from "next/link";
+import { auth } from "@/lib/auth";
 import { ChevronLeftIcon } from "lucide-react";
+
+import ActiveSessions from "./active-sessions";
+import EditUser from "./edit-user";
+
+export const metadata: Metadata = {
+  title: "Profile",
+};
 
 export default async function ProfilePage() {
   const allSessions = await auth.api.listSessions({
