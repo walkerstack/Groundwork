@@ -3,9 +3,13 @@ import { AgentsetApiError } from "@/lib/api/errors";
 import { withAuthApiHandler } from "@/lib/api/handler";
 import { parseRequestBody } from "@/lib/api/utils";
 import { getNamespaceLanguageModel } from "@/lib/llm";
-import { NEW_MESSAGE_PROMPT } from "@/lib/prompts";
+import {
+  CONDENSE_SYSTEM_PROMPT,
+  CONDENSE_USER_PROMPT,
+  NEW_MESSAGE_PROMPT,
+} from "@/lib/prompts";
 import { queryVectorStoreV2 } from "@/lib/vector-store";
-import { createDataStreamResponse, streamText } from "ai";
+import { createDataStreamResponse, generateText, streamText } from "ai";
 
 import { chatSchema } from "./schema";
 
@@ -18,24 +22,54 @@ export const POST = withAuthApiHandler(
     const body = await chatSchema.parseAsync(await parseRequestBody(req));
 
     const messagesWithoutQuery = body.messages.slice(0, -1);
-    const query =
+    const lastMessage =
       body.messages.length > 0
         ? (body.messages[body.messages.length - 1]!.content as string)
         : null;
 
-    if (!query) {
+    if (!lastMessage) {
       throw new AgentsetApiError({
         code: "bad_request",
-        message: "No query provided",
+        message: "Messages must contain at least one message",
       });
     }
 
     // TODO: pass namespace config
     const languageModel = await getNamespaceLanguageModel();
 
+    let query: string;
+    if (messagesWithoutQuery.length === 0) {
+      query = lastMessage;
+    } else {
+      // limit messagesWithoutQuery to the last 10 messages
+      const messagesToCondense = messagesWithoutQuery.slice(-10);
+
+      // we need to condense the messages + last message into a single query
+      query = (
+        await generateText({
+          model: languageModel,
+          system: CONDENSE_SYSTEM_PROMPT.compile(),
+          messages: [
+            {
+              role: "user",
+              content: CONDENSE_USER_PROMPT.compile({
+                chatHistory: messagesToCondense
+                  .map(
+                    (m) =>
+                      `- ${m.role === "user" ? "Human" : "Assistant"}: ${m.content as string}`,
+                  )
+                  .join("\n\n"),
+                query: lastMessage,
+              }),
+            },
+          ],
+        })
+      ).text;
+    }
+
     // TODO: track the usage
     const data = await queryVectorStoreV2(namespace, {
-      query: query,
+      query,
       tenantId,
       topK: body.topK,
       minScore: body.minScore,
@@ -61,7 +95,7 @@ export const POST = withAuthApiHandler(
           chunks: data.results
             .map((chunk, idx) => `[${idx + 1}]: ${chunk.text}`)
             .join("\n\n"),
-          query,
+          query: lastMessage, // put the original query in the message to help with context
         }),
       },
     ];
@@ -69,10 +103,6 @@ export const POST = withAuthApiHandler(
     // add the sources to the stream
     return createDataStreamResponse({
       execute: (dataStream) => {
-        dataStream.writeMessageAnnotation({
-          agentset_sources: data as unknown as JSONValue,
-        });
-
         const messageStream = streamText({
           model: languageModel,
           system: body.systemPrompt,
@@ -80,6 +110,9 @@ export const POST = withAuthApiHandler(
           temperature: body.temperature,
         });
 
+        dataStream.writeMessageAnnotation({
+          agentset_sources: data as unknown as JSONValue,
+        });
         messageStream.mergeIntoDataStream(dataStream);
       },
       headers,

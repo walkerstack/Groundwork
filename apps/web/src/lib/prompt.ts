@@ -17,7 +17,9 @@ export const prmpt = <K extends PlaceholderKey[]>(
 ): PromptResult<InferPromptVars<K>> => {
   if (keys.length === 0) {
     return {
-      compile: (() => strings[0]) as CompileFunction<InferPromptVars<K>>,
+      compile: (() => strings[0]?.trim()) as CompileFunction<
+        InferPromptVars<K>
+      >,
     };
   }
 
@@ -32,7 +34,7 @@ export const prmpt = <K extends PlaceholderKey[]>(
         }
       }
 
-      return result;
+      return result?.trim();
     }) as CompileFunction<InferPromptVars<K>>,
   };
 };

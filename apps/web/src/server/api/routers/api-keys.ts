@@ -1,7 +1,6 @@
-import { z } from "zod";
-
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { TRPCError } from "@trpc/server";
+import { z } from "zod";
 
 const keyGenerator = (prefix?: string, length = 16) => {
   const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
@@ -74,7 +73,7 @@ export const apiKeysRouter = createTRPCRouter({
           label: input.label,
           scope: input.scope,
           organizationId: input.orgId,
-          key: keyGenerator("org_"),
+          key: keyGenerator("agentset_"),
         },
       });
 
