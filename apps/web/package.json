@@ -92,7 +92,8 @@
     "zod": "catalog:",
     "zod-error": "^1.5.0",
     "zod-openapi": "^4.2.3",
-    "zustand": "^5.0.3"
+    "zustand": "^5.0.3",
+    "@agentset/emails": "workspace:*"
   },
   "devDependencies": {
     "@agentset/eslint-config": "workspace:*",

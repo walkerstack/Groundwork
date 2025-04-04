@@ -1,5 +1,7 @@
 "use client";
 
+import type { Invitation } from "@/lib/auth-types";
+import { useState } from "react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -11,13 +13,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { AlertCircle, BuildingIcon, CheckIcon, XIcon } from "lucide-react";
-import type { Invitation } from "@/lib/auth-types";
-import { InvitationStatus } from "./invitation-status";
-import { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
 import { authClient } from "@/lib/auth-client";
+import { useMutation } from "@tanstack/react-query";
+import { AlertCircle, BuildingIcon, CheckIcon, XIcon } from "lucide-react";
 import { toast } from "sonner";
+
+import { InvitationStatus } from "./invitation-status";
 
 const useAcceptInvitation = (
   id: string,
@@ -126,7 +127,7 @@ export function InvitationCard({
         description={`You are now a member of ${invitation.organizationName}`}
         action={{
           label: "View dashboard",
-          href: `/dashboard/${invitation.organizationSlug}`,
+          href: `/${invitation.organizationSlug}`,
         }}
       />
     );

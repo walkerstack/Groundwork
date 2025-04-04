@@ -1,14 +1,11 @@
 "use client";
 
-import type { Metadata } from "next";
+import { DataTable } from "@/components/data-table";
 import { useOrganization } from "@/contexts/organization-context";
+import { api } from "@/trpc/react";
 
-import ApiKeysList from "./api-keys-list";
+import { columns } from "./columns";
 import CreateApiKey from "./create-api-key";
-
-export const metadata: Metadata = {
-  title: "API Keys",
-};
 
 export default function ApiKeysPage() {
   const { activeOrganization, isAdmin } = useOrganization();
@@ -19,11 +16,19 @@ export default function ApiKeysPage() {
 
   return (
     <>
-      <div className="mb-10">
+      <div className="mb-5 flex justify-end">
         <CreateApiKey orgId={activeOrganization.id} />
       </div>
 
       <ApiKeysList orgId={activeOrganization.id} />
     </>
   );
+}
+
+function ApiKeysList({ orgId }: { orgId: string }) {
+  const { data, isLoading } = api.apiKey.getApiKeys.useQuery({
+    orgId,
+  });
+
+  return <DataTable columns={columns} data={data} isLoading={isLoading} />;
 }

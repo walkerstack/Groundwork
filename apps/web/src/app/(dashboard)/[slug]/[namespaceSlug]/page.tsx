@@ -1,9 +1,10 @@
-import { notFound } from "next/navigation";
-import DashboardPageWrapper from "../dashboard-page-wrapper";
-import { api } from "@/trpc/server";
-import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { notFound } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { api } from "@/trpc/server";
 import { SparkleIcon } from "lucide-react";
+
+import DashboardPageWrapper from "../dashboard-page-wrapper";
 
 export default async function NamespacesPage({
   params,
@@ -24,7 +25,7 @@ export default async function NamespacesPage({
     <DashboardPageWrapper title={namespace.name}>
       <div>
         <Button asChild>
-          <Link href={`/dashboard/${slug}/${namespace.slug}/playground`}>
+          <Link href={`/${slug}/${namespace.slug}/playground`}>
             <SparkleIcon className="h-4 w-4" />
             Playground
           </Link>

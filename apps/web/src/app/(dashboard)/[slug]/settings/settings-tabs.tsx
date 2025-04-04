@@ -32,7 +32,7 @@ export function SettingsTabs() {
 
   const final = items.map((item) => ({
     ...item,
-    url: `/dashboard/${slug}/settings${item.url === "/" ? "" : item.url}`,
+    url: `/${slug}/settings${item.url === "/" ? "" : item.url}`,
   }));
 
   const onChange = (value: string) => {
@@ -50,7 +50,12 @@ export function SettingsTabs() {
     <Tabs onValueChange={onChange} value={active?.title}>
       <TabsList>
         {final.map((item) => (
-          <TabsTrigger key={item.title} value={item.title} disabled={isPending}>
+          <TabsTrigger
+            key={item.title}
+            value={item.title}
+            disabled={isPending}
+            className="px-4"
+          >
             {item.title}
           </TabsTrigger>
         ))}

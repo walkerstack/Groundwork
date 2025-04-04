@@ -10,7 +10,7 @@ export default function SettingsLayout({
     <DashboardPageWrapper title="Settings" className="pt-0">
       <SettingsTabs />
 
-      <div className="mt-5">{children}</div>
+      <div className="mt-8">{children}</div>
     </DashboardPageWrapper>
   );
 }

@@ -30,7 +30,7 @@ export default function NamespacesList() {
       {data.map((namespace) => (
         <Link
           key={namespace.id}
-          href={`/dashboard/${activeOrganization.slug}/${namespace.slug}`}
+          href={`/${activeOrganization.slug}/${namespace.slug}`}
           className="flex h-40 w-full flex-col items-center justify-center rounded-md border p-4"
         >
           <h3 className="text-lg font-bold">{namespace.name}</h3>

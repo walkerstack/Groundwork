@@ -102,7 +102,7 @@ export default function ApiDialog() {
             </TabsList>
             <Button asChild size="sm">
               <a
-                href={`/dashboard/${activeOrganization.slug}/settings/api-keys`}
+                href={`/${activeOrganization.slug}/settings/api-keys`}
                 target="_blank"
               >
                 <ArrowUpRightIcon className="size-4" />

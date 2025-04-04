@@ -1,4 +1,4 @@
-import { CreateOrgForm } from "@/app/dashboard/create-organization/create-org-form";
+import { CreateOrgForm } from "@/app/(dashboard)/create-organization/create-org-form";
 import {
   Dialog,
   DialogContent,

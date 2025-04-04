@@ -18,7 +18,7 @@ export function DeleteOrgButton() {
       }),
     onSuccess: () => {
       toast.success("Organization deleted");
-      router.push("/dashboard");
+      router.push("/");
     },
     onError: (error) => {
       console.error(error);

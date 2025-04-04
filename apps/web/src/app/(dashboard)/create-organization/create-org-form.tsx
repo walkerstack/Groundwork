@@ -71,7 +71,7 @@ export function CreateOrgForm({
         return response.data;
       },
       onSuccess: (data) => {
-        router.push(`/dashboard/${data.slug}`);
+        router.push(`/${data.slug}`);
         onSuccess?.();
         form.reset();
       },

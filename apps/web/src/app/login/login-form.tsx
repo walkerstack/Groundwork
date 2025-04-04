@@ -1,12 +1,12 @@
 "use client";
 
-import { cn } from "@/lib/utils";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
-import { authClient } from "@/lib/auth-client";
 import { Logo } from "@/components/ui/logo";
+import { authClient } from "@/lib/auth-client";
+import { cn } from "@/lib/utils";
 import { useMutation } from "@tanstack/react-query";
 import { CheckCircle2Icon } from "lucide-react";
 
@@ -21,9 +21,7 @@ export function LoginForm({
   const [sent, setSent] = useState(false);
 
   const redirect =
-    redirectParam && redirectParam?.startsWith("/")
-      ? redirectParam
-      : "/dashboard";
+    redirectParam && redirectParam.startsWith("/") ? redirectParam : "/";
 
   const { mutateAsync: sendMagicLink, isPending: isSendingMagicLink } =
     useMutation({

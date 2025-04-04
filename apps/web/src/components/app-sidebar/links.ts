@@ -11,7 +11,7 @@ import {
 
 import type { SidebarItemType } from ".";
 
-const createOrgUrl = (url: string) => `/dashboard/{slug}${url}`;
+const createOrgUrl = (url: string) => `/{slug}${url}`;
 
 export const mainItems: SidebarItemType[] = [
   {
@@ -45,11 +45,11 @@ export const mainItems: SidebarItemType[] = [
 
   //     // {
   //     //   title: "Billing",
-  //     //   url: "/dashboard/settings/billing",
+  //     //   url: "/settings/billing",
   //     // },
   //     // {
   //     //   title: "Limits",
-  //     //   url: "/dashboard/settings/limits",
+  //     //   url: "/settings/limits",
   //     // },
   //   ],
   // },
@@ -68,8 +68,7 @@ export const secondaryItems: SidebarItemType[] = [
   },
 ];
 
-const createNamespaceUrl = (url: string) =>
-  `/dashboard/{slug}/{namespaceSlug}${url}`;
+const createNamespaceUrl = (url: string) => `/{slug}/{namespaceSlug}${url}`;
 
 export const namespaceItems: SidebarItemType[] = [
   {

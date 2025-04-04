@@ -3,6 +3,7 @@ import { prismaAdapter } from "better-auth/adapters/prisma";
 import { magicLink, organization } from "better-auth/plugins";
 
 import { db } from "@agentset/db";
+import { LoginEmail } from "@agentset/emails";
 
 import { env } from "../env";
 import { resend } from "./resend";
@@ -26,9 +27,9 @@ export const auth = betterAuth({
         await resend.emails.send({
           from: "Agentset.ai <noreply@agentset.ai>",
           to: email,
-          subject: `Invitation to join "${organization.name}" on AgentSet.ai`,
-          text: `You are invited to join ${organization.name} on AgentSet.ai. Click here to accept the invitation: ${getBaseUrl()}/invitation/${id}`,
-          html: `<p>You are invited to join ${organization.name} on AgentSet.ai. Click here to accept the invitation: <a href="${getBaseUrl()}/invitation/${id}">here</a></p>`,
+          subject: `Invitation to join "${organization.name}" on Agentset.ai`,
+          text: `You are invited to join ${organization.name} on Agentset.ai. Click here to accept the invitation: ${getBaseUrl()}/invitation/${id}`,
+          html: `<p>You are invited to join ${organization.name} on Agentset.ai. Click here to accept the invitation: <a href="${getBaseUrl()}/invitation/${id}">here</a></p>`,
         });
       },
     }),
@@ -37,8 +38,8 @@ export const auth = betterAuth({
         await resend.emails.send({
           from: "Agentset.ai <noreply@agentset.ai>",
           to: email,
-          subject: "You AgentSet login link",
-          html: `<p>Click here to sign in to AgentSet.ai: <a href="${url}">here</a></p>`,
+          subject: "Your Agentset login link",
+          react: <LoginEmail loginLink={url} />,
         });
       },
     }),

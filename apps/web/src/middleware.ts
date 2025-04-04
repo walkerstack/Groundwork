@@ -2,12 +2,6 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { getSessionCookie } from "better-auth/cookies";
 
-const redirectLogin = (request: NextRequest) =>
-  NextResponse.redirect(new URL("/login", request.url));
-
-const redirectDashboard = (request: NextRequest) =>
-  NextResponse.redirect(new URL("/dashboard", request.url));
-
 export const config = {
   matcher: [
     /*
@@ -36,14 +30,17 @@ export function middleware(request: NextRequest) {
     return NextResponse.rewrite(new URL(`/api${fullPath}`, request.url));
   }
 
-  // if the user is not logged in, and is trying to access a dashboard page, redirect to login
-  if (!cookies && (pathname.startsWith("/dashboard") || pathname === "/")) {
-    return redirectLogin(request);
+  // if the user is logged in, and is trying to access the login page, redirect to dashboard
+  if (cookies && pathname.startsWith("/login")) {
+    return NextResponse.redirect(new URL("/", request.url));
   }
 
-  // if the user is logged in, and is trying to access the login page, redirect to dashboard
-  if (cookies && (pathname.startsWith("/login") || pathname === "/")) {
-    return redirectDashboard(request);
+  // if the user is not logged in, and is trying to access a dashboard page, redirect to login
+  if (
+    !cookies &&
+    !(pathname.startsWith("/login") || pathname.startsWith("/invitation"))
+  ) {
+    return NextResponse.redirect(new URL("/login", request.url));
   }
 
   return NextResponse.next();

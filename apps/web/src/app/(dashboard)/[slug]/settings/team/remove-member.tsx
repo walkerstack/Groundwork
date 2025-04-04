@@ -37,7 +37,7 @@ export const RemoveMemberButton = ({
       });
 
       if (isCurrentMember) {
-        router.push("/dashboard");
+        router.push("/");
       }
     },
     onError: (error) => {

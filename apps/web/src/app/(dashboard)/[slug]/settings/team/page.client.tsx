@@ -48,6 +48,7 @@ export default function TeamSettingsPage() {
         {activeOrganization.members.map((member) => (
           <MemberCard
             key={member.id}
+            id={member.id}
             name={member.user.name}
             email={member.user.email}
             image={member.user.image}
@@ -69,6 +70,7 @@ export default function TeamSettingsPage() {
           .map((invitation) => (
             <MemberCard
               key={invitation.id}
+              id={invitation.id}
               name={invitation.email}
               email={invitation.status}
               role={invitation.role}

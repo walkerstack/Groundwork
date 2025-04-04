@@ -1,8 +1,10 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import RoleSelector from "./role-selector";
 import type { Role } from "@/lib/auth-types";
+import { EntityAvatar } from "@/components/ui/avatar";
+
+import RoleSelector from "./role-selector";
 
 export const MemberCard = ({
+  id,
   name,
   email,
   image,
@@ -10,6 +12,7 @@ export const MemberCard = ({
   showRole,
   actions,
 }: {
+  id: string;
   name?: string;
   email: string;
   image?: string;
@@ -20,10 +23,15 @@ export const MemberCard = ({
   return (
     <div className="flex items-center justify-between space-x-4">
       <div className="flex items-center space-x-4">
-        <Avatar className="h-9 w-9">
-          <AvatarImage src={image || undefined} className="object-cover" />
-          <AvatarFallback>{name?.charAt(0) || email.charAt(0)}</AvatarFallback>
-        </Avatar>
+        <EntityAvatar
+          className="size-9"
+          fallbackClassName="bg-muted text-foreground"
+          entity={{
+            id,
+            name,
+            logo: image,
+          }}
+        />
 
         <div>
           {name ? (

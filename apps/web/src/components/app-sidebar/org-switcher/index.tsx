@@ -1,8 +1,8 @@
 "use client";
 
 import type { Organization } from "@/lib/auth-types";
-import * as React from "react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useState } from "react";
+import { EntityAvatar } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,40 +21,53 @@ import {
 import { useOrganization } from "@/contexts/organization-context";
 import { authClient } from "@/lib/auth-client";
 import { useRouter } from "@bprogress/next/app";
+import { useMutation } from "@tanstack/react-query";
 import { ChevronsUpDown, Plus } from "lucide-react";
+import { toast } from "sonner";
 
 import CreateOrganizationDialog from "./create-org-dialog";
-
-const getFallback = (name: string) => {
-  return name.charAt(0).toUpperCase();
-};
 
 export function OrganizationSwitcher() {
   const { isMobile } = useSidebar();
   const router = useRouter();
-  const { activeOrganization, setActiveOrganization } = useOrganization();
+  const {
+    activeOrganization,
+    setActiveOrganization: setActiveOrganizationInContext,
+  } = useOrganization();
   const organizations = authClient.useListOrganizations();
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
+
+  const { mutateAsync: setActiveOrganization, isPending } = useMutation({
+    onMutate(organization) {
+      // optimistic update
+      setActiveOrganizationInContext({
+        ...organization,
+        members: [],
+        invitations: [],
+      });
+    },
+    mutationFn: async (organization: Organization) => {
+      return authClient.organization.setActive({
+        organizationId: organization.id,
+      });
+    },
+    onSuccess: (data) => {
+      if (data.data) {
+        router.push(`/${data.data.slug}`);
+        setActiveOrganizationInContext(data.data);
+      }
+    },
+    onError: () => {
+      toast.error("Failed to switch organization!");
+    },
+  });
 
   const handleOrganizationChange = async (organization: Organization) => {
-    if (organization.id === activeOrganization.id) {
+    if (organization.id === activeOrganization.id || isPending) {
       return;
     }
 
-    setActiveOrganization({
-      ...organization,
-      members: [],
-      invitations: [],
-    });
-
-    const { data } = await authClient.organization.setActive({
-      organizationId: organization.id,
-    });
-
-    if (data) {
-      router.push(`/dashboard/${data.slug}`);
-      setActiveOrganization(data);
-    }
+    await setActiveOrganization(organization);
   };
 
   return (
@@ -67,15 +80,9 @@ export function OrganizationSwitcher() {
             <SidebarMenuButton
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+              disabled={isPending}
             >
-              <Avatar className="size-8 shrink-0 rounded-lg">
-                {activeOrganization.logo && (
-                  <AvatarImage src={activeOrganization.logo} />
-                )}
-                <AvatarFallback className="bg-sidebar-primary text-sidebar-primary-foreground rounded-lg">
-                  {getFallback(activeOrganization.name)}
-                </AvatarFallback>
-              </Avatar>
+              <EntityAvatar entity={activeOrganization} />
 
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-semibold">
@@ -86,6 +93,7 @@ export function OrganizationSwitcher() {
               <ChevronsUpDown className="ml-auto" />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
+
           <DropdownMenuContent
             className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
             align="start"
@@ -103,14 +111,11 @@ export function OrganizationSwitcher() {
                 className="gap-2 p-2"
               >
                 <div className="flex size-6 items-center justify-center rounded-sm border">
-                  <Avatar className="size-4 shrink-0">
-                    {organization.logo && (
-                      <AvatarImage src={organization.logo} />
-                    )}
-                    <AvatarFallback>
-                      {getFallback(organization.name)}
-                    </AvatarFallback>
-                  </Avatar>
+                  <EntityAvatar
+                    entity={organization}
+                    className="size-4 shrink-0 rounded-none"
+                    fallbackClassName="bg-transparent rounded-none text-foreground"
+                  />
                 </div>
                 {organization.name}
                 <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>

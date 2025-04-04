@@ -1,9 +1,8 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import * as AvatarPrimitive from "@radix-ui/react-avatar"
-
-import { cn } from "@/lib/utils"
+import * as React from "react";
+import { cn } from "@/lib/utils";
+import * as AvatarPrimitive from "@radix-ui/react-avatar";
 
 function Avatar({
   className,
@@ -14,11 +13,11 @@ function Avatar({
       data-slot="avatar"
       className={cn(
         "relative flex size-8 shrink-0 overflow-hidden rounded-full",
-        className
+        className,
       )}
       {...props}
     />
-  )
+  );
 }
 
 function AvatarImage({
@@ -31,7 +30,7 @@ function AvatarImage({
       className={cn("aspect-square size-full", className)}
       {...props}
     />
-  )
+  );
 }
 
 function AvatarFallback({
@@ -43,11 +42,60 @@ function AvatarFallback({
       data-slot="avatar-fallback"
       className={cn(
         "bg-muted flex size-full items-center justify-center rounded-full",
-        className
+        className,
       )}
       {...props}
     />
-  )
+  );
 }
 
-export { Avatar, AvatarImage, AvatarFallback }
+const getInitials = (name: string) => {
+  return name
+    .split(" ")
+    .slice(0, 2)
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase();
+};
+
+function EntityAvatar({
+  className,
+  entity,
+  fallbackClassName,
+  ...props
+}: React.ComponentProps<typeof Avatar> & {
+  fallbackClassName?: string;
+  entity: {
+    id: string;
+    logo?: string | null;
+    image?: string | null;
+    name?: string | null;
+  };
+}) {
+  const logo = entity.logo || entity.image;
+  const hasNameOrLogo = logo || entity.name;
+  return (
+    <Avatar className={cn("size-8 shrink-0 rounded-lg", className)} {...props}>
+      {!hasNameOrLogo && (
+        <AvatarImage
+          src={`https://api.dicebear.com/9.x/glass/svg?seed=${entity.id}`}
+        />
+      )}
+
+      {logo && <AvatarImage src={logo} />}
+
+      {entity.name && (
+        <AvatarFallback
+          className={cn(
+            "bg-sidebar-primary text-sidebar-primary-foreground rounded-lg",
+            fallbackClassName,
+          )}
+        >
+          {getInitials(entity.name)}
+        </AvatarFallback>
+      )}
+    </Avatar>
+  );
+}
+
+export { Avatar, AvatarImage, AvatarFallback, EntityAvatar };
