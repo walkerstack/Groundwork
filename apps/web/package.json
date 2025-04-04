@@ -22,6 +22,7 @@
   },
   "dependencies": {
     "@agentset/db": "workspace:*",
+    "@agentset/emails": "workspace:*",
     "@ai-sdk/azure": "^1.2.1",
     "@ai-sdk/openai": "^1.2.1",
     "@ai-sdk/react": "^1.1.21",
@@ -92,8 +93,7 @@
     "zod": "catalog:",
     "zod-error": "^1.5.0",
     "zod-openapi": "^4.2.3",
-    "zustand": "^5.0.3",
-    "@agentset/emails": "workspace:*"
+    "zustand": "^5.0.3"
   },
   "devDependencies": {
     "@agentset/eslint-config": "workspace:*",
