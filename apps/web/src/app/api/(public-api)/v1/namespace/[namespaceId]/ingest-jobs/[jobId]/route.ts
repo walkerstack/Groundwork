@@ -71,8 +71,8 @@ export const DELETE = withNamespaceApiHandler(
     }
 
     if (
-      ingestJob.status !== IngestJobStatus.QUEUED_FOR_DELETE &&
-      ingestJob.status !== IngestJobStatus.DELETING
+      ingestJob.status === IngestJobStatus.QUEUED_FOR_DELETE ||
+      ingestJob.status === IngestJobStatus.DELETING
     ) {
       throw new AgentsetApiError({
         code: "bad_request",

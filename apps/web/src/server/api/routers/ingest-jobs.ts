@@ -88,8 +88,8 @@ export const ingestJobRouter = createTRPCRouter({
       }
 
       if (
-        ingestJob.status !== IngestJobStatus.QUEUED_FOR_DELETE &&
-        ingestJob.status !== IngestJobStatus.DELETING
+        ingestJob.status === IngestJobStatus.QUEUED_FOR_DELETE ||
+        ingestJob.status === IngestJobStatus.DELETING
       ) {
         throw new TRPCError({ code: "BAD_REQUEST" });
       }
