@@ -1,7 +1,7 @@
 "use client";
 
 import type { DropzoneProps, FileRejection } from "react-dropzone";
-import * as React from "react";
+import { useCallback, useEffect } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -111,7 +111,7 @@ export function FileUploader(props: FileUploaderProps) {
     onChange: onValueChange,
   });
 
-  const onDrop = React.useCallback(
+  const onDrop = useCallback(
     (acceptedFiles: File[], rejectedFiles: FileRejection[]) => {
       if (!multiple && maxFileCount === 1 && acceptedFiles.length > 1) {
         toast.error("Cannot upload more than 1 file at a time");
@@ -169,7 +169,7 @@ export function FileUploader(props: FileUploaderProps) {
   }
 
   // Revoke preview url when component unmounts
-  React.useEffect(() => {
+  useEffect(() => {
     return () => {
       if (!files) return;
       files.forEach((file) => {
