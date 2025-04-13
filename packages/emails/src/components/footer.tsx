@@ -18,18 +18,12 @@ export function Footer({
           Don't want to get these emails?{" "}
           <Link
             className="text-neutral-700 underline"
-            href="https://app.dub.co/account/settings"
+            href="https://app.agentset.ai/account/settings"
           >
             Unsubscribe here.
           </Link>
         </Text>
-        <Text className="text-[12px] text-neutral-500">
-          Dub Technologies, Inc.
-          <br />
-          2261 Market Street STE 5906
-          <br />
-          San Francisco, CA 941114
-        </Text>
+        <Text className="text-[12px] text-neutral-500">Agentset Inc.</Text>
       </Tailwind>
     );
   }
@@ -55,13 +49,7 @@ export function Footer({
           </Link>
         </Text>
       )}
-      <Text className="text-[12px] text-neutral-500">
-        Dub Technologies, Inc.
-        <br />
-        2261 Market Street STE 5906
-        <br />
-        San Francisco, CA 941114
-      </Text>
+      <Text className="text-[12px] text-neutral-500">Agentset Inc.</Text>
     </Tailwind>
   );
 }

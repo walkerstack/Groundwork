@@ -51,14 +51,9 @@ export function FailedPayment({
               <code className="text-purple-600">${amountDue / 100}</code> for
               your Agentset organization{" "}
               <code className="text-purple-600">{organization.name}</code> has
-              failed. Please{" "}
-              <Link
-                href="https://dub.co/help/article/how-to-change-billing-information"
-                className="font-medium text-blue-600 no-underline"
-              >
-                update your payment information
-              </Link>{" "}
-              using the link below:
+              failed. Please update your payment information using the link
+              below:
+              {/* TODO: add link for help article */}
             </Text>
             <Section className="my-8">
               <Link

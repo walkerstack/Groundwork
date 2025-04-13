@@ -32,6 +32,6 @@ export const log = async ({
       }),
     });
   } catch (e) {
-    console.log(`Failed to log to Dub Slack. Error: ${e}`);
+    console.log(`Failed to log to Agentset Discord. Error: ${e}`);
   }
 };

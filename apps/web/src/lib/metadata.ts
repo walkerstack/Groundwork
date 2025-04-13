@@ -5,28 +5,10 @@ import { HOME_DOMAIN } from "./constants";
 export function constructMetadata({
   title,
   fullTitle,
-  description = "Dub.co is the open-source link management platform for modern marketing teams to create marketing campaigns, link sharing features, and referral programs.",
-  image = "https://assets.dub.co/thumbnail.jpg",
+  description = "Build your RAG application in seconds, fully performant and with agentic superpowers.",
+  image = "https://agentset.ai/screenshots/og.png",
   video,
-  icons = [
-    {
-      rel: "apple-touch-icon",
-      sizes: "32x32",
-      url: "https://assets.dub.co/favicons/apple-touch-icon.png",
-    },
-    {
-      rel: "icon",
-      type: "image/png",
-      sizes: "32x32",
-      url: "https://assets.dub.co/favicons/favicon-32x32.png",
-    },
-    {
-      rel: "icon",
-      type: "image/png",
-      sizes: "16x16",
-      url: "https://assets.dub.co/favicons/favicon-16x16.png",
-    },
-  ],
+  // TOOD: add icons
   url,
   canonicalUrl,
   noIndex = false,
@@ -72,7 +54,7 @@ export function constructMetadata({
         player: video,
       }),
     },
-    icons,
+    // icons,
     metadataBase: new URL(HOME_DOMAIN),
     ...((url || canonicalUrl) && {
       alternates: {
