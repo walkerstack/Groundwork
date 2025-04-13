@@ -48,7 +48,7 @@ export async function invoicePaymentFailed(event: Stripe.Event) {
 
   if (!organization) {
     console.log(
-      "Workspace with Stripe ID *`" +
+      "Organization with Stripe ID *`" +
         stripeIdString +
         "`* not found in invoice.payment_failed event",
     );

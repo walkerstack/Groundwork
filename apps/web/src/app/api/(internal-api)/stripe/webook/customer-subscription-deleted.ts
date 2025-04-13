@@ -41,7 +41,7 @@ export async function customerSubscriptionDeleted(event: Stripe.Event) {
 
   if (!organization) {
     console.log(
-      "Workspace with Stripe ID *`" +
+      "Organization with Stripe ID *`" +
         stripeId +
         "`* not found in Stripe webhook `customer.subscription.deleted` callback",
     );
