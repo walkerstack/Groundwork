@@ -1,16 +1,38 @@
 model Organization {
-  id          String               @id
-  name        String
-  slug        String?
-  logo        String?
-  createdAt   DateTime
-  metadata    String?
+  id   String  @id
+  name String
+  slug String
+  logo String?
+
+  metadata String?
+
   members     Member[]
   invitations Invitation[]
   namespaces  Namespace[]
   apiKeys     OrganizationApiKey[]
 
+  totalNamespaces Int @default(0) // Total number of links in the workspace
+  totalDocuments  Int @default(0) // Total number of clicks in the workspace
+  totalIngestJobs Int @default(0) // Total number of clicks in the workspace
+
+  totalPages Int @default(0)
+  pagesLimit Int @default(1000)
+
+  searchUsage Int @default(0)
+  searchLimit Int @default(10000)
+
+  apiRatelimit Int @default(60) // requests per second
+
+  plan              String    @default("free")
+  stripeId          String?   @unique // Stripe customer ID
+  billingCycleStart Int? // day of the month when the billing cycle starts
+  paymentFailedAt   DateTime?
+
+  createdAt        DateTime @default(now())
+  usageLastChecked DateTime @default(now())
+
   @@unique([slug])
+  @@index(usageLastChecked(sort: Asc))
   @@map("organization")
 }
 
