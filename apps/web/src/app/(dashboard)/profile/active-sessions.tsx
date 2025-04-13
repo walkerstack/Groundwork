@@ -3,7 +3,6 @@
 import type { Session } from "@/lib/auth-types";
 import { useMemo } from "react";
 import { Button } from "@/components/ui/button";
-import { useSession } from "@/contexts/session-context";
 import { authClient } from "@/lib/auth-client";
 import { useRouter } from "@bprogress/next/app";
 import { useMutation } from "@tanstack/react-query";
@@ -12,14 +11,14 @@ import { toast } from "sonner";
 import { UAParser } from "ua-parser-js";
 
 const SessionItem = ({ session }: { session: Session["session"] }) => {
-  const [activeSession] = useSession();
+  const { data: activeSession } = authClient.useSession();
   const router = useRouter();
 
   const parsedAgent = useMemo(
     () => new UAParser(session.userAgent || ""),
     [session.userAgent],
   );
-  const isCurrentSession = session.id === activeSession.session.id;
+  const isCurrentSession = session.id === activeSession?.session.id;
 
   const { mutateAsync: terminateSession, isPending: isTerminating } =
     useMutation({

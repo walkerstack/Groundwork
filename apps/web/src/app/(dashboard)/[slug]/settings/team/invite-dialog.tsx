@@ -1,14 +1,16 @@
 "use client";
 
+import type { ActiveOrganization, Role } from "@/lib/auth-types";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
-  DialogTrigger,
   Dialog,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
   DialogDescription,
   DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,16 +21,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { authClient } from "@/lib/auth-client";
-import { toast } from "sonner";
-import { useState } from "react";
 import { useOrganization } from "@/contexts/organization-context";
-import type { ActiveOrganization, Role } from "@/lib/auth-types";
+import { authClient } from "@/lib/auth-client";
 import { useMutation } from "@tanstack/react-query";
+import { PlusIcon } from "lucide-react";
+import { toast } from "sonner";
 
-function InviteMemberDialog({ trigger }: { trigger: React.ReactNode }) {
+function InviteMemberDialog() {
   const [open, setOpen] = useState(false);
-  const { activeOrganization, setActiveOrganization } = useOrganization();
+  const { activeOrganization, setActiveOrganization, isAdmin } =
+    useOrganization();
   const [email, setEmail] = useState("");
   const [role, setRole] = useState("member");
 
@@ -40,8 +42,8 @@ function InviteMemberDialog({ trigger }: { trigger: React.ReactNode }) {
         organizationId: activeOrganization.id,
       });
 
-      if (res.error || !res.data) {
-        throw new Error(res.error?.message || "Failed to invite member");
+      if (!res.data) {
+        throw new Error(res.error.message || "Failed to invite member");
       }
 
       return res.data;
@@ -50,7 +52,7 @@ function InviteMemberDialog({ trigger }: { trigger: React.ReactNode }) {
       setActiveOrganization({
         ...activeOrganization,
         invitations: [
-          ...(activeOrganization?.invitations || []),
+          ...(activeOrganization.invitations || []),
           result as ActiveOrganization["invitations"][number],
         ],
       });
@@ -60,17 +62,22 @@ function InviteMemberDialog({ trigger }: { trigger: React.ReactNode }) {
   });
 
   const handleInvite = async () => {
-    toast.promise(invite({ email, role }), {
+    void toast.promise(invite({ email, role }), {
       loading: "Inviting member...",
       success: "Member invited successfully",
       error: (error: { error?: { message?: string } }) =>
-        error?.error?.message || "Failed to invite member",
+        error.error?.message || "Failed to invite member",
     });
   };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>{trigger}</DialogTrigger>
+      <DialogTrigger asChild disabled={!isAdmin}>
+        <Button>
+          <PlusIcon className="size-4" />
+          Invite Member
+        </Button>
+      </DialogTrigger>
 
       <DialogContent className="w-11/12 sm:max-w-[425px]">
         <DialogHeader>

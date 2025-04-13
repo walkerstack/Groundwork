@@ -6,6 +6,7 @@ import { AppSidebar } from "@/components/app-sidebar";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { OrganizationProvider } from "@/contexts/organization-context";
 import { auth } from "@/lib/auth";
+import { constructMetadata } from "@/lib/metadata";
 
 const getOrg = cache(async (slug: string) => {
   const allHeaders = await headers();
@@ -33,12 +34,7 @@ export const generateMetadata = async ({
   const { slug } = await params;
   const organization = await getOrg(slug);
 
-  return {
-    title: {
-      template: `%s | ${organization.name}`,
-      absolute: `${organization.name} | Agentset`,
-    },
-  };
+  return constructMetadata({ title: organization.name });
 };
 
 export default async function OrganizationLayout({

@@ -18,14 +18,15 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { useSession } from "@/contexts/session-context";
 import { authClient } from "@/lib/auth-client";
 import { useRouter } from "@bprogress/next/app";
 import { BadgeCheck, CreditCard, LogOut, MoreVerticalIcon } from "lucide-react";
 
+import { Skeleton } from "../ui/skeleton";
+
 export function NavUser() {
   const { isMobile } = useSidebar();
-  const [{ user }] = useSession();
+  const { data: session, isPending } = authClient.useSession();
 
   const router = useRouter();
   const [isSigningOut, setIsSigningOut] = useState(false);
@@ -41,6 +42,9 @@ export function NavUser() {
     });
     setIsSigningOut(false);
   };
+
+  if (isPending || !session) return <Skeleton className="h-12 w-full" />;
+  const { user } = session;
 
   return (
     <SidebarMenu>

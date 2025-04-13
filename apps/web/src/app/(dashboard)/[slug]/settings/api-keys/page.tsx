@@ -1,10 +1,8 @@
-import type { Metadata } from "next";
+import { constructMetadata } from "@/lib/metadata";
 
 import ApiKeysPage from "./page.client";
 
-export const metadata: Metadata = {
-  title: "API Keys",
-};
+export const metadata = constructMetadata({ title: "API Keys" });
 
 export default function ApiKeysPageServer() {
   return <ApiKeysPage />;

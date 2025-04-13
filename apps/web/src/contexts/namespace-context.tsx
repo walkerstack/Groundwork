@@ -33,6 +33,7 @@ export function NamespaceProvider({
 
 export function useNamespace() {
   const context = useContext(NamespaceContext);
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (!context) {
     throw new Error("useNamespace must be used within a NamespaceProvider");
   }

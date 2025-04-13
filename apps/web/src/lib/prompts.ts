@@ -34,6 +34,12 @@ Given a conversation history between Human and Assistant and a follow-up questio
 6. Expands pronouns and references to their full form (e.g. "it" → "the database schema")
 
 Your task is to create a clear, context-rich query that will yield the most relevant search results from the vector database.
+
+
+Question: ${"question"}
+
+History:
+${"chatHistory"}
 `;
 
 export const CONDENSE_USER_PROMPT = prmpt`

@@ -48,21 +48,18 @@ export const POST = withAuthApiHandler(
       query = (
         await generateText({
           model: languageModel,
-          system: CONDENSE_SYSTEM_PROMPT.compile(),
-          messages: [
-            {
-              role: "user",
-              content: CONDENSE_USER_PROMPT.compile({
-                chatHistory: messagesToCondense
-                  .map(
-                    (m) =>
-                      `- ${m.role === "user" ? "Human" : "Assistant"}: ${m.content as string}`,
-                  )
-                  .join("\n\n"),
-                query: lastMessage,
-              }),
-            },
-          ],
+          prompt: CONDENSE_SYSTEM_PROMPT.compile({
+            question: lastMessage,
+            chatHistory: CONDENSE_USER_PROMPT.compile({
+              query: lastMessage,
+              chatHistory: messagesToCondense
+                .map(
+                  (m) =>
+                    `- ${m.role === "user" ? "Human" : "Assistant"}: ${m.content as string}`,
+                )
+                .join("\n\n"),
+            }),
+          }),
         })
       ).text;
     }

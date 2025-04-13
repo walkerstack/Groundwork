@@ -6,7 +6,7 @@ import { SparkleIcon } from "lucide-react";
 
 import DashboardPageWrapper from "../dashboard-page-wrapper";
 
-export default async function NamespacesPage({
+export default async function NamespacePage({
   params,
 }: {
   params: Promise<{ slug: string; namespaceSlug: string }>;

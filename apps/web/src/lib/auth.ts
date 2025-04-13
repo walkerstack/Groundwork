@@ -3,10 +3,10 @@ import { prismaAdapter } from "better-auth/adapters/prisma";
 import { magicLink, organization } from "better-auth/plugins";
 
 import { db } from "@agentset/db";
-import { LoginEmail } from "@agentset/emails";
+import { InviteUserEmail, LoginEmail } from "@agentset/emails";
 
 import { env } from "../env";
-import { resend } from "./resend";
+import { sendEmail } from "./resend";
 import { getBaseUrl } from "./utils";
 
 export const auth = betterAuth({
@@ -23,23 +23,27 @@ export const auth = betterAuth({
   },
   plugins: [
     organization({
-      sendInvitationEmail: async ({ email, organization, id }) => {
-        await resend.emails.send({
-          from: "Agentset.ai <noreply@agentset.ai>",
-          to: email,
-          subject: `Invitation to join "${organization.name}" on Agentset.ai`,
-          text: `You are invited to join ${organization.name} on Agentset.ai. Click here to accept the invitation: ${getBaseUrl()}/invitation/${id}`,
-          html: `<p>You are invited to join ${organization.name} on Agentset.ai. Click here to accept the invitation: <a href="${getBaseUrl()}/invitation/${id}">here</a></p>`,
+      sendInvitationEmail: async ({ email, organization, id, inviter }) => {
+        const url = `${getBaseUrl()}/invitation/${id}`;
+        await sendEmail({
+          email,
+          subject: "You've been invited to join an organization on Agentset.ai",
+          react: InviteUserEmail({
+            email,
+            url,
+            organizationName: organization.name,
+            organizationUserEmail: inviter.user.email,
+            organizationUser: inviter.user.name,
+          }),
         });
       },
     }),
     magicLink({
       sendMagicLink: async ({ email, url }) => {
-        await resend.emails.send({
-          from: "Agentset.ai <noreply@agentset.ai>",
-          to: email,
+        await sendEmail({
+          email,
           subject: "Your Agentset login link",
-          react: <LoginEmail loginLink={url} />,
+          react: LoginEmail({ loginLink: url }),
         });
       },
     }),

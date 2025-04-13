@@ -1,8 +1,8 @@
 "use client";
 
-import { createContext, useContext, useState } from "react";
 import type { ActiveOrganization } from "@/lib/auth-types";
-import { useSession } from "./session-context";
+import { createContext, useContext, useState } from "react";
+import { authClient } from "@/lib/auth-client";
 
 type OrganizationContextType = {
   activeOrganization: ActiveOrganization;
@@ -34,20 +34,26 @@ export function OrganizationProvider({
 
 export function useOrganization() {
   const context = useContext(OrganizationContext);
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (!context) {
     throw new Error(
       "useOrganization must be used within a OrganizationProvider",
     );
   }
 
-  const [{ user }] = useSession();
-
-  return {
-    ...context,
-    isAdmin: context.activeOrganization?.members.some(
+  const { data: session } = authClient.useSession();
+  let isAdmin = false;
+  if (session) {
+    const { user } = session;
+    isAdmin = context.activeOrganization.members.some(
       (member) =>
         (member.role === "admin" || member.role === "owner") &&
         member.userId === user.id,
-    ),
+    );
+  }
+
+  return {
+    ...context,
+    isAdmin,
   };
 }

@@ -1,6 +1,32 @@
+import type { ProtectedProcedureContext } from "@/server/api/trpc";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
+
+const validateIsMember = async (
+  ctx: ProtectedProcedureContext,
+  orgId: string,
+  roles?: string[],
+) => {
+  const member = await ctx.db.member.findFirst({
+    where: {
+      userId: ctx.session.user.id,
+      organizationId: orgId,
+    },
+    select: {
+      id: true,
+      role: true,
+    },
+  });
+
+  if (!member) {
+    throw new TRPCError({ code: "UNAUTHORIZED" });
+  }
+
+  if (roles && !roles.includes(member.role)) {
+    throw new TRPCError({ code: "UNAUTHORIZED" });
+  }
+};
 
 export const namespaceRouter = createTRPCRouter({
   getOrgNamespaces: protectedProcedure
@@ -10,22 +36,7 @@ export const namespaceRouter = createTRPCRouter({
       }),
     )
     .query(async ({ ctx, input }) => {
-      // make sure the user is a member of the org
-      console.log({ s: ctx.session.user.id });
-
-      const member = await ctx.db.member.findFirst({
-        where: {
-          userId: ctx.session.user.id,
-          organizationId: input.orgId,
-        },
-        select: {
-          id: true,
-        },
-      });
-
-      if (!member) {
-        throw new TRPCError({ code: "UNAUTHORIZED" });
-      }
+      await validateIsMember(ctx, input.orgId);
 
       const namespaces = await ctx.db.namespace.findMany({
         where: {
@@ -35,6 +46,7 @@ export const namespaceRouter = createTRPCRouter({
 
       return namespaces;
     }),
+
   getNamespaceBySlug: protectedProcedure
     .input(z.object({ orgSlug: z.string(), slug: z.string() }))
     .query(async ({ ctx, input }) => {
@@ -50,23 +62,26 @@ export const namespaceRouter = createTRPCRouter({
 
       return namespace;
     }),
-  createNamespace: protectedProcedure
-    .input(z.object({ orgId: z.string(), name: z.string() }))
-    .mutation(async ({ ctx, input }) => {
-      const member = await ctx.db.member.findFirst({
-        where: {
-          userId: ctx.session.user.id,
-          organizationId: input.orgId,
-        },
+  checkSlug: protectedProcedure
+    .input(z.string())
+    .query(async ({ ctx, input }) => {
+      const namespace = await ctx.db.namespace.findUnique({
+        where: { slug: input },
       });
 
-      if (!member || (member.role !== "admin" && member.role !== "owner")) {
-        throw new TRPCError({ code: "UNAUTHORIZED" });
-      }
+      return !!namespace;
+    }),
+  createNamespace: protectedProcedure
+    .input(z.object({ orgId: z.string(), name: z.string(), slug: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      await validateIsMember(ctx, input.orgId, ["admin", "owner"]);
 
-      const slug = input.name.toLowerCase().replace(/ /g, "-");
       const namespace = await ctx.db.namespace.create({
-        data: { name: input.name, slug, organizationId: input.orgId },
+        data: {
+          name: input.name,
+          slug: input.slug,
+          organizationId: input.orgId,
+        },
       });
 
       return namespace;

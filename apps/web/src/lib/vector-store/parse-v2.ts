@@ -38,19 +38,21 @@ const formatResults = (
   });
 };
 
+export type QueryVectorStoreV2Options = {
+  query: string;
+  topK: number;
+  tenantId?: string;
+  minScore?: number;
+  filter?: Record<string, string>;
+  includeMetadata?: boolean;
+  includeRelationships?: boolean;
+  rerankLimit?: number;
+  rerank?: boolean;
+};
+
 export const queryVectorStoreV2 = async (
   namespace: Namespace,
-  options: {
-    query: string;
-    topK: number;
-    tenantId?: string;
-    minScore?: number;
-    filter?: Record<string, string>;
-    includeMetadata?: boolean;
-    includeRelationships?: boolean;
-    rerankLimit?: number;
-    rerank?: boolean;
-  },
+  options: QueryVectorStoreV2Options,
 ) => {
   // TODO: if the embedding model is managed, track the usage
   const [embeddingModel, vectorStore] = await Promise.all([

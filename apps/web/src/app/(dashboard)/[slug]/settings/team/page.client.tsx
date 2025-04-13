@@ -1,51 +1,40 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
+import { useMemo } from "react";
 import CopyButton from "@/components/ui/copy-button";
-import { Separator } from "@/components/ui/separator";
 import { useOrganization } from "@/contexts/organization-context";
-import { useSession } from "@/contexts/session-context";
-import { PlusIcon } from "lucide-react";
+import { authClient } from "@/lib/auth-client";
 
-import InviteMemberDialog from "./invite-dialog";
 import { MemberCard } from "./member-card";
 import { RemoveMemberButton } from "./remove-member";
 import { RevokeInvitationButton } from "./revoke-invitation";
 
 export default function TeamSettingsPage() {
-  const [session] = useSession();
+  const { data: session } = authClient.useSession();
   const { activeOrganization, isAdmin } = useOrganization();
 
-  const currentMember = activeOrganization.members.find(
-    (member) => member.userId === session.user.id,
-  );
+  const currentMember =
+    session &&
+    activeOrganization.members.find(
+      (member) => member.userId === session.user.id,
+    );
+
+  const sortedMembers = useMemo(() => {
+    return activeOrganization.members.sort((a, b) => {
+      if (a.role === "owner") return -1;
+      if (b.role === "owner") return 1;
+
+      if (a.role === "admin") return -1;
+      if (b.role === "admin") return 1;
+
+      return 0;
+    });
+  }, [activeOrganization.members]);
 
   return (
     <>
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="font-semibold">Team Members</h2>
-          <p className="text-muted-foreground text-sm">
-            Invite your team members to collaborate.
-          </p>
-        </div>
-
-        {isAdmin && (
-          <InviteMemberDialog
-            trigger={
-              <Button>
-                <PlusIcon className="size-4" />
-                Invite Member
-              </Button>
-            }
-          />
-        )}
-      </div>
-
-      <Separator className="my-4" />
-
       <div className="grid gap-6">
-        {activeOrganization.members.map((member) => (
+        {sortedMembers.map((member) => (
           <MemberCard
             key={member.id}
             id={member.id}

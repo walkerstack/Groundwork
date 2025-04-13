@@ -64,7 +64,7 @@ export function CreateOrgForm({
           slug,
         });
 
-        if (response.error || !response.data) {
+        if (!response.data) {
           throw new Error(response.error.message);
         }
 

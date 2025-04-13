@@ -2,14 +2,16 @@ import { createEnv } from "@t3-oss/env-nextjs";
 import { z } from "zod";
 
 export const env = createEnv({
+  shared: {
+    NODE_ENV: z
+      .enum(["development", "test", "production"])
+      .default("development"),
+  },
   server: {
     DATABASE_URL: z.string().url(),
     SUPABASE_URL: z.string().url(),
     SUPABASE_ANON_KEY: z.string(),
 
-    NODE_ENV: z
-      .enum(["development", "test", "production"])
-      .default("development"),
     RESEND_API_KEY: z.string(),
 
     BETTER_AUTH_SECRET: z.string(),
@@ -48,8 +50,18 @@ export const env = createEnv({
 
     REDIS_URL: z.string().url(),
     REDIS_TOKEN: z.string(),
+
+    STRIPE_API_KEY: z.string(),
+    STRIPE_WEBHOOK_SECRET: z.string(),
+
+    DISCORD_HOOK_ALERTS: z.string().url().optional(),
+    DISCORD_HOOK_CRON: z.string().url().optional(),
+    DISCORD_HOOK_SUBSCRIBERS: z.string().url().optional(),
+    DISCORD_HOOK_ERRORS: z.string().url().optional(),
   },
-  client: {},
+  client: {
+    NEXT_PUBLIC_STRIPE_PUBLIC_KEY: z.string(),
+  },
   runtimeEnv: {
     DATABASE_URL: process.env.DATABASE_URL,
     SUPABASE_URL: process.env.SUPABASE_URL,
@@ -97,6 +109,15 @@ export const env = createEnv({
 
     REDIS_URL: process.env.REDIS_URL,
     REDIS_TOKEN: process.env.REDIS_TOKEN,
+
+    STRIPE_API_KEY: process.env.STRIPE_API_KEY,
+    STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET,
+    NEXT_PUBLIC_STRIPE_PUBLIC_KEY: process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY,
+
+    DISCORD_HOOK_ALERTS: process.env.DISCORD_HOOK_ALERTS,
+    DISCORD_HOOK_CRON: process.env.DISCORD_HOOK_CRON,
+    DISCORD_HOOK_SUBSCRIBERS: process.env.DISCORD_HOOK_SUBSCRIBERS,
+    DISCORD_HOOK_ERRORS: process.env.DISCORD_HOOK_ERRORS,
   },
   skipValidation: !!process.env.SKIP_ENV_VALIDATION,
   emptyStringAsUndefined: true,

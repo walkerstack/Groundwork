@@ -1,11 +1,11 @@
 "use client";
 
+import type { Session } from "@/lib/auth-types";
 import { useState } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useSession } from "@/contexts/session-context";
 import { authClient } from "@/lib/auth-client";
 import { useRouter } from "@bprogress/next/app";
 import { Loader2Icon, XIcon } from "lucide-react";
@@ -21,7 +21,13 @@ async function convertImageToBase64(file: File): Promise<string> {
 }
 
 export default function EditUser() {
-  const [session] = useSession();
+  const { data: session, isPending } = authClient.useSession();
+  if (isPending || !session) return <div>Loading...</div>;
+
+  return <EditUserForm session={session} />;
+}
+
+const EditUserForm = ({ session }: { session: Session }) => {
   const [name, setName] = useState<string>(session.user.name);
   const [image, setImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(
@@ -171,4 +177,4 @@ export default function EditUser() {
       </form>
     </div>
   );
-}
+};

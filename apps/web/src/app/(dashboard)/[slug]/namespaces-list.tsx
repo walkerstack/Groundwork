@@ -15,7 +15,7 @@ export default function NamespacesList() {
     return (
       <div className="grid grid-cols-3 gap-4">
         {[...Array(9)].map((_, index) => (
-          <NamespaceCardSkeleton key={index} />
+          <Skeleton className="h-40 w-full" key={index} />
         ))}
       </div>
     );
@@ -38,8 +38,4 @@ export default function NamespacesList() {
       ))}
     </div>
   );
-}
-
-function NamespaceCardSkeleton() {
-  return <Skeleton className="h-40 w-full" />;
 }

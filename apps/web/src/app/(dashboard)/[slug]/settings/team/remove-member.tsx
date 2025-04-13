@@ -23,7 +23,7 @@ export const RemoveMemberButton = ({
         organizationId: activeOrganization.id,
       });
 
-      if (data.error || !data.data) {
+      if (data.error) {
         throw new Error(data.error.message || "Failed to remove member");
       }
 
