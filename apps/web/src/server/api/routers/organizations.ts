@@ -15,6 +15,7 @@ export const organizationsRouter = createTRPCRouter({
             userId: ctx.session.user.id,
           },
         },
+        status: OrganizationStatus.ACTIVE,
       },
       include: {
         members: {
