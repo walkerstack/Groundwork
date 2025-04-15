@@ -4,6 +4,8 @@ import z from "@/lib/zod";
 import { ZodError } from "zod";
 import { generateErrorMessage } from "zod-error";
 
+import { capitalize } from "../string-utils";
+
 export const ErrorCode = z.enum([
   "bad_request",
   "not_found",
@@ -237,4 +239,20 @@ export const errorSchemaFactory = (
       },
     },
   };
+};
+
+export const exceededLimitError = ({
+  plan,
+  limit,
+  type,
+}: {
+  plan: string;
+  limit: number;
+  type: "retrievals" | "api";
+}) => {
+  return `You've reached your ${
+    type === "retrievals" ? "monthly" : ""
+  } limit of ${limit} ${
+    limit === 1 ? type.slice(0, -1) : type
+  } on the ${capitalize(plan)} plan. Please upgrade to add more ${type}.`;
 };

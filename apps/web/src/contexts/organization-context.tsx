@@ -1,8 +1,16 @@
 "use client";
 
-import type { ActiveOrganization } from "@/lib/auth-types";
 import { createContext, useContext, useState } from "react";
-import { authClient } from "@/lib/auth-client";
+import { useSession } from "@/hooks/use-session";
+
+import type { Invitation, Member, Organization, User } from "@agentset/db";
+
+type ActiveOrganization = Organization & {
+  members: (Member & {
+    user: User;
+  })[];
+  invitations: Invitation[];
+};
 
 type OrganizationContextType = {
   activeOrganization: ActiveOrganization;
@@ -34,6 +42,7 @@ export function OrganizationProvider({
 
 export function useOrganization() {
   const context = useContext(OrganizationContext);
+
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (!context) {
     throw new Error(
@@ -41,7 +50,7 @@ export function useOrganization() {
     );
   }
 
-  const { data: session } = authClient.useSession();
+  const { session } = useSession();
   let isAdmin = false;
   if (session) {
     const { user } = session;

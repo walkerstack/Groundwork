@@ -47,8 +47,6 @@ export const withAuthApiHandler = (
         namespaceId,
       );
 
-      // TODO: get limit from plan
-      // const rateLimit = token.rateLimit || 600;
       const rateLimit = 600;
       const { success, limit, reset, remaining } = await ratelimit(
         rateLimit,

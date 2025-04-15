@@ -6,6 +6,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useSession } from "@/hooks/use-session";
 import { authClient } from "@/lib/auth-client";
 import { useRouter } from "@bprogress/next/app";
 import { Loader2Icon, XIcon } from "lucide-react";
@@ -21,8 +22,8 @@ async function convertImageToBase64(file: File): Promise<string> {
 }
 
 export default function EditUser() {
-  const { data: session, isPending } = authClient.useSession();
-  if (isPending || !session) return <div>Loading...</div>;
+  const { session, isLoading } = useSession();
+  if (isLoading || !session) return <div>Loading...</div>;
 
   return <EditUserForm session={session} />;
 }

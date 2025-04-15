@@ -1,6 +1,6 @@
 "use client";
 
-import type { Organization } from "@/lib/auth-types";
+import type { RouterOutputs } from "@/trpc/react";
 import { useState } from "react";
 import { EntityAvatar } from "@/components/ui/avatar";
 import {
@@ -20,12 +20,15 @@ import {
 } from "@/components/ui/sidebar";
 import { useOrganization } from "@/contexts/organization-context";
 import { authClient } from "@/lib/auth-client";
+import { api } from "@/trpc/react";
 import { useRouter } from "@bprogress/next/app";
 import { useMutation } from "@tanstack/react-query";
 import { ChevronsUpDown, Plus } from "lucide-react";
 import { toast } from "sonner";
 
 import CreateOrganizationDialog from "./create-org-dialog";
+
+type Organization = RouterOutputs["organization"]["getOrganizations"][number];
 
 export function OrganizationSwitcher() {
   const { isMobile } = useSidebar();
@@ -34,28 +37,22 @@ export function OrganizationSwitcher() {
     activeOrganization,
     setActiveOrganization: setActiveOrganizationInContext,
   } = useOrganization();
-  const organizations = authClient.useListOrganizations();
+  const { data: organizations } = api.organization.getOrganizations.useQuery();
   const [open, setOpen] = useState(false);
 
   const { mutateAsync: setActiveOrganization, isPending } = useMutation({
     onMutate(organization) {
       // optimistic update
-      setActiveOrganizationInContext({
-        ...organization,
-        members: [],
-        invitations: [],
-      });
+      setActiveOrganizationInContext(organization);
     },
     mutationFn: async (organization: Organization) => {
       return authClient.organization.setActive({
         organizationId: organization.id,
       });
     },
-    onSuccess: (data) => {
-      if (data.data) {
-        router.push(`/${data.data.slug}`);
-        setActiveOrganizationInContext(data.data);
-      }
+    onSuccess: (data, organization) => {
+      router.push(`/${(data.data || organization).slug}`);
+      setActiveOrganizationInContext(organization);
     },
     onError: () => {
       toast.error("Failed to switch organization!");
@@ -88,7 +85,9 @@ export function OrganizationSwitcher() {
                 <span className="truncate font-semibold">
                   {activeOrganization.name}
                 </span>
-                <span className="truncate text-xs">FREE</span>
+                <span className="truncate text-xs">
+                  {activeOrganization.plan.toUpperCase()}
+                </span>
               </div>
               <ChevronsUpDown className="ml-auto" />
             </SidebarMenuButton>
@@ -104,7 +103,7 @@ export function OrganizationSwitcher() {
               Organizations
             </DropdownMenuLabel>
 
-            {organizations.data?.map((organization, index) => (
+            {organizations?.map((organization, index) => (
               <DropdownMenuItem
                 key={organization.id}
                 onClick={() => handleOrganizationChange(organization)}

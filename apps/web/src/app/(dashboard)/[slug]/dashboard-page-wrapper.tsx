@@ -28,7 +28,7 @@ export default function DashboardPageWrapper({
         {actions}
       </header>
 
-      <div className={cn("flex flex-1 flex-col p-4 pt-10", className)}>
+      <div className={cn("flex flex-1 flex-col px-8 py-10", className)}>
         {children}
       </div>
     </>

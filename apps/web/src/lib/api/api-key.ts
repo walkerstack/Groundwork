@@ -12,6 +12,14 @@ export const getApiKeyInfo = (apiKey: string) => {
         select: {
           scope: true,
           organizationId: true,
+          organization: {
+            select: {
+              plan: true,
+              apiRatelimit: true,
+              searchLimit: true,
+              searchUsage: true,
+            },
+          },
         },
       });
 
@@ -20,7 +28,9 @@ export const getApiKeyInfo = (apiKey: string) => {
     ["apiKey", apiKey],
     {
       tags: [`apiKey:${apiKey}`],
-      revalidate: 60 * 30, // 30 mins
+      revalidate: 60 * 1, // 1 min
     },
   )();
 };
+
+export type ApiKeyInfo = NonNullable<Awaited<ReturnType<typeof getApiKeyInfo>>>;

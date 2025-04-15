@@ -5,14 +5,5 @@ export const chunkArray = <T>(array: T[], size: number) => {
   );
 };
 
-// capitalize first character of each word in a string
-export const capitalize = (str?: string | null) => {
-  if (!str || typeof str !== "string") return str;
-  return str
-    .split(" ")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ");
-};
-
 export const filterFalsy = <T>(arr: T[]): NonNullable<T>[] =>
   arr.filter(Boolean) as NonNullable<T>[];

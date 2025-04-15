@@ -14,6 +14,7 @@
     "db:migrate": "turbo -F @agentset/db db:migrate",
     "db:generate": "turbo -F @agentset/db db:generate",
     "generate-openapi": "turbo -F @agentset/web generate-openapi",
+    "stripe:listen": "stripe listen --forward-to localhost:3000/api/stripe/webhook --events checkout.session.completed,customer.subscription.updated,customer.subscription.deleted,invoice.payment_failed",
     "dev": "turbo watch dev --continue",
     "dev:web": "turbo watch dev -F @agentset/web...",
     "dev:emails": "turbo watch dev -F @agentset/emails...",

@@ -39,9 +39,10 @@ export function formatBytes(
 
 let formatter: Intl.NumberFormat | undefined;
 let compactFormatter: Intl.NumberFormat | undefined;
+let currencyFormatter: Intl.NumberFormat | undefined;
 export function formatNumber(
   num: number,
-  style: "decimal" | "compact" = "decimal",
+  style: "decimal" | "compact" | "currency" = "decimal",
 ) {
   let formatterToUse;
 
@@ -54,6 +55,16 @@ export function formatNumber(
       });
     }
     formatterToUse = formatter;
+  } else if (style === "currency") {
+    if (!currencyFormatter) {
+      currencyFormatter = new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "USD",
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2,
+      });
+    }
+    formatterToUse = currencyFormatter;
   } else {
     if (!compactFormatter) {
       compactFormatter = new Intl.NumberFormat("en-US", {

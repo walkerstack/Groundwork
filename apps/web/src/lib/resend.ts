@@ -12,8 +12,8 @@ interface ResendEmailOptions extends Omit<CreateEmailOptions, "to" | "from"> {
 
 const VARIANT_TO_FROM_MAP = {
   primary: "Agentset.ai <system@agentset.ai>",
-  notifications: "Agentset.ai <notifications@mail.agentset.ai>",
-  marketing: "Abdellatif from Agentset.ai <abdellatif@ship.agentset.ai>",
+  notifications: "Agentset.ai <notifications@agentset.ai>", // TODO: change domain to mail.
+  marketing: "Abdellatif from Agentset.ai <abdellatif@agentset.ai>", // TODO: change domain to ship.
 };
 
 export const sendEmail = async (opts: ResendEmailOptions) => {

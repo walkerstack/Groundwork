@@ -3,6 +3,7 @@ import { tryCatch } from "@/lib/error";
 
 import type { Organization } from "@agentset/db";
 
+import type { ApiKeyInfo } from "../api-key";
 import { getApiKeyInfo } from "../api-key";
 import { AgentsetApiError, handleAndReturnErrorResponse } from "../errors";
 import { ratelimit } from "../rate-limit";
@@ -13,7 +14,7 @@ export interface HandlerParams {
   req: NextRequest;
   params: Record<string, string>;
   searchParams: Record<string, string>;
-  organization: Pick<Organization, "id">;
+  organization: Pick<Organization, "id"> & ApiKeyInfo["organization"];
   apiScope: string;
   tenantId?: string;
   headers?: Record<string, string>;
@@ -62,9 +63,7 @@ export const withApiHandler = (handler: Handler) => {
         });
       }
 
-      // TODO: get limit from plan
-      // const rateLimit = token.rateLimit || 600;
-      const rateLimit = 600;
+      const rateLimit = orgApiKey.data.organization.apiRatelimit;
       const { success, limit, reset, remaining } = await ratelimit(
         rateLimit,
         "1 m",
@@ -90,7 +89,10 @@ export const withApiHandler = (handler: Handler) => {
         req,
         params: routeParams ?? {},
         searchParams,
-        organization: { id: orgApiKey.data.organizationId },
+        organization: {
+          id: orgApiKey.data.organizationId,
+          ...orgApiKey.data.organization,
+        },
         apiScope: orgApiKey.data.scope,
         headers,
         tenantId,

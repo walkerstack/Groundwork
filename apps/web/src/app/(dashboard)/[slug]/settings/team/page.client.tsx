@@ -3,14 +3,14 @@
 import { useMemo } from "react";
 import CopyButton from "@/components/ui/copy-button";
 import { useOrganization } from "@/contexts/organization-context";
-import { authClient } from "@/lib/auth-client";
+import { useSession } from "@/hooks/use-session";
 
 import { MemberCard } from "./member-card";
 import { RemoveMemberButton } from "./remove-member";
 import { RevokeInvitationButton } from "./revoke-invitation";
 
 export default function TeamSettingsPage() {
-  const { data: session } = authClient.useSession();
+  const { session } = useSession();
   const { activeOrganization, isAdmin } = useOrganization();
 
   const currentMember =

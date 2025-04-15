@@ -27,7 +27,9 @@ export function filenamize(value: string, length = 20) {
   return truncate(slug, length);
 }
 
-export function capitalize(str: string) {
+export function capitalize(str?: string | null) {
+  if (!str || typeof str !== "string") return str;
+
   return str
     .split(" ")
     .map(

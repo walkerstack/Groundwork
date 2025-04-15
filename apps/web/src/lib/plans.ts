@@ -33,18 +33,11 @@ export const PLANS = [
       monthly: 49,
       yearly: 490,
       ids: [
-        "price_1LodNLAlJJEpqkPVQSrt33Lc", // old monthly
-        "price_1LodNLAlJJEpqkPVRxUyCQgZ", // old yearly
-        "price_1OTcQBAlJJEpqkPViGtGEsbb", // new monthly (test)
-        "price_1OYJeBAlJJEpqkPVLjTsjX0E", // new monthly (prod)
-        "price_1OTcQBAlJJEpqkPVYlCMqdLL", // new yearly (test)
-        "price_1OYJeBAlJJEpqkPVnPGEZeb0", // new yearly (prod)
+        "price_1RE26ODPtsw7PNYQduDp19Gx", // yearly
+        "price_1RE26ODPtsw7PNYQlDfyMYjV", // monthly
 
-        // 2025 pricing
-        "price_1R8XtyAlJJEpqkPV5WZ4c0jF", //  yearly
-        "price_1R8XtEAlJJEpqkPV4opVvVPq", // monthly
-        "price_1R8XxZAlJJEpqkPVqGi0wOqD", // yearly (test),
-        "price_1R7oeBAlJJEpqkPVh6q5q3h8", // monthly (test),
+        "price_1RE25PDPtsw7PNYQXPwhPIAt", // yearly (test),
+        "price_1RE25PDPtsw7PNYQQjlEQbPf", // monthly (test),
       ],
     },
     limits: {

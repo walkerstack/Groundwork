@@ -6,7 +6,6 @@ import { EntityAvatar } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -18,15 +17,16 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { useSession } from "@/hooks/use-session";
 import { authClient } from "@/lib/auth-client";
 import { useRouter } from "@bprogress/next/app";
-import { BadgeCheck, CreditCard, LogOut, MoreVerticalIcon } from "lucide-react";
+import { BadgeCheck, LogOut, MoreVerticalIcon } from "lucide-react";
 
 import { Skeleton } from "../ui/skeleton";
 
 export function NavUser() {
   const { isMobile } = useSidebar();
-  const { data: session, isPending } = authClient.useSession();
+  const { session, isLoading } = useSession();
 
   const router = useRouter();
   const [isSigningOut, setIsSigningOut] = useState(false);
@@ -36,14 +36,14 @@ export function NavUser() {
     await authClient.signOut({
       fetchOptions: {
         onSuccess() {
-          router.push("/");
+          router.replace("/");
         },
       },
     });
     setIsSigningOut(false);
   };
 
-  if (isPending || !session) return <Skeleton className="h-12 w-full" />;
+  if (isLoading || !session) return <Skeleton className="h-12 w-full" />;
   const { user } = session;
 
   return (
@@ -94,19 +94,13 @@ export function NavUser() {
 
             <DropdownMenuSeparator />
 
-            <DropdownMenuGroup>
-              <DropdownMenuItem asChild>
-                <Link href="/profile">
-                  <BadgeCheck />
-                  Account
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <CreditCard />
-                Billing
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
+            <DropdownMenuItem asChild>
+              <Link href="/profile">
+                <BadgeCheck />
+                Account
+              </Link>
+            </DropdownMenuItem>
+
             <DropdownMenuItem onClick={handleSignOut} disabled={isSigningOut}>
               <LogOut />
               Log out

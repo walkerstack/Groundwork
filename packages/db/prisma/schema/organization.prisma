@@ -11,9 +11,9 @@ model Organization {
   namespaces  Namespace[]
   apiKeys     OrganizationApiKey[]
 
-  totalNamespaces Int @default(0) // Total number of links in the workspace
-  totalDocuments  Int @default(0) // Total number of clicks in the workspace
-  totalIngestJobs Int @default(0) // Total number of clicks in the workspace
+  totalNamespaces Int @default(0) // Total number of namespaces in the organization
+  totalDocuments  Int @default(0) // Total number of documents in the organization
+  totalIngestJobs Int @default(0) // Total number of ingest jobs in the organization
 
   totalPages Int @default(0)
   pagesLimit Int @default(1000)
