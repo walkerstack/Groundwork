@@ -42,6 +42,8 @@ export const triggerDocumentJob = async (body: TriggerDocumentJobBody) => {
 export type DeleteDocumentBody = {
   documentId: string;
   deleteJobWhenDone?: boolean;
+  deleteNamespaceWhenDone?: boolean;
+  deleteOrgWhenDone?: boolean;
 };
 export const triggerDeleteDocumentJob = async (body: DeleteDocumentBody) => {
   return workflowClient.trigger({

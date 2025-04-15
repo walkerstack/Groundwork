@@ -13,6 +13,9 @@ export const { POST } = serve<DeleteDocumentBody>(
   async (context) => {
     const {
       ingestJob: { namespace, ...ingestJob },
+      shouldDeleteJob,
+      shouldDeleteNamespace,
+      shouldDeleteOrg,
       ...document
     } = await context.run("get-config", async () => {
       const { documentId } = context.requestPayload;
@@ -32,7 +35,13 @@ export const { POST } = serve<DeleteDocumentBody>(
         throw new Error("Ingestion job not found");
       }
 
-      return doc;
+      return {
+        ...doc,
+        shouldDeleteJob: context.requestPayload.deleteJobWhenDone ?? false,
+        shouldDeleteNamespace:
+          context.requestPayload.deleteNamespaceWhenDone ?? false,
+        shouldDeleteOrg: context.requestPayload.deleteOrgWhenDone ?? false,
+      };
     });
 
     await context.run("update-status-deleting", async () => {
@@ -112,10 +121,8 @@ export const { POST } = serve<DeleteDocumentBody>(
       }
     });
 
-    await context.run("check-and-delete-ingest-job", async () => {
-      const { deleteJobWhenDone } = context.requestPayload;
-
-      if (deleteJobWhenDone) {
+    if (shouldDeleteJob) {
+      await context.run("check-and-delete-ingest-job", async () => {
         const document = await db.document.findFirst({
           where: { ingestJobId: ingestJob.id },
         });
@@ -134,9 +141,62 @@ export const { POST } = serve<DeleteDocumentBody>(
 
               throw e;
             });
+
+          return true;
         }
-      }
-    });
+
+        return false;
+      });
+    }
+
+    if (shouldDeleteNamespace) {
+      await context.run("check-and-delete-namespace", async () => {
+        const job = await db.ingestJob.findFirst({
+          where: { namespaceId: namespace.id },
+          select: { id: true },
+        });
+
+        if (!job) {
+          await db.$transaction([
+            db.namespace.delete({ where: { id: namespace.id } }),
+            db.organization.update({
+              where: { id: namespace.organizationId },
+              data: { totalNamespaces: { decrement: 1 } },
+            }),
+          ]);
+          return true;
+        }
+
+        return false;
+      });
+    }
+
+    if (shouldDeleteOrg) {
+      await context.run("check-and-delete-org", async () => {
+        const ns = await db.namespace.findFirst({
+          where: { organizationId: namespace.organizationId },
+          select: { id: true },
+        });
+
+        if (!ns) {
+          await db.organization
+            .delete({
+              where: { id: namespace.organizationId },
+            })
+            .catch((e) => {
+              if (e.code === "P2025") {
+                return null; // already deleted
+              }
+
+              throw e;
+            });
+
+          return true;
+        }
+
+        return false;
+      });
+    }
   },
   {
     qstashClient: qstashClient,

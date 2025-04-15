@@ -72,8 +72,10 @@ export const { POST } = serve<DeleteIngestJobBody>(
       return documents;
     });
 
+    const shouldEnqueueDeleteDocuments = documents.length > 0;
+
     // enqueue delete documents in parallel
-    if (documents.length > 0) {
+    if (shouldEnqueueDeleteDocuments) {
       const batches = chunkArray(documents, BATCH_SIZE);
       await Promise.all(
         batches.map((batch, i) =>
@@ -89,6 +91,8 @@ export const { POST } = serve<DeleteIngestJobBody>(
                   const { workflowRunId } = await triggerDeleteDocumentJob({
                     documentId: document.id,
                     deleteJobWhenDone: true,
+                    deleteNamespaceWhenDone: shouldDeleteNamespace,
+                    deleteOrgWhenDone: shouldDeleteOrg,
                   });
 
                   return { documentId: document.id, workflowRunId };
@@ -132,9 +136,7 @@ export const { POST } = serve<DeleteIngestJobBody>(
           }),
         ]);
       });
-    }
 
-    if (shouldDeleteNamespace) {
       await context.run("check-and-delete-namespace", async () => {
         const job = await db.ingestJob.findFirst({
           where: { namespaceId: namespace.id },
@@ -154,9 +156,7 @@ export const { POST } = serve<DeleteIngestJobBody>(
 
         return false;
       });
-    }
 
-    if (shouldDeleteOrg) {
       await context.run("check-and-delete-org", async () => {
         const ns = await db.namespace.findFirst({
           where: { organizationId: namespace.organizationId },
@@ -164,9 +164,17 @@ export const { POST } = serve<DeleteIngestJobBody>(
         });
 
         if (!ns) {
-          await db.organization.delete({
-            where: { id: namespace.organizationId },
-          });
+          await db.organization
+            .delete({
+              where: { id: namespace.organizationId },
+            })
+            .catch((e) => {
+              if (e.code === "P2025") {
+                return null; // already deleted
+              }
+
+              throw e;
+            });
           return true;
         }
 
