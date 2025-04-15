@@ -61,6 +61,7 @@ export const ingestJobRouter = createTRPCRouter({
       return await createIngestJob({
         payload: input.payload,
         namespaceId: input.namespaceId,
+        organizationId: namespace.organizationId,
         config: input.config,
       });
     }),

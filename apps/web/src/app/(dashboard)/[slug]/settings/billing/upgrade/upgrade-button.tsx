@@ -14,6 +14,7 @@ import { toast } from "sonner";
 export function UpgradePlanButton({
   plan,
   period,
+  children,
   ...rest
 }: {
   plan: string;
@@ -63,11 +64,12 @@ export function UpgradePlanButton({
       onClick={onClick}
       {...rest}
     >
-      {isCurrentPlan
-        ? "Your current plan"
-        : activeOrganization.plan === "free"
-          ? `Get started with ${selectedPlan.name} ${capitalize(period)}`
-          : `Switch to ${selectedPlan.name} ${capitalize(period)}`}
+      {children ||
+        (isCurrentPlan
+          ? "Your current plan"
+          : activeOrganization.plan === "free"
+            ? `Get started with ${selectedPlan.name} ${capitalize(period)}`
+            : `Switch to ${selectedPlan.name} ${capitalize(period)}`)}
     </Button>
   );
 }

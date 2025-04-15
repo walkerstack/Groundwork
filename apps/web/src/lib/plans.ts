@@ -5,6 +5,7 @@ import { INFINITY_NUMBER } from "./constants";
 export type PlanFeature = {
   id?: string;
   text: string;
+  disabled?: boolean;
   tooltip?: {
     title: string;
     cta: string;
@@ -15,20 +16,36 @@ export type PlanFeature = {
 export const PLANS = [
   {
     name: "Free",
+    description: "For personal use and small projects.",
     price: {
       monthly: 0,
       yearly: 0,
     },
     limits: {
-      namespaces: 3,
       pages: 1000,
       retrievals: 10_000,
-      users: 1,
       api: 60,
+      // namespaces: 3,
+      // users: 1,
     },
+    features: [
+      { id: "pages", text: "1,000 pages included" },
+      { id: "retrievals", text: "10,000 retrievals /month" },
+      { id: "api", text: "60 API calls /min" },
+      { id: "support", text: "Basic support" },
+      {
+        id: "additional_pages",
+        text: "$0.01 per additional page",
+        disabled: true,
+      },
+      { id: "connector", text: "$100 per connector", disabled: true },
+      // { id: "users", text: "1 user" },
+      // { id: "namespaces", text: "3 namespaces" },
+    ] satisfies PlanFeature[],
   },
   {
     name: "Pro",
+    description: "For production applications ready to scale.",
     price: {
       monthly: 49,
       yearly: 490,
@@ -41,22 +58,41 @@ export const PLANS = [
       ],
     },
     limits: {
-      namespaces: 10,
       pages: 10_000,
       retrievals: INFINITY_NUMBER,
-      users: 10,
       api: 600,
+      // users: 10,
+      // namespaces: 10,
     },
     featureTitle: "Everything in Free, plus:",
     features: [
-      { id: "namespaces", text: "10 namespaces" },
-      { id: "pages", text: "10K pages" },
-      { id: "retrievals", text: "Infinite retrievals" },
-      { id: "users", text: "10 users" },
+      { id: "pages", text: "10,000 pages included" },
+      { id: "retrievals", text: "Unlimited retrievals" },
+      { id: "additional_pages", text: "$0.01 per additional page" },
+      { id: "connector", text: "$100 per connector" },
       { id: "api", text: "600 API calls /min" },
-    ] as PlanFeature[],
+      { id: "support", text: "Email support" },
+      // { id: "users", text: "10 users" },
+      // { id: "namespaces", text: "10 namespaces" },
+    ] satisfies PlanFeature[],
   },
 ];
+
+export const ENTERPRISE_PLAN = {
+  name: "Enterprise",
+  description: "For organizations with custom workflows.",
+  price: "Custom",
+  features: [
+    { id: "pages", text: "Unlimited pages" },
+    { id: "retrievals", text: "Unlimited retrievals" },
+    { id: "connector", text: "Custom connector pricing" },
+    { id: "integrations", text: "Custom integrations" },
+    { id: "api", text: "Custom API rate limit" },
+    { id: "support", text: "Dedicated account manager" },
+    // { id: "users", text: "1 user" },
+    // { id: "namespaces", text: "3 namespaces" },
+  ] satisfies PlanFeature[],
+};
 
 export const FREE_PLAN = PLANS.find((plan) => plan.name === "Free")!;
 export const PRO_PLAN = PLANS.find((plan) => plan.name === "Pro")!;

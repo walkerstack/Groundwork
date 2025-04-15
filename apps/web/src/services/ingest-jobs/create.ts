@@ -6,11 +6,13 @@ import { db, IngestJobStatus } from "@agentset/db";
 
 export const createIngestJob = async ({
   namespaceId,
+  organizationId,
   tenantId,
   config,
   payload,
 }: {
   namespaceId: string;
+  organizationId: string;
   tenantId?: string;
   payload: IngestJob["payload"];
   config?: NonNullable<IngestJob["config"]>;
@@ -51,15 +53,24 @@ export const createIngestJob = async ({
     throw new Error("INVALID_PAYLOAD");
   }
 
-  const job = await db.ingestJob.create({
-    data: {
-      namespace: { connect: { id: namespaceId } },
-      tenantId,
-      status: IngestJobStatus.QUEUED,
-      payload: finalPayload,
-      config,
-    },
-  });
+  const [job] = await db.$transaction([
+    db.ingestJob.create({
+      data: {
+        namespace: { connect: { id: namespaceId } },
+        tenantId,
+        status: IngestJobStatus.QUEUED,
+        payload: finalPayload,
+        config,
+      },
+    }),
+    db.organization.update({
+      where: { id: organizationId },
+      data: {
+        totalIngestJobs: { increment: 1 },
+      },
+      select: { id: true },
+    }),
+  ]);
 
   const { workflowRunId } = await triggerIngestionJob({ jobId: job.id });
 

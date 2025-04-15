@@ -62,7 +62,7 @@ export const billingRouter = createTRPCRouter({
   upgrade: organizationMiddleware
     .input(
       z.object({
-        plan: z.enum(["pro"]),
+        plan: z.enum(["free", "pro"]),
         period: z.enum(["monthly", "yearly"]),
         baseUrl: z.string(),
       }),
@@ -71,11 +71,9 @@ export const billingRouter = createTRPCRouter({
       const { plan, period, baseUrl } = input;
 
       const planKey = plan.replace(" ", "+");
-
       const prices = await stripe.prices.list({
         lookup_keys: [`${planKey}_${period}`],
       });
-
       const priceId = prices.data[0]!.id;
 
       const activeSubscription = ctx.organization.stripeId

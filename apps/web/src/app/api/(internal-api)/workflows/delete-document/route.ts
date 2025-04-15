@@ -25,6 +25,7 @@ export const { POST } = serve<{
           tenantId: true,
           source: true,
           workflowRunsIds: true,
+          totalPages: true,
           ingestJob: { select: { id: true, namespace: true } },
         },
       });
@@ -92,10 +93,19 @@ export const { POST } = serve<{
     });
 
     await context.run("delete-document", async () => {
-      await db.document.delete({
-        where: { id: document.id },
-        select: { id: true },
-      });
+      await db.$transaction([
+        db.document.delete({
+          where: { id: document.id },
+          select: { id: true },
+        }),
+        db.organization.update({
+          where: { id: namespace.organizationId },
+          data: {
+            totalDocuments: { decrement: 1 },
+            totalPages: { decrement: document.totalPages },
+          },
+        }),
+      ]);
     });
 
     await context.run("check-and-delete-managed-file", async () => {

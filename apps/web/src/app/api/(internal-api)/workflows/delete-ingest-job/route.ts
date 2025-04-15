@@ -34,7 +34,7 @@ export const { POST } = serve<{
             tenantId: true,
             payload: true,
             workflowRunsIds: true,
-            namespace: { select: { id: true } },
+            namespace: { select: { id: true, organizationId: true } },
           },
         });
 
@@ -128,9 +128,15 @@ export const { POST } = serve<{
       );
     } else {
       await context.run("delete-ingest-job", async () => {
-        await db.ingestJob.delete({
-          where: { id: ingestJob.id },
-        });
+        await db.$transaction([
+          db.ingestJob.delete({
+            where: { id: ingestJob.id },
+          }),
+          db.organization.update({
+            where: { id: namespace.organizationId },
+            data: { totalIngestJobs: { decrement: 1 } },
+          }),
+        ]);
       });
     }
 
@@ -141,7 +147,13 @@ export const { POST } = serve<{
         });
 
         if (!job) {
-          await db.namespace.delete({ where: { id: namespace.id } });
+          await db.$transaction([
+            db.namespace.delete({ where: { id: namespace.id } }),
+            db.organization.update({
+              where: { id: namespace.organizationId },
+              data: { totalNamespaces: { decrement: 1 } },
+            }),
+          ]);
           return true;
         }
 

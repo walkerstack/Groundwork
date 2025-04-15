@@ -28,10 +28,15 @@ export function UpgradeEmail({
     name: string;
     features?: {
       text: string;
+      disabled?: boolean;
       tooltip?: { title: string; cta: string; href: string };
     }[];
   };
 }) {
+  const finalFeatures = plan.features
+    ? plan.features.filter((feature) => !feature.disabled)
+    : [];
+
   return (
     <Html>
       <Head />
@@ -57,12 +62,12 @@ export function UpgradeEmail({
               <strong>Agentset {plan.name}</strong>! Your support means the
               world to us and helps us continue to build and improve Agentset.
             </Text>
-            {plan.features && plan.features.length > 0 ? (
+            {finalFeatures.length > 0 ? (
               <>
                 <Text className="text-sm leading-6 text-black">
                   On the {plan.name} plan, you now have access to:
                 </Text>
-                {plan.features.map((feature) => (
+                {finalFeatures.map((feature) => (
                   <Text className="ml-1 text-sm leading-4 text-black">
                     ◆{" "}
                     {feature.tooltip?.href ? (
@@ -74,6 +79,7 @@ export function UpgradeEmail({
                 ))}
               </>
             ) : null}
+
             <Text className="text-sm leading-6 text-black">
               If you have any questions or feedback about Agentset, please don't
               hesitate to reach out – I'm always happy to help!

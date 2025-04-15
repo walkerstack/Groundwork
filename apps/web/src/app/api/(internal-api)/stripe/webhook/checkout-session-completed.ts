@@ -87,7 +87,7 @@ export async function checkoutSessionCompleted(event: Stripe.Event) {
           react: UpgradeEmail({
             name: user.name,
             email: user.email,
-            plan: plan,
+            plan,
           }),
           variant: "marketing",
         }),

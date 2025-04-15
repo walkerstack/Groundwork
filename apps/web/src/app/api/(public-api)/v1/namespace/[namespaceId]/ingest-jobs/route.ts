@@ -63,6 +63,7 @@ export const POST = withNamespaceApiHandler(
       const job = await createIngestJob({
         payload: body.payload,
         namespaceId: namespace.id,
+        organizationId: namespace.organizationId,
         tenantId,
         config: body.config,
       });

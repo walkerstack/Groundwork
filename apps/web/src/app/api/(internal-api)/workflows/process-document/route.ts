@@ -71,9 +71,14 @@ export const { POST } = serve<{
     }
 
     // change status to processing
-    await context.run(
+    const { totalPages } = await context.run(
       "update-document-properties-and-status-processing",
       async () => {
+        const totalPages =
+          body.total_pages && typeof body.total_pages === "number"
+            ? body.total_pages
+            : body.total_characters / 1000;
+
         await db.document.update({
           where: { id: document.id },
           data: {
@@ -81,11 +86,7 @@ export const { POST } = serve<{
             processingAt: new Date(),
             totalCharacters: body.total_characters,
             totalChunks: body.total_chunks,
-            ...(body.total_pages && typeof body.total_pages === "number"
-              ? {
-                  totalPages: body.total_pages,
-                }
-              : {}),
+            totalPages,
             // totalTokens: body.total_tokens,
             documentProperties: {
               fileSize: body.metadata.sizeInBytes,
@@ -94,6 +95,8 @@ export const { POST } = serve<{
           },
           select: { id: true },
         });
+
+        return { totalPages };
       },
     );
 
@@ -152,6 +155,15 @@ export const { POST } = serve<{
         where: {
           ingestJob: { id: ingestJob.id },
           status: { not: DocumentStatus.COMPLETED },
+        },
+        select: { id: true },
+      });
+
+      // update org total pages
+      await db.organization.update({
+        where: { id: namespace.organizationId },
+        data: {
+          totalPages: { increment: totalPages },
         },
         select: { id: true },
       });

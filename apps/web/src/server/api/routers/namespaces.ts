@@ -76,13 +76,19 @@ export const namespaceRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       await validateIsMember(ctx, input.orgId, ["admin", "owner"]);
 
-      const namespace = await ctx.db.namespace.create({
-        data: {
-          name: input.name,
-          slug: input.slug,
-          organizationId: input.orgId,
-        },
-      });
+      const [namespace] = await ctx.db.$transaction([
+        ctx.db.namespace.create({
+          data: {
+            name: input.name,
+            slug: input.slug,
+            organizationId: input.orgId,
+          },
+        }),
+        ctx.db.organization.update({
+          where: { id: input.orgId },
+          data: { totalNamespaces: { increment: 1 } },
+        }),
+      ]);
 
       return namespace;
     }),

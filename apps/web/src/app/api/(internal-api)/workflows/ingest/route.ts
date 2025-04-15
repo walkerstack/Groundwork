@@ -135,6 +135,17 @@ export const { POST } = serve<{
       }
     }
 
+    // update total documents in org
+    await context.run("update-total-documents-in-org", async () => {
+      await db.organization.update({
+        where: { id: ingestionJob.namespace.organizationId },
+        data: {
+          totalDocuments: { increment: documents.length },
+        },
+        select: { id: true },
+      });
+    });
+
     const documentIdToWorkflowRunId = await context.run(
       "enqueue-documents",
       async () => {
