@@ -58,6 +58,21 @@ export const ingestJobRouter = createTRPCRouter({
         throw new TRPCError({ code: "NOT_FOUND" });
       }
 
+      const organization = await ctx.db.organization.findUnique({
+        where: { id: namespace.organizationId },
+      });
+
+      if (!organization) {
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
+
+      if (organization.totalPages >= organization.pagesLimit) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "You've reached the maximum number of pages.",
+        });
+      }
+
       return await createIngestJob({
         payload: input.payload,
         namespaceId: input.namespaceId,

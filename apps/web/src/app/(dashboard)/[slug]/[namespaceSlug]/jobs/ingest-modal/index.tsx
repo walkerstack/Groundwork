@@ -10,6 +10,12 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { useOrganization } from "@/contexts/organization-context";
 import { api } from "@/trpc/react";
 import { PlusIcon } from "lucide-react";
 import { toast } from "sonner";
@@ -21,6 +27,7 @@ import UrlsForm from "./urls-form";
 export function IngestModal() {
   const [isOpen, setIsOpen] = useState(false);
   const utils = api.useUtils();
+  const { activeOrganization } = useOrganization();
 
   const onSuccess = () => {
     setIsOpen(false);
@@ -44,19 +51,38 @@ export function IngestModal() {
 
   const isPending = utils.ingestJob.ingest.isMutating() > 0;
 
+  const isOverLimit =
+    activeOrganization.totalPages >= activeOrganization.pagesLimit;
+
   return (
     <Dialog
       open={isOpen}
       onOpenChange={(newOpen) => {
         if (isPending) return;
+        if (newOpen && isOverLimit) return;
         setIsOpen(newOpen);
       }}
     >
       <div>
         <DialogTrigger asChild>
-          <Button>
-            <PlusIcon className="mr-2 h-4 w-4" /> Ingest content
-          </Button>
+          {isOverLimit ? (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span>
+                  <Button disabled>
+                    <PlusIcon className="mr-2 h-4 w-4" /> Ingest content
+                  </Button>
+                </span>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>You've reached your plan's limits. Upgrade to ingest more</p>
+              </TooltipContent>
+            </Tooltip>
+          ) : (
+            <Button>
+              <PlusIcon className="mr-2 h-4 w-4" /> Ingest content
+            </Button>
+          )}
         </DialogTrigger>
       </div>
 

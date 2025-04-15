@@ -32,7 +32,7 @@ export default function JobsPage() {
       cursor,
       cursorDirection,
     },
-    { refetchInterval: 10000, placeholderData: keepPreviousData }, // Refetch every 10 seconds
+    { refetchInterval: 15_000, placeholderData: keepPreviousData }, // Refetch every 15 seconds
   );
 
   return (

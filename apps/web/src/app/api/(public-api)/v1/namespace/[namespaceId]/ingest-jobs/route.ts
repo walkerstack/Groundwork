@@ -1,4 +1,4 @@
-import { AgentsetApiError } from "@/lib/api/errors";
+import { AgentsetApiError, exceededLimitError } from "@/lib/api/errors";
 import { withNamespaceApiHandler } from "@/lib/api/handler";
 import { prefixId } from "@/lib/api/ids";
 import { makeApiSuccessResponse } from "@/lib/api/response";
@@ -54,7 +54,18 @@ export const GET = withNamespaceApiHandler(
 );
 
 export const POST = withNamespaceApiHandler(
-  async ({ req, namespace, tenantId, headers }) => {
+  async ({ req, namespace, tenantId, headers, organization }) => {
+    if (organization.totalPages >= organization.pagesLimit) {
+      throw new AgentsetApiError({
+        code: "rate_limit_exceeded",
+        message: exceededLimitError({
+          plan: organization.plan,
+          limit: organization.pagesLimit,
+          type: "pages",
+        }),
+      });
+    }
+
     const body = await createIngestJobSchema.parseAsync(
       await parseRequestBody(req),
     );

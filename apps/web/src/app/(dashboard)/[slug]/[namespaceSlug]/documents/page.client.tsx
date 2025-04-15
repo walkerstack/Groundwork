@@ -21,7 +21,7 @@ export default function DocumentsPage() {
       cursor,
       cursorDirection,
     },
-    { refetchInterval: 5000, placeholderData: keepPreviousData }, // Refetch every 5 seconds
+    { refetchInterval: 15_000, placeholderData: keepPreviousData }, // Refetch every 5 seconds
   );
 
   return (

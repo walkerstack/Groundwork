@@ -18,6 +18,8 @@ export const getApiKeyInfo = (apiKey: string) => {
               apiRatelimit: true,
               searchLimit: true,
               searchUsage: true,
+              totalPages: true,
+              pagesLimit: true,
             },
           },
         },

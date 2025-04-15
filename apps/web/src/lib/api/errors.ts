@@ -248,7 +248,7 @@ export const exceededLimitError = ({
 }: {
   plan: string;
   limit: number;
-  type: "retrievals" | "api";
+  type: "retrievals" | "api" | "pages";
 }) => {
   return `You've reached your ${
     type === "retrievals" ? "monthly" : ""
