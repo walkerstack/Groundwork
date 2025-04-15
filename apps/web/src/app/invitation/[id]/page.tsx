@@ -1,11 +1,10 @@
-import { SessionProvider } from "@/contexts/session-context";
-import { auth } from "@/lib/auth";
-
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { auth } from "@/lib/auth";
+import { AlertCircleIcon } from "lucide-react";
+
 import { InvitationCard } from "./invitation-card";
 import { InvitationStatus } from "./invitation-status";
-import { AlertCircleIcon } from "lucide-react";
 
 export default async function InvitationPage({
   params,
@@ -55,10 +54,8 @@ export default async function InvitationPage({
   }
 
   return (
-    <SessionProvider session={session}>
-      <div className="dark:bg-background flex min-h-screen flex-col items-center justify-center bg-slate-50">
-        <InvitationCard invitation={invitation} />
-      </div>
-    </SessionProvider>
+    <div className="dark:bg-background flex min-h-screen flex-col items-center justify-center bg-slate-50">
+      <InvitationCard invitation={invitation} />
+    </div>
   );
 }
