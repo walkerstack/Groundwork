@@ -1,27 +1,19 @@
 import type { Metadata } from "next";
 import { cache } from "react";
-import { headers } from "next/headers";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { AppSidebar } from "@/components/app-sidebar";
 import { ModalProvider } from "@/components/modals";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { OrganizationProvider } from "@/contexts/organization-context";
-import { auth } from "@/lib/auth";
+import { getSession } from "@/lib/auth";
 import { constructMetadata } from "@/lib/metadata";
 
 import { db } from "@agentset/db";
 
 const getOrg = cache(async (slug: string) => {
-  const allHeaders = await headers();
-  const session = await auth.api
-    .getSession({
-      headers: allHeaders,
-    })
-    .catch(() => null);
-
-  // organization.
+  const session = await getSession();
   if (!session) {
-    notFound();
+    redirect("/login");
   }
 
   const org = await db.organization.findUnique({

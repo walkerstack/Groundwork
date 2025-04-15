@@ -1,3 +1,4 @@
+import type { TriggerIngestionJobBody } from "@/lib/workflow";
 import { chunkArray } from "@/lib/functions";
 import {
   qstashClient,
@@ -6,14 +7,12 @@ import {
 } from "@/lib/workflow";
 import { serve } from "@upstash/workflow/nextjs";
 
-import type { Document, IngestJob, Prisma } from "@agentset/db";
+import type { Document, Prisma } from "@agentset/db";
 import { db, DocumentStatus, IngestJobStatus } from "@agentset/db";
 
 const BATCH_SIZE = 30;
 
-export const { POST } = serve<{
-  jobId: IngestJob["id"];
-}>(
+export const { POST } = serve<TriggerIngestionJobBody>(
   async (context) => {
     const ingestionJob = await context.run("get-config", async () => {
       const { jobId } = context.requestPayload;

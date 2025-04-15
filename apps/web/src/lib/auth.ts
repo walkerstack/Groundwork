@@ -1,3 +1,5 @@
+import { cache } from "react";
+import { headers } from "next/headers";
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { magicLink, organization } from "better-auth/plugins";
@@ -51,4 +53,15 @@ export const auth = betterAuth({
   database: prismaAdapter(db, {
     provider: "postgresql",
   }),
+});
+
+export const getSession = cache(async () => {
+  const allHeaders = await headers();
+  const session = await auth.api
+    .getSession({
+      headers: allHeaders,
+    })
+    .catch(() => null);
+
+  return session;
 });

@@ -19,55 +19,54 @@ export const qstashReceiver = new Receiver({
   nextSigningKey: env.QSTASH_NEXT_SIGNING_KEY,
 });
 
-export const triggerIngestionJob = async ({ jobId }: { jobId: string }) => {
+export type TriggerIngestionJobBody = {
+  jobId: string;
+};
+export const triggerIngestionJob = async (body: TriggerIngestionJobBody) => {
   return workflowClient.trigger({
     url: `${getBaseUrl()}/api/workflows/ingest`,
-    body: {
-      jobId: jobId,
-    },
+    body,
   });
 };
 
-export const triggerDocumentJob = async ({
-  documentId,
-}: {
+export type TriggerDocumentJobBody = {
   documentId: string;
-}) => {
+};
+export const triggerDocumentJob = async (body: TriggerDocumentJobBody) => {
   return workflowClient.trigger({
     url: `${getBaseUrl()}/api/workflows/process-document`,
-    body: {
-      documentId: documentId,
-    },
+    body,
   });
 };
 
-export const triggerDeleteDocumentJob = async ({
-  documentId,
-  deleteJobWhenDone,
-}: {
+export type DeleteDocumentBody = {
   documentId: string;
   deleteJobWhenDone?: boolean;
-}) => {
+};
+export const triggerDeleteDocumentJob = async (body: DeleteDocumentBody) => {
   return workflowClient.trigger({
     url: `${getBaseUrl()}/api/workflows/delete-document`,
-    body: {
-      documentId,
-      deleteJobWhenDone,
-    },
+    body,
   });
 };
 
-export const triggerDeleteIngestJob = async (body: {
+export type DeleteIngestJobBody = {
   jobId: string;
   deleteNamespaceWhenDone?: boolean;
-}) => {
+  deleteOrgWhenDone?: boolean;
+};
+export const triggerDeleteIngestJob = async (body: DeleteIngestJobBody) => {
   return workflowClient.trigger({
     url: `${getBaseUrl()}/api/workflows/delete-ingest-job`,
     body,
   });
 };
 
-export const triggerDeleteNamespace = async (body: { namespaceId: string }) => {
+export type DeleteNamespaceBody = {
+  namespaceId: string;
+  deleteOrgWhenDone?: boolean;
+};
+export const triggerDeleteNamespace = async (body: DeleteNamespaceBody) => {
   return workflowClient.trigger({
     url: `${getBaseUrl()}/api/workflows/delete-namespace`,
     body,

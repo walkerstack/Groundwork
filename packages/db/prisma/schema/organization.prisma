@@ -1,3 +1,8 @@
+enum OrganizationStatus {
+  ACTIVE
+  DELETING
+}
+
 model Organization {
   id   String  @id
   name String
@@ -27,6 +32,8 @@ model Organization {
   stripeId          String?   @unique // Stripe customer ID
   billingCycleStart Int? // day of the month when the billing cycle starts
   paymentFailedAt   DateTime?
+
+  status OrganizationStatus @default(ACTIVE)
 
   createdAt        DateTime @default(now())
   usageLastChecked DateTime @default(now())

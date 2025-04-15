@@ -1,3 +1,4 @@
+import type { TriggerDocumentJobBody } from "@/lib/workflow";
 import type { PartitionBatch, PartitionResult } from "@/types/partition";
 import { env } from "@/env";
 import { makeChunk } from "@/lib/chunk";
@@ -12,9 +13,7 @@ import { embedMany } from "ai";
 
 import { db, DocumentStatus, IngestJobStatus } from "@agentset/db";
 
-export const { POST } = serve<{
-  documentId: string;
-}>(
+export const { POST } = serve<TriggerDocumentJobBody>(
   async (context) => {
     const {
       ingestJob: { namespace, ...ingestJob },

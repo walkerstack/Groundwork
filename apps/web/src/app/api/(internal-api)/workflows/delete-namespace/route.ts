@@ -1,3 +1,4 @@
+import type { DeleteNamespaceBody } from "@/lib/workflow";
 import { chunkArray } from "@/lib/functions";
 import {
   qstashClient,
@@ -9,11 +10,9 @@ import { serve } from "@upstash/workflow/nextjs";
 import { db } from "@agentset/db";
 
 const BATCH_SIZE = 30;
-export const { POST } = serve<{
-  namespaceId: string;
-}>(
+export const { POST } = serve<DeleteNamespaceBody>(
   async (context) => {
-    const { namespaceId } = context.requestPayload;
+    const { namespaceId, deleteOrgWhenDone } = context.requestPayload;
 
     const namespace = await context.run("get-namespace", async () => {
       const job = await db.namespace.findUnique({
@@ -57,6 +56,7 @@ export const { POST } = serve<{
             triggerDeleteIngestJob({
               jobId: ingestJob.id,
               deleteNamespaceWhenDone: true,
+              deleteOrgWhenDone,
             }),
           ),
         );

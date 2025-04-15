@@ -1,3 +1,4 @@
+import type { DeleteIngestJobBody } from "@/lib/workflow";
 import { chunkArray } from "@/lib/functions";
 import {
   cancelWorkflow,
@@ -11,21 +12,10 @@ import { db, DocumentStatus, IngestJobStatus } from "@agentset/db";
 
 const BATCH_SIZE = 30;
 
-export const { POST } = serve<{
-  jobId: string;
-  deleteNamespaceWhenDone?: boolean;
-}>(
+export const { POST } = serve<DeleteIngestJobBody>(
   async (context) => {
-    const shouldDeleteNamespace = await context.run(
-      "should-delete-namespace",
-      () => {
-        return context.requestPayload.deleteNamespaceWhenDone ?? false;
-      },
-    );
-
-    const { namespace, ...ingestJob } = await context.run(
-      "get-config",
-      async () => {
+    const { namespace, shouldDeleteNamespace, shouldDeleteOrg, ...ingestJob } =
+      await context.run("get-config", async () => {
         const { jobId } = context.requestPayload;
         const job = await db.ingestJob.findUnique({
           where: { id: jobId },
@@ -42,9 +32,13 @@ export const { POST } = serve<{
           throw new Error("Ingestion job not found");
         }
 
-        return job;
-      },
-    );
+        return {
+          ...job,
+          shouldDeleteNamespace:
+            context.requestPayload.deleteNamespaceWhenDone ?? false,
+          shouldDeleteOrg: context.requestPayload.deleteOrgWhenDone ?? false,
+        };
+      });
 
     await context.run("update-status-deleting", async () => {
       await db.ingestJob.update({
@@ -144,6 +138,7 @@ export const { POST } = serve<{
       await context.run("check-and-delete-namespace", async () => {
         const job = await db.ingestJob.findFirst({
           where: { namespaceId: namespace.id },
+          select: { id: true },
         });
 
         if (!job) {
@@ -154,6 +149,24 @@ export const { POST } = serve<{
               data: { totalNamespaces: { decrement: 1 } },
             }),
           ]);
+          return true;
+        }
+
+        return false;
+      });
+    }
+
+    if (shouldDeleteOrg) {
+      await context.run("check-and-delete-org", async () => {
+        const ns = await db.namespace.findFirst({
+          where: { organizationId: namespace.organizationId },
+          select: { id: true },
+        });
+
+        if (!ns) {
+          await db.organization.delete({
+            where: { id: namespace.organizationId },
+          });
           return true;
         }
 

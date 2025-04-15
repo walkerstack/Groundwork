@@ -1,3 +1,4 @@
+import type { DeleteDocumentBody } from "@/lib/workflow";
 import { chunkArray } from "@/lib/functions";
 import { deleteObject } from "@/lib/s3";
 import { getNamespaceVectorStore } from "@/lib/vector-store";
@@ -8,10 +9,7 @@ import { db, DocumentStatus } from "@agentset/db";
 
 const BATCH_SIZE = 30;
 
-export const { POST } = serve<{
-  documentId: string;
-  deleteJobWhenDone?: boolean;
-}>(
+export const { POST } = serve<DeleteDocumentBody>(
   async (context) => {
     const {
       ingestJob: { namespace, ...ingestJob },
