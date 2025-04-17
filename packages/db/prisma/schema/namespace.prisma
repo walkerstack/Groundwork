@@ -18,6 +18,10 @@ model Namespace {
   connections Connection[]
   ingestJobs  IngestJob[]
 
+  totalIngestJobs Int @default(0) // Total number of ingest jobs in the namespace
+  totalDocuments  Int @default(0) // Total number of documents in the namespace
+  totalPages      Int @default(0)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
