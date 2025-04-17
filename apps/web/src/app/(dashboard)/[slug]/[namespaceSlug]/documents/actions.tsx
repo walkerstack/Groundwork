@@ -8,7 +8,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useNamespace } from "@/contexts/namespace-context";
 import { prefixId } from "@/lib/api/ids";
-import { api } from "@/trpc/react";
+import { useTRPC } from "@/trpc/react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { CopyIcon, EllipsisVerticalIcon, Trash2Icon } from "lucide-react";
 import { toast } from "sonner";
 
@@ -17,16 +18,24 @@ import { DocumentStatus } from "@agentset/db";
 import type { DocumentCol } from "./columns";
 
 export function DocumentActions({ row }: { row: Row<DocumentCol> }) {
-  const utils = api.useUtils();
   const { activeNamespace } = useNamespace();
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
 
-  const { isPending, mutate: deleteDocument } = api.document.delete.useMutation(
-    {
+  const { isPending, mutate: deleteDocument } = useMutation(
+    trpc.document.delete.mutationOptions({
       onSuccess: () => {
-        toast.success("Document deleted");
-        void utils.document.all.invalidate();
+        toast.success("Document deleted successfully");
+        void queryClient.invalidateQueries(
+          trpc.document.all.queryFilter({
+            namespaceId: activeNamespace.id,
+          }),
+        );
       },
-    },
+      onError: (error) => {
+        toast.error(error.message);
+      },
+    }),
   );
 
   const handleCopy = async () => {
@@ -35,7 +44,7 @@ export function DocumentActions({ row }: { row: Row<DocumentCol> }) {
   };
 
   const handleDelete = () => {
-    void deleteDocument({
+    deleteDocument({
       documentId: row.original.id,
       namespaceId: activeNamespace.id,
     });

@@ -5,16 +5,20 @@ import { DataWrapper } from "@/components/ui/data-wrapper";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useOrganization } from "@/contexts/organization-context";
-import { api } from "@/trpc/react";
+import { useTRPC } from "@/trpc/react";
+import { useQuery } from "@tanstack/react-query";
 import { FolderIcon } from "lucide-react";
 
 import CreateNamespace from "./create-namespace";
 
 export default function NamespacesList() {
   const { activeOrganization } = useOrganization();
-  const { data, isLoading, error } = api.namespace.getOrgNamespaces.useQuery({
-    orgId: activeOrganization.id,
-  });
+  const trpc = useTRPC();
+  const { data, isLoading, error } = useQuery(
+    trpc.namespace.getOrgNamespaces.queryOptions({
+      orgId: activeOrganization.id,
+    }),
+  );
 
   return (
     <DataWrapper

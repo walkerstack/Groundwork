@@ -10,7 +10,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useOrganization } from "@/contexts/organization-context";
-import { api } from "@/trpc/react";
+import { useTRPC } from "@/trpc/react";
+import { useMutation } from "@tanstack/react-query";
 import { CalendarSyncIcon, MoreVerticalIcon, XIcon } from "lucide-react";
 import { toast } from "sonner";
 
@@ -18,19 +19,25 @@ export default function SubscriptionMenu() {
   const [isOpen, setIsOpen] = useState(false);
   const { activeOrganization } = useOrganization();
   const router = useRouter();
+  const trpc = useTRPC();
 
   const { mutateAsync: cancelSubscription, isPending: isCancelling } =
-    api.billing.cancel.useMutation({
-      onError: (error) => {
-        toast.error(error.message);
-      },
-    });
+    useMutation(
+      trpc.billing.cancel.mutationOptions({
+        onError: (error) => {
+          toast.error(error.message);
+        },
+      }),
+    );
+
   const { mutateAsync: manageSubscription, isPending: isManaging } =
-    api.billing.manage.useMutation({
-      onError: (error) => {
-        toast.error(error.message);
-      },
-    });
+    useMutation(
+      trpc.billing.manage.mutationOptions({
+        onError: (error) => {
+          toast.error(error.message);
+        },
+      }),
+    );
 
   const isLoading = isCancelling || isManaging;
 

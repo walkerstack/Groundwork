@@ -14,8 +14,9 @@ import { Input } from "@/components/ui/input";
 import { useNamespace } from "@/contexts/namespace-context";
 import { useUploadFile } from "@/hooks/use-upload";
 import { MAX_UPLOAD_SIZE } from "@/lib/upload";
-import { api } from "@/trpc/react";
+import { useTRPC } from "@/trpc/react";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -29,6 +30,7 @@ const schema = z.object({
 
 export default function UploadForm({ onSuccess }: { onSuccess: () => void }) {
   const { activeNamespace } = useNamespace();
+  const trpc = useTRPC();
 
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
@@ -49,10 +51,11 @@ export default function UploadForm({ onSuccess }: { onSuccess: () => void }) {
     namespaceId: activeNamespace.id,
   });
 
-  const { mutateAsync, isPending: isFilePending } =
-    api.ingestJob.ingest.useMutation({
-      onSuccess: onSuccess,
-    });
+  const { mutateAsync, isPending: isFilePending } = useMutation(
+    trpc.ingestJob.ingest.mutationOptions({
+      onSuccess,
+    }),
+  );
 
   const handleFileSubmit = async (data: z.infer<typeof schema>) => {
     const uploadedFile = await onUpload(data.files[0]!);

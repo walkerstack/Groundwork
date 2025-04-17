@@ -4,24 +4,27 @@ import { DataTable } from "@/components/data-table";
 import { Button } from "@/components/ui/button";
 import { useNamespace } from "@/contexts/namespace-context";
 import { useCursorPagination } from "@/hooks/use-cursor-pagination";
-import { api } from "@/trpc/react";
-import { keepPreviousData } from "@tanstack/react-query";
+import { useTRPC } from "@/trpc/react";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { RefreshCcwIcon } from "lucide-react";
 
 import { columns } from "./columns";
 
 export default function DocumentsPage() {
   const { activeNamespace } = useNamespace();
+  const trpc = useTRPC();
   const { cursor, cursorDirection, handleNext, handlePrevious, hasPrevious } =
     useCursorPagination();
 
-  const { isLoading, data, refetch, isFetching } = api.document.all.useQuery(
-    {
-      namespaceId: activeNamespace.id,
-      cursor,
-      cursorDirection,
-    },
-    { refetchInterval: 15_000, placeholderData: keepPreviousData }, // Refetch every 5 seconds
+  const { isLoading, data, refetch, isFetching } = useQuery(
+    trpc.document.all.queryOptions(
+      {
+        namespaceId: activeNamespace.id,
+        cursor,
+        cursorDirection,
+      },
+      { refetchInterval: 15_000, placeholderData: keepPreviousData }, // Refetch every 5 seconds
+    ),
   );
 
   return (

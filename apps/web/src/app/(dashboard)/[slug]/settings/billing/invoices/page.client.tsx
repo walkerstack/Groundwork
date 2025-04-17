@@ -14,14 +14,18 @@ import {
 } from "@/components/ui/tooltip";
 import { useOrganization } from "@/contexts/organization-context";
 import { formatNumber } from "@/lib/utils";
-import { api } from "@/trpc/react";
+import { useTRPC } from "@/trpc/react";
+import { useQuery } from "@tanstack/react-query";
 import { ChevronLeftIcon, DollarSignIcon, ReceiptTextIcon } from "lucide-react";
 
 export default function OrganizationInvoicesClient() {
   const { activeOrganization } = useOrganization();
-  const { data: invoices, isLoading } = api.billing.invoices.useQuery({
-    orgId: activeOrganization.id,
-  });
+  const trpc = useTRPC();
+  const { data: invoices, isLoading } = useQuery(
+    trpc.billing.invoices.queryOptions({
+      orgId: activeOrganization.id,
+    }),
+  );
 
   return (
     <div>

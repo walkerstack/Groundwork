@@ -6,29 +6,33 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { api } from "@/trpc/react";
+import { useTRPC } from "@/trpc/react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { EllipsisVerticalIcon, Trash2Icon } from "lucide-react";
 import { toast } from "sonner";
 
 import type { ApiKeyDef } from "./columns";
 
 export function ApiKeyActions({ row }: { row: Row<ApiKeyDef> }) {
-  const utils = api.useUtils();
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
   const orgId = row.original.organizationId;
   const id = row.original.id;
 
-  const { mutateAsync: deleteApiKey, isPending } =
-    api.apiKey.deleteApiKey.useMutation({
+  const { mutateAsync: deleteApiKey, isPending } = useMutation(
+    trpc.apiKey.deleteApiKey.mutationOptions({
       onSuccess: () => {
-        utils.apiKey.getApiKeys.setData({ orgId }, (old) => {
+        const queryFilter = trpc.apiKey.getApiKeys.queryFilter({ orgId });
+        queryClient.setQueriesData(queryFilter, (old) => {
           if (!old) return [];
           return old.filter((key) => key.id !== id);
         });
-        void utils.apiKey.getApiKeys.invalidate({ orgId });
+        void queryClient.invalidateQueries(queryFilter);
 
         toast.success("API key deleted");
       },
-    });
+    }),
+  );
 
   const handleDelete = async () => {
     await deleteApiKey({ orgId, id });

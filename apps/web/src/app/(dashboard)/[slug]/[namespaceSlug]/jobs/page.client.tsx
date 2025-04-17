@@ -11,8 +11,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useNamespace } from "@/contexts/namespace-context";
 import { useCursorPagination } from "@/hooks/use-cursor-pagination";
-import { api } from "@/trpc/react";
-import { keepPreviousData } from "@tanstack/react-query";
+import { useTRPC } from "@/trpc/react";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { RefreshCcwIcon } from "lucide-react";
 
 import { IngestJobStatus } from "@agentset/db";
@@ -21,18 +21,21 @@ import { columns } from "./columns";
 
 export default function JobsPage() {
   const { activeNamespace } = useNamespace();
+  const trpc = useTRPC();
   const [statuses, setStatuses] = useState<IngestJobStatus[]>([]);
   const { cursor, cursorDirection, handleNext, handlePrevious, hasPrevious } =
     useCursorPagination();
 
-  const { isLoading, data, refetch, isFetching } = api.ingestJob.all.useQuery(
-    {
-      namespaceId: activeNamespace.id,
-      statuses,
-      cursor,
-      cursorDirection,
-    },
-    { refetchInterval: 15_000, placeholderData: keepPreviousData }, // Refetch every 15 seconds
+  const { isLoading, data, refetch, isFetching } = useQuery(
+    trpc.ingestJob.all.queryOptions(
+      {
+        namespaceId: activeNamespace.id,
+        statuses,
+        cursor,
+        cursorDirection,
+      },
+      { refetchInterval: 15_000, placeholderData: keepPreviousData }, // Refetch every 15 seconds
+    ),
   );
 
   return (

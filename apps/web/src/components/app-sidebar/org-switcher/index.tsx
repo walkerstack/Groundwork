@@ -20,9 +20,9 @@ import {
 } from "@/components/ui/sidebar";
 import { useOrganization } from "@/contexts/organization-context";
 import { authClient } from "@/lib/auth-client";
-import { api } from "@/trpc/react";
+import { useTRPC } from "@/trpc/react";
 import { useRouter } from "@bprogress/next/app";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { ChevronsUpDown, Plus } from "lucide-react";
 import { toast } from "sonner";
 
@@ -37,7 +37,10 @@ export function OrganizationSwitcher() {
     activeOrganization,
     setActiveOrganization: setActiveOrganizationInContext,
   } = useOrganization();
-  const { data: organizations } = api.organization.getOrganizations.useQuery();
+  const trpc = useTRPC();
+  const { data: organizations } = useQuery(
+    trpc.organization.getOrganizations.queryOptions(),
+  );
   const [open, setOpen] = useState(false);
 
   const { mutateAsync: setActiveOrganization, isPending } = useMutation({

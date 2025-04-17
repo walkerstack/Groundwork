@@ -11,7 +11,8 @@ import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useOrganization } from "@/contexts/organization-context";
 import { cn } from "@/lib/utils";
-import { api } from "@/trpc/react";
+import { useTRPC } from "@/trpc/react";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { CreditCardIcon } from "lucide-react";
 import { toast } from "sonner";
 
@@ -29,15 +30,21 @@ export default function PaymentMethods() {
 function PaymentMethodsInner() {
   const router = useRouter();
   const { activeOrganization } = useOrganization();
-  const { data: paymentMethods, isLoading } =
-    api.billing.getPaymentMethods.useQuery({ orgId: activeOrganization.id });
+  const trpc = useTRPC();
 
-  const { mutateAsync: addPaymentMethod, isPending: isAdding } =
-    api.billing.addPaymentMethod.useMutation({
+  const { data: paymentMethods, isLoading } = useQuery(
+    trpc.billing.getPaymentMethods.queryOptions({
+      orgId: activeOrganization.id,
+    }),
+  );
+
+  const { mutateAsync: addPaymentMethod, isPending: isAdding } = useMutation(
+    trpc.billing.addPaymentMethod.mutationOptions({
       onError: (error) => {
         toast.error(error.message);
       },
-    });
+    }),
+  );
 
   const regularPaymentMethods = paymentMethods?.filter(
     (pm) => pm.type !== "us_bank_account",

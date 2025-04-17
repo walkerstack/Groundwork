@@ -11,8 +11,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useNamespace } from "@/contexts/namespace-context";
-import { api } from "@/trpc/react";
+import { useTRPC } from "@/trpc/react";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -23,14 +24,17 @@ const schema = z.object({
 
 export default function TextForm({ onSuccess }: { onSuccess: () => void }) {
   const { activeNamespace } = useNamespace();
+  const trpc = useTRPC();
 
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
   });
 
-  const { mutateAsync, isPending } = api.ingestJob.ingest.useMutation({
-    onSuccess: onSuccess,
-  });
+  const { mutateAsync, isPending } = useMutation(
+    trpc.ingestJob.ingest.mutationOptions({
+      onSuccess,
+    }),
+  );
 
   const handleTextSubmit = async (data: z.infer<typeof schema>) => {
     await mutateAsync({

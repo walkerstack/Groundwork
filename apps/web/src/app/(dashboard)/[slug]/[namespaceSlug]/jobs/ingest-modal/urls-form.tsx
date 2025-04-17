@@ -10,8 +10,9 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useNamespace } from "@/contexts/namespace-context";
-import { api } from "@/trpc/react";
+import { useTRPC } from "@/trpc/react";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
 import { Trash2Icon } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -24,6 +25,7 @@ const schema = z.object({
 
 export default function UrlsForm({ onSuccess }: { onSuccess: () => void }) {
   const { activeNamespace } = useNamespace();
+  const trpc = useTRPC();
 
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
@@ -32,9 +34,11 @@ export default function UrlsForm({ onSuccess }: { onSuccess: () => void }) {
     },
   });
 
-  const { mutateAsync, isPending } = api.ingestJob.ingest.useMutation({
-    onSuccess,
-  });
+  const { mutateAsync, isPending } = useMutation(
+    trpc.ingestJob.ingest.mutationOptions({
+      onSuccess,
+    }),
+  );
 
   const handleUrlsSubmit = async (data: z.infer<typeof schema>) => {
     await mutateAsync({

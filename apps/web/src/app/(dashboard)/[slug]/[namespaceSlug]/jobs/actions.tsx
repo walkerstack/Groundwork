@@ -8,7 +8,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useNamespace } from "@/contexts/namespace-context";
 import { prefixId } from "@/lib/api/ids";
-import { api } from "@/trpc/react";
+import { useTRPC } from "@/trpc/react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { CopyIcon, EllipsisVerticalIcon, Trash2Icon } from "lucide-react";
 import { toast } from "sonner";
 
@@ -17,14 +18,24 @@ import { IngestJobStatus } from "@agentset/db";
 import type { JobCol } from "./columns";
 
 export function JobActions({ row }: { row: Row<JobCol> }) {
-  const utils = api.useUtils();
+  const queryClient = useQueryClient();
   const { activeNamespace } = useNamespace();
-  const { mutate: deleteJob, isPending } = api.ingestJob.delete.useMutation({
-    onSuccess: () => {
-      toast.success("Ingest job deleted");
-      void utils.ingestJob.all.invalidate();
-    },
-  });
+  const trpc = useTRPC();
+  const { mutate: deleteJob, isPending } = useMutation(
+    trpc.ingestJob.delete.mutationOptions({
+      onSuccess: () => {
+        toast.success("Job deleted successfully");
+        void queryClient.invalidateQueries(
+          trpc.ingestJob.all.queryFilter({
+            namespaceId: activeNamespace.id,
+          }),
+        );
+      },
+      onError: (error) => {
+        toast.error(error.message);
+      },
+    }),
+  );
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(prefixId(row.original.id, "job_"));

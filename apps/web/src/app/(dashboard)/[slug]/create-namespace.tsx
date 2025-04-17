@@ -22,9 +22,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { useOrganization } from "@/contexts/organization-context";
 import { toSlug } from "@/lib/slug";
-import { api, apiClient } from "@/trpc/react";
+import { trpcClient, useTRPC } from "@/trpc/react";
 import { useRouter } from "@bprogress/next/app";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation } from "@tanstack/react-query";
 import { PlusIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -40,7 +41,7 @@ const formSchema = z.object({
     .refine(
       async (value) => {
         if (value === "") return false;
-        const result = await apiClient.namespace.checkSlug.query(value);
+        const result = await trpcClient.namespace.checkSlug.query(value);
         return !result;
       },
       { message: "Slug is already taken" },
@@ -51,6 +52,7 @@ export default function CreateNamespace() {
   const { activeOrganization } = useOrganization();
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
+  const trpc = useTRPC();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema, undefined, { mode: "async" }),
@@ -61,8 +63,8 @@ export default function CreateNamespace() {
     },
   });
 
-  const { isPending, mutateAsync: createNamespace } =
-    api.namespace.createNamespace.useMutation({
+  const { isPending, mutateAsync: createNamespace } = useMutation(
+    trpc.namespace.createNamespace.mutationOptions({
       onSuccess: (data) => {
         toast.success("Namespace created");
         setIsOpen(false);
@@ -71,7 +73,8 @@ export default function CreateNamespace() {
       onError: (error) => {
         toast.error(error.message);
       },
-    });
+    }),
+  );
 
   const name = form.watch("name");
   const { formState, setValue } = form;

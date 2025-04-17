@@ -2,23 +2,26 @@
 
 import { Button } from "@/components/ui/button";
 import { useOrganization } from "@/contexts/organization-context";
-import { api } from "@/trpc/react";
+import { useTRPC } from "@/trpc/react";
 import { useRouter } from "@bprogress/next/app";
+import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 export function DeleteOrgButton() {
   const { activeOrganization, isAdmin } = useOrganization();
   const router = useRouter();
-  const { mutate: deleteOrg, isPending } =
-    api.organization.deleteOrganization.useMutation({
+  const trpc = useTRPC();
+  const { mutate: deleteOrganization, isPending } = useMutation(
+    trpc.organization.deleteOrganization.mutationOptions({
       onSuccess: () => {
         toast.success("Organization deleted");
         router.push("/");
       },
       onError: (error) => {
-        toast.error("Failed to delete organization");
+        toast.error(error.message || "Failed to delete organization");
       },
-    });
+    }),
+  );
 
   if (!isAdmin) return null;
 
@@ -26,7 +29,9 @@ export function DeleteOrgButton() {
     <Button
       variant="destructive"
       isLoading={isPending}
-      onClick={() => deleteOrg({ organizationId: activeOrganization.id })}
+      onClick={() =>
+        deleteOrganization({ organizationId: activeOrganization.id })
+      }
     >
       Delete
     </Button>

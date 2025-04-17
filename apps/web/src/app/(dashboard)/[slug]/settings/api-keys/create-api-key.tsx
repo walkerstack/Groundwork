@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import CopyButton from "@/components/ui/copy-button";
 import {
@@ -18,31 +19,35 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { api } from "@/trpc/react";
+import { useTRPC } from "@/trpc/react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { PlusIcon } from "lucide-react";
-import { useState } from "react";
 import { toast } from "sonner";
 
 export default function CreateApiKey({ orgId }: { orgId: string }) {
   const [isOpen, setIsOpen] = useState(false);
   const [label, setLabel] = useState("");
   const [scope, setScope] = useState<"all">("all");
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
 
-  const utils = api.useUtils();
-  const { isPending, mutateAsync, data } = api.apiKey.createApiKey.useMutation({
-    onSuccess: (newKey) => {
-      utils.apiKey.getApiKeys.setData({ orgId }, (old) => {
-        if (!old) return [];
-        return [...old, newKey];
-      });
-      void utils.apiKey.getApiKeys.invalidate({ orgId });
+  const { isPending, mutateAsync, data } = useMutation(
+    trpc.apiKey.createApiKey.mutationOptions({
+      onSuccess: (newKey) => {
+        const queryFilter = trpc.apiKey.getApiKeys.queryFilter({ orgId });
+        queryClient.setQueriesData(queryFilter, (old) => {
+          if (!old) return [];
+          return [...old, newKey];
+        });
 
-      toast.success("API key created");
-    },
-    onError: (error) => {
-      toast.error(error.message);
-    },
-  });
+        toast.success("API key created");
+        void queryClient.invalidateQueries(queryFilter);
+      },
+      onError: (error) => {
+        toast.error(error.message);
+      },
+    }),
+  );
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

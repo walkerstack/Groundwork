@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { api } from "@/trpc/react";
+import { useTRPC } from "@/trpc/react";
+import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 const uploadWithProgress = (
@@ -41,8 +42,10 @@ const uploadWithProgress = (
 };
 
 export function useUploadFile({ namespaceId }: { namespaceId: string }) {
-  const { mutateAsync: getPresignedUrl } =
-    api.upload.getPresignedUrl.useMutation();
+  const trpc = useTRPC();
+  const { mutateAsync: getPresignedUrl } = useMutation(
+    trpc.upload.getPresignedUrl.mutationOptions(),
+  );
 
   const [uploadedFiles, setUploadedFiles] = useState<
     { key: string; name: string }[]

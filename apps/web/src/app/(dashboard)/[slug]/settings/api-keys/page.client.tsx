@@ -2,7 +2,8 @@
 
 import { DataTable } from "@/components/data-table";
 import { useOrganization } from "@/contexts/organization-context";
-import { api } from "@/trpc/react";
+import { useTRPC } from "@/trpc/react";
+import { useQuery } from "@tanstack/react-query";
 
 import { columns } from "./columns";
 import CreateApiKey from "./create-api-key";
@@ -26,9 +27,12 @@ export default function ApiKeysPage() {
 }
 
 function ApiKeysList({ orgId }: { orgId: string }) {
-  const { data, isLoading } = api.apiKey.getApiKeys.useQuery({
-    orgId,
-  });
+  const trpc = useTRPC();
+  const { data, isLoading } = useQuery(
+    trpc.apiKey.getApiKeys.queryOptions({
+      orgId,
+    }),
+  );
 
   return <DataTable columns={columns} data={data} isLoading={isLoading} />;
 }

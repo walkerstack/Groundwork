@@ -8,7 +8,8 @@ import { SELF_SERVE_PAID_PLANS } from "@/lib/plans";
 import { capitalize } from "@/lib/string-utils";
 import { getStripe } from "@/lib/stripe/client";
 import { getBaseUrl } from "@/lib/utils";
-import { api } from "@/trpc/react";
+import { useTRPC } from "@/trpc/react";
+import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 export function UpgradePlanButton({
@@ -23,22 +24,25 @@ export function UpgradePlanButton({
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const trpc = useTRPC();
   const { activeOrganization } = useOrganization();
 
-  const { mutateAsync, isPending } = api.billing.upgrade.useMutation({
-    onSuccess: async (data) => {
-      // TODO: log to analytics
-      if (data.url) {
-        router.push(data.url);
-      } else if (data.sessionId) {
-        const stripe = await getStripe();
-        void stripe?.redirectToCheckout({ sessionId: data.sessionId });
-      }
-    },
-    onError: (error) => {
-      toast.error(error.message);
-    },
-  });
+  const { mutateAsync, isPending } = useMutation(
+    trpc.billing.upgrade.mutationOptions({
+      onSuccess: async (data) => {
+        // TODO: log to analytics
+        if (data.url) {
+          router.push(data.url);
+        } else if (data.sessionId) {
+          const stripe = await getStripe();
+          void stripe?.redirectToCheckout({ sessionId: data.sessionId });
+        }
+      },
+      onError: (error) => {
+        toast.error(error.message);
+      },
+    }),
+  );
 
   const selectedPlan = (SELF_SERVE_PAID_PLANS.find(
     (p) => p.name.toLowerCase() === plan.toLowerCase(),
