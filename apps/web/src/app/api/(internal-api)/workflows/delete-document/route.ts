@@ -105,11 +105,17 @@ export const { POST } = serve<DeleteDocumentBody>(
           where: { id: document.id },
           select: { id: true },
         }),
-        db.organization.update({
-          where: { id: namespace.organizationId },
+        db.namespace.update({
+          where: { id: namespace.id },
           data: {
             totalDocuments: { decrement: 1 },
             totalPages: { decrement: document.totalPages },
+            organization: {
+              update: {
+                totalDocuments: { decrement: 1 },
+                totalPages: { decrement: document.totalPages },
+              },
+            },
           },
         }),
       ]);

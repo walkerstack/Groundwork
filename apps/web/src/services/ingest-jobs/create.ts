@@ -63,10 +63,15 @@ export const createIngestJob = async ({
         config,
       },
     }),
-    db.organization.update({
-      where: { id: organizationId },
+    db.namespace.update({
+      where: { id: namespaceId },
       data: {
         totalIngestJobs: { increment: 1 },
+        organization: {
+          update: {
+            totalIngestJobs: { increment: 1 },
+          },
+        },
       },
       select: { id: true },
     }),

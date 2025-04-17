@@ -137,16 +137,31 @@ export const { POST } = serve<TriggerDocumentJobBody>(
     }
 
     await context.run("update-status-completed", async () => {
-      await db.document.update({
-        where: { id: document.id },
-        data: {
-          status: DocumentStatus.COMPLETED,
-          totalTokens,
-          completedAt: new Date(),
-          error: null,
-        },
-        select: { id: true },
-      });
+      await db.$transaction([
+        db.document.update({
+          where: { id: document.id },
+          data: {
+            status: DocumentStatus.COMPLETED,
+            totalTokens,
+            completedAt: new Date(),
+            error: null,
+          },
+          select: { id: true },
+        }),
+        // update namespace + organization total pages
+        db.namespace.update({
+          where: { id: namespace.id },
+          data: {
+            totalPages: { increment: totalPages },
+            organization: {
+              update: {
+                totalPages: { increment: totalPages },
+              },
+            },
+          },
+          select: { id: true },
+        }),
+      ]);
     });
 
     await context.run("check-and-update-ingestion-job-status", async () => {
@@ -154,15 +169,6 @@ export const { POST } = serve<TriggerDocumentJobBody>(
         where: {
           ingestJob: { id: ingestJob.id },
           status: { not: DocumentStatus.COMPLETED },
-        },
-        select: { id: true },
-      });
-
-      // update org total pages
-      await db.organization.update({
-        where: { id: namespace.organizationId },
-        data: {
-          totalPages: { increment: totalPages },
         },
         select: { id: true },
       });

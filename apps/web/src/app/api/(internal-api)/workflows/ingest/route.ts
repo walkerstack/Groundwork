@@ -134,12 +134,17 @@ export const { POST } = serve<TriggerIngestionJobBody>(
       }
     }
 
-    // update total documents in org
-    await context.run("update-total-documents-in-org", async () => {
-      await db.organization.update({
-        where: { id: ingestionJob.namespace.organizationId },
+    // update total documents in namespace + organization
+    await context.run("update-total-documents", async () => {
+      await db.namespace.update({
+        where: { id: ingestionJob.namespace.id },
         data: {
           totalDocuments: { increment: documents.length },
+          organization: {
+            update: {
+              totalDocuments: { increment: documents.length },
+            },
+          },
         },
         select: { id: true },
       });

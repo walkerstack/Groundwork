@@ -130,9 +130,16 @@ export const { POST } = serve<DeleteIngestJobBody>(
           db.ingestJob.delete({
             where: { id: ingestJob.id },
           }),
-          db.organization.update({
-            where: { id: namespace.organizationId },
-            data: { totalIngestJobs: { decrement: 1 } },
+          db.namespace.update({
+            where: { id: namespace.id },
+            data: {
+              totalIngestJobs: { decrement: 1 },
+              organization: {
+                update: {
+                  totalIngestJobs: { decrement: 1 },
+                },
+              },
+            },
           }),
         ]);
       });
