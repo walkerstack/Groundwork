@@ -10,7 +10,6 @@
     "dev": "pnpm with-env next dev --turbopack",
     "test": "vitest",
     "test:watch": "vitest --watch",
-    "workflows:dev": "pnpm dlx @upstash/qstash-cli dev",
     "format": "prettier --check . --ignore-path ../../.gitignore",
     "lint": "eslint",
     "lint:fix": "pnpm lint --fix",
