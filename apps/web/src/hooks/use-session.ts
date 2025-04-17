@@ -9,6 +9,9 @@ export function useSession() {
   } = useQuery({
     queryKey: ["session"],
     queryFn: () => authClient.getSession().then((res) => res.data),
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    staleTime: Infinity,
   });
 
   return {

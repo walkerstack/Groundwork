@@ -15,8 +15,8 @@ export const MemberCard = ({
   id: string;
   name?: string;
   email: string;
-  image?: string;
-  role?: string;
+  image?: string | null;
+  role?: string | null;
   showRole?: boolean;
   actions?: React.ReactNode;
 }) => {
