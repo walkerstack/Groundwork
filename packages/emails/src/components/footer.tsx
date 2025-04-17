@@ -1,14 +1,16 @@
 import { Hr, Link, Tailwind, Text } from "@react-email/components";
 
+export type FooterProps = {
+  email: string;
+  marketing?: boolean;
+  notificationSettingsUrl?: string;
+};
+
 export function Footer({
   email,
   marketing,
   notificationSettingsUrl,
-}: {
-  email: string;
-  marketing?: boolean;
-  notificationSettingsUrl?: string;
-}) {
+}: FooterProps) {
   if (marketing) {
     return (
       <Tailwind>
