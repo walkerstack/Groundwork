@@ -8,7 +8,7 @@ import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useControllableState } from "@/hooks/use-controllable-state";
 import { cn, formatBytes } from "@/lib/utils";
-import { FileText, Upload, X } from "lucide-react";
+import { FileTextIcon, UploadIcon, XIcon } from "lucide-react";
 import Dropzone from "react-dropzone";
 import { toast } from "sonner";
 
@@ -209,7 +209,7 @@ export function FileUploader(props: FileUploaderProps) {
             {isDragActive ? (
               <div className="flex flex-col items-center justify-center gap-4 sm:px-5">
                 <div className="rounded-full border border-dashed p-3">
-                  <Upload
+                  <UploadIcon
                     className="text-muted-foreground size-7"
                     aria-hidden="true"
                   />
@@ -221,7 +221,7 @@ export function FileUploader(props: FileUploaderProps) {
             ) : (
               <div className="flex flex-col items-center justify-center gap-4 sm:px-5">
                 <div className="rounded-full border border-dashed p-3">
-                  <Upload
+                  <UploadIcon
                     className="text-muted-foreground size-7"
                     aria-hidden="true"
                   />
@@ -292,7 +292,7 @@ function FileCard({ file, progress, onRemove }: FileCardProps) {
           className="size-7"
           onClick={onRemove}
         >
-          <X className="size-4" aria-hidden="true" />
+          <XIcon className="size-4" aria-hidden="true" />
           <span className="sr-only">Remove file</span>
         </Button>
       </div>
@@ -323,6 +323,9 @@ function FilePreview({ file }: FilePreviewProps) {
   }
 
   return (
-    <FileText className="text-muted-foreground size-10" aria-hidden="true" />
+    <FileTextIcon
+      className="text-muted-foreground size-10"
+      aria-hidden="true"
+    />
   );
 }

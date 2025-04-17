@@ -4,6 +4,8 @@ import { createContext, useContext, useState } from "react";
 
 import type { Namespace } from "@agentset/db";
 
+import { useOrganization } from "./organization-context";
+
 interface NamespaceContextType {
   activeNamespace: Namespace;
   setActiveNamespace: (namespace: Namespace) => void;
@@ -33,10 +35,17 @@ export function NamespaceProvider({
 
 export function useNamespace() {
   const context = useContext(NamespaceContext);
+
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (!context) {
     throw new Error("useNamespace must be used within a NamespaceProvider");
   }
 
-  return context;
+  const { activeOrganization } = useOrganization();
+
+  return {
+    ...context,
+    organization: activeOrganization,
+    baseUrl: `/${activeOrganization.slug}/${context.activeNamespace.slug}`,
+  };
 }

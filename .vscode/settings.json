@@ -22,8 +22,10 @@
   "tailwindCSS.experimental.configFile": "./apps/web/src/styles/globals.css",
   "typescript.enablePromptUseWorkspaceTsdk": true,
   "typescript.preferences.autoImportFileExcludePatterns": [
-    "next/router.d.ts",
-    "next/dist/client/router.d.ts"
+    "@radix-ui",
+    "next/router",
+    "next/dist",
+    "lucide-react/dist/lucide-react.suffixed"
   ],
   "typescript.tsdk": "node_modules/typescript/lib"
 }

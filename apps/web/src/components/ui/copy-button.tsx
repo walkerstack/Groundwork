@@ -6,7 +6,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
-import { Check, Copy } from "lucide-react";
+import { CheckIcon, CopyIcon } from "lucide-react";
 
 interface CopyButtonProps {
   textToCopy: string;
@@ -42,9 +42,9 @@ export default function CopyButton({ textToCopy, className }: CopyButtonProps) {
           className={cn("h-8 w-8", className)}
         >
           {isCopied ? (
-            <Check className="h-4 w-4" />
+            <CheckIcon className="h-4 w-4" />
           ) : (
-            <Copy className="h-4 w-4" />
+            <CopyIcon className="h-4 w-4" />
           )}
           <span className="sr-only">Copy to clipboard</span>
         </Button>

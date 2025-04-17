@@ -18,7 +18,7 @@ import {
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
 import { useOrganization } from "@/contexts/organization-context";
-import { ChevronRight } from "lucide-react";
+import { ChevronRightIcon } from "lucide-react";
 
 import type { SidebarItemType } from ".";
 
@@ -92,7 +92,7 @@ export function NavItems({
                     <Link href={url}>
                       {item.icon && <item.icon />}
                       <span>{item.title}</span>
-                      <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                      <ChevronRightIcon className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
                     </Link>
                   </SidebarMenuButton>
                 </CollapsibleTrigger>

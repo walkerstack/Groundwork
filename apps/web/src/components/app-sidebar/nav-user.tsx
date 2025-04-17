@@ -20,7 +20,7 @@ import {
 import { useSession } from "@/hooks/use-session";
 import { authClient } from "@/lib/auth-client";
 import { useRouter } from "@bprogress/next/app";
-import { BadgeCheck, LogOut, MoreVerticalIcon } from "lucide-react";
+import { BadgeCheckIcon, LogOutIcon, MoreVerticalIcon } from "lucide-react";
 
 import { Skeleton } from "../ui/skeleton";
 
@@ -96,13 +96,13 @@ export function NavUser() {
 
             <DropdownMenuItem asChild>
               <Link href="/profile">
-                <BadgeCheck />
+                <BadgeCheckIcon />
                 Account
               </Link>
             </DropdownMenuItem>
 
             <DropdownMenuItem onClick={handleSignOut} disabled={isSigningOut}>
-              <LogOut />
+              <LogOutIcon />
               Log out
             </DropdownMenuItem>
           </DropdownMenuContent>
