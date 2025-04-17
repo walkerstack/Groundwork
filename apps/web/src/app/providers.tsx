@@ -1,3 +1,5 @@
+"use client";
+
 import { Toaster } from "@/components/ui/sonner";
 import { TRPCReactProvider } from "@/trpc/react";
 import { ProgressProvider } from "@bprogress/next/app";

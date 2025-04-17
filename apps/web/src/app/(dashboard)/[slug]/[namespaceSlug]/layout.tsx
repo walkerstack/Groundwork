@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
-import { api } from "@/trpc/server";
 import { NamespaceProvider } from "@/contexts/namespace-context";
+import { trpcApi } from "@/trpc/server";
 
 export default async function NamespaceLayout({
   params,
@@ -10,7 +10,7 @@ export default async function NamespaceLayout({
   children: React.ReactNode;
 }) {
   const { slug, namespaceSlug } = await params;
-  const namespace = await api.namespace.getNamespaceBySlug({
+  const namespace = await trpcApi.namespace.getNamespaceBySlug({
     slug: namespaceSlug,
     orgSlug: slug,
   });

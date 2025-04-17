@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { api } from "@/trpc/server";
+import { trpcApi } from "@/trpc/server";
 import { SparkleIcon } from "lucide-react";
 
 import DashboardPageWrapper from "../dashboard-page-wrapper";
@@ -12,7 +12,7 @@ export default async function NamespacePage({
   params: Promise<{ slug: string; namespaceSlug: string }>;
 }) {
   const { slug, namespaceSlug } = await params;
-  const namespace = await api.namespace.getNamespaceBySlug({
+  const namespace = await trpcApi.namespace.getNamespaceBySlug({
     slug: namespaceSlug,
     orgSlug: slug,
   });

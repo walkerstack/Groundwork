@@ -15,8 +15,10 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useNamespace } from "@/contexts/namespace-context";
 import { useOrganization } from "@/contexts/organization-context";
-import { api } from "@/trpc/react";
+import { useTRPC } from "@/trpc/react";
+import { useQueryClient } from "@tanstack/react-query";
 import { PlusIcon } from "lucide-react";
 import { toast } from "sonner";
 
@@ -26,12 +28,16 @@ import UrlsForm from "./urls-form";
 
 export function IngestModal() {
   const [isOpen, setIsOpen] = useState(false);
-  const utils = api.useUtils();
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
   const { activeOrganization } = useOrganization();
+  const { activeNamespace } = useNamespace();
 
   const onSuccess = () => {
     setIsOpen(false);
-    void utils.ingestJob.all.invalidate();
+    void queryClient.invalidateQueries(
+      trpc.ingestJob.all.queryFilter({ namespaceId: activeNamespace.id }),
+    );
   };
 
   const onTextSuccess = () => {
@@ -49,7 +55,8 @@ export function IngestModal() {
     toast.success("URL ingestion job created");
   };
 
-  const isPending = utils.ingestJob.ingest.isMutating() > 0;
+  const isPending =
+    queryClient.isMutating(trpc.ingestJob.ingest.mutationOptions()) > 0;
 
   const isOverLimit =
     activeOrganization.totalPages >= activeOrganization.pagesLimit;
