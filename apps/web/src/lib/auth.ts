@@ -45,7 +45,7 @@ export const auth = betterAuth({
         await sendEmail({
           email,
           subject: "Your Agentset login link",
-          react: LoginEmail({ loginLink: url }),
+          react: LoginEmail({ loginLink: url, email }),
         });
       },
     }),
