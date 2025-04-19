@@ -2,25 +2,39 @@
 
 import { useMemo } from "react";
 import CopyButton from "@/components/ui/copy-button";
+import { DataWrapper } from "@/components/ui/data-wrapper";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useOrganization } from "@/contexts/organization-context";
 import { useSession } from "@/hooks/use-session";
+import { useTRPC } from "@/trpc/react";
+import { useQuery } from "@tanstack/react-query";
 
 import { MemberCard } from "./member-card";
 import { RemoveMemberButton } from "./remove-member";
 import { RevokeInvitationButton } from "./revoke-invitation";
 
 export default function TeamSettingsPage() {
+  const {
+    activeOrganization: { id: activeOrganizationId },
+    isAdmin,
+  } = useOrganization();
   const { session } = useSession();
-  const { activeOrganization, isAdmin } = useOrganization();
+  const trpc = useTRPC();
+
+  const { data, isLoading } = useQuery(
+    trpc.organization.members.queryOptions({
+      organizationId: activeOrganizationId,
+    }),
+  );
 
   const currentMember =
     session &&
-    activeOrganization.members.find(
-      (member) => member.userId === session.user.id,
-    );
+    data?.members.find((member) => member.userId === session.user.id);
 
   const sortedMembers = useMemo(() => {
-    return activeOrganization.members.sort((a, b) => {
+    if (!data?.members) return [];
+
+    return data.members.sort((a, b) => {
       if (a.role === "owner") return -1;
       if (b.role === "owner") return 1;
 
@@ -29,34 +43,42 @@ export default function TeamSettingsPage() {
 
       return 0;
     });
-  }, [activeOrganization.members]);
+  }, [data?.members]);
 
   return (
-    <>
-      <div className="grid gap-6">
-        {sortedMembers.map((member) => (
-          <MemberCard
-            key={member.id}
-            id={member.id}
-            name={member.user.name}
-            email={member.user.email}
-            image={member.user.image}
-            role={member.role}
-            showRole={isAdmin}
-            actions={
-              isAdmin && member.role !== "owner" ? (
-                <RemoveMemberButton
-                  memberId={member.id}
-                  currentMemberId={currentMember?.id}
-                />
-              ) : null
-            }
-          />
-        ))}
+    <DataWrapper
+      data={data}
+      isLoading={isLoading}
+      loadingState={
+        <div className="flex flex-col gap-6">
+          <MemberCardSkeleton />
+          <MemberCardSkeleton />
+        </div>
+      }
+    >
+      {({ invitations }) => (
+        <div className="flex flex-col gap-6">
+          {sortedMembers.map((member) => (
+            <MemberCard
+              key={member.id}
+              id={member.id}
+              name={member.user.name}
+              email={member.user.email}
+              image={member.user.image}
+              role={member.role}
+              showRole={isAdmin}
+              actions={
+                isAdmin && member.role !== "owner" ? (
+                  <RemoveMemberButton
+                    memberId={member.id}
+                    currentMemberId={currentMember?.id}
+                  />
+                ) : null
+              }
+            />
+          ))}
 
-        {activeOrganization.invitations
-          .filter((invitation) => invitation.status === "pending")
-          .map((invitation) => (
+          {invitations.map((invitation) => (
             <MemberCard
               key={invitation.id}
               id={invitation.id}
@@ -79,7 +101,20 @@ export default function TeamSettingsPage() {
               }
             />
           ))}
+        </div>
+      )}
+    </DataWrapper>
+  );
+}
+
+function MemberCardSkeleton() {
+  return (
+    <div className="flex items-center justify-between space-x-4">
+      <Skeleton className="size-9" />
+      <div className="flex flex-col gap-2">
+        <Skeleton className="h-4 w-24" />
+        <Skeleton className="h-4 w-32" />
       </div>
-    </>
+    </div>
   );
 }

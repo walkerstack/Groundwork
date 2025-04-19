@@ -34,7 +34,7 @@ import { toast } from "sonner";
 import CreateNamespaceDialog from "./create-namespace-dialog";
 import CreateOrganizationDialog from "./create-org-dialog";
 
-type Organization = RouterOutputs["organization"]["getOrganizations"][number];
+type Organization = RouterOutputs["organization"]["all"][number];
 type Namespace = Organization["namespaces"][number];
 
 export function OrganizationSwitcher() {
@@ -45,7 +45,7 @@ export function OrganizationSwitcher() {
 
   const trpc = useTRPC();
   const { data: organizations } = useQuery(
-    trpc.organization.getOrganizations.queryOptions(),
+    trpc.organization.all.queryOptions(),
   );
 
   const [createOrgOpen, setCreateOrgOpen] = useState(false);

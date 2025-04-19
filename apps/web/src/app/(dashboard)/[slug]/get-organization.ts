@@ -23,11 +23,14 @@ export const getOrganization = cache(async (slug: string) => {
     },
     include: {
       members: {
-        include: {
-          user: true,
+        where: {
+          userId: session.user.id,
+        },
+        take: 1,
+        select: {
+          role: true,
         },
       },
-      invitations: true,
     },
   });
 
@@ -35,5 +38,8 @@ export const getOrganization = cache(async (slug: string) => {
     notFound();
   }
 
-  return org;
+  const { members } = org;
+  const isAdmin = members[0]?.role === "admin" || members[0]?.role === "owner";
+
+  return { ...org, isAdmin };
 });

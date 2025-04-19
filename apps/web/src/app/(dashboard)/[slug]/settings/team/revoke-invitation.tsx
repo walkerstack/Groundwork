@@ -1,7 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { useOrganization } from "@/contexts/organization-context";
 import { authClient } from "@/lib/auth-client";
-import { useMutation } from "@tanstack/react-query";
+import { useTRPC } from "@/trpc/react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 export const RevokeInvitationButton = ({
@@ -9,27 +10,38 @@ export const RevokeInvitationButton = ({
 }: {
   invitationId: string;
 }) => {
-  const { activeOrganization, setActiveOrganization } = useOrganization();
+  const { activeOrganization } = useOrganization();
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
+
   const { mutateAsync: revokeInvitation, isPending: isRevoking } = useMutation({
     mutationFn: async () => {
       const data = await authClient.organization.cancelInvitation({
         invitationId,
       });
 
-      if (data.error || !data.data) {
-        throw new Error(data.error?.message || "Failed to revoke invitation");
+      if (data.error) {
+        throw new Error(data.error.message || "Failed to revoke invitation");
       }
 
       return data.data;
     },
     onSuccess: (data) => {
-      toast.success("Invitation revoked successfully");
-      setActiveOrganization({
-        ...activeOrganization,
-        invitations: activeOrganization.invitations.filter(
-          (inv) => inv.id !== data.id,
-        ),
+      const queryFilter = trpc.organization.members.queryFilter({
+        organizationId: activeOrganization.id,
       });
+
+      queryClient.setQueriesData(queryFilter, (old) => {
+        if (!old) return old;
+
+        return {
+          ...old,
+          invitations: old.invitations.filter((inv) => inv.id !== data.id),
+        };
+      });
+
+      void queryClient.invalidateQueries(queryFilter);
+      toast.success("Invitation revoked successfully");
     },
   });
 

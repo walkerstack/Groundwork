@@ -1,16 +1,10 @@
 "use client";
 
 import { createContext, use, useEffect, useState } from "react";
-import { useSession } from "@/hooks/use-session";
 
-import type { Invitation, Member, Organization, User } from "@agentset/db";
+import type { Organization } from "@agentset/db";
 
-type ActiveOrganization = Organization & {
-  members: (Member & {
-    user: User;
-  })[];
-  invitations: Invitation[];
-};
+type ActiveOrganization = Organization & { isAdmin: boolean };
 
 type OrganizationContextType = {
   activeOrganization: ActiveOrganization;
@@ -54,19 +48,5 @@ export function useOrganization() {
     );
   }
 
-  const { session } = useSession();
-  let isAdmin = false;
-  if (session) {
-    const { user } = session;
-    isAdmin = context.activeOrganization.members.some(
-      (member) =>
-        (member.role === "admin" || member.role === "owner") &&
-        member.userId === user.id,
-    );
-  }
-
-  return {
-    ...context,
-    isAdmin,
-  };
+  return { ...context, isAdmin: context.activeOrganization.isAdmin };
 }

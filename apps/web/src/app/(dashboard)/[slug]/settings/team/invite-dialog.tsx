@@ -1,6 +1,6 @@
 "use client";
 
-import type { ActiveOrganization, Role } from "@/lib/auth-types";
+import type { Role } from "@/lib/auth-types";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -23,17 +23,20 @@ import {
 } from "@/components/ui/select";
 import { useOrganization } from "@/contexts/organization-context";
 import { authClient } from "@/lib/auth-client";
-import { useMutation } from "@tanstack/react-query";
+import { useTRPC } from "@/trpc/react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { PlusIcon } from "lucide-react";
 import { toast } from "sonner";
 
 function InviteMemberDialog() {
   const [open, setOpen] = useState(false);
-  const { activeOrganization, setActiveOrganization, isAdmin } =
-    useOrganization();
+  const { activeOrganization, isAdmin } = useOrganization();
+
   const [email, setEmail] = useState("");
   const [role, setRole] = useState("member");
 
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
   const { mutateAsync: invite, isPending } = useMutation({
     mutationFn: async ({ email, role }: { email: string; role: string }) => {
       const res = await authClient.organization.inviteMember({
@@ -49,19 +52,26 @@ function InviteMemberDialog() {
       return res.data;
     },
     onSuccess: (result) => {
-      setActiveOrganization({
-        ...activeOrganization,
-        invitations: [
-          ...(activeOrganization.invitations || []),
-          result as ActiveOrganization["invitations"][number],
-        ],
+      const queryFilter = trpc.organization.members.queryFilter({
+        organizationId: activeOrganization.id,
       });
+
+      queryClient.setQueriesData(queryFilter, (old) => {
+        if (!old) return old;
+
+        return {
+          ...old,
+          invitations: [...old.invitations, result],
+        };
+      });
+
+      void queryClient.invalidateQueries(queryFilter);
 
       setOpen(false);
     },
   });
 
-  const handleInvite = async () => {
+  const handleInvite = () => {
     void toast.promise(invite({ email, role }), {
       loading: "Inviting member...",
       success: "Member invited successfully",

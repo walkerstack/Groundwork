@@ -12,7 +12,7 @@ export function DeleteOrgButton() {
   const router = useRouter();
   const trpc = useTRPC();
   const { mutate: deleteOrganization, isPending } = useMutation(
-    trpc.organization.deleteOrganization.mutationOptions({
+    trpc.organization.delete.mutationOptions({
       onSuccess: () => {
         toast.success("Organization deleted");
         router.push("/");

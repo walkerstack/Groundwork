@@ -7,7 +7,7 @@ import { OrganizationStatus } from "@agentset/db";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 
 export const organizationsRouter = createTRPCRouter({
-  getOrganizations: protectedProcedure.query(async ({ ctx }) => {
+  all: protectedProcedure.query(async ({ ctx }) => {
     const orgs = await ctx.db.organization.findMany({
       where: {
         members: {
@@ -38,7 +38,48 @@ export const organizationsRouter = createTRPCRouter({
 
     return orgs;
   }),
-  deleteOrganization: protectedProcedure
+  members: protectedProcedure
+    .input(
+      z.object({
+        organizationId: z.string(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const members = await ctx.db.organization.findUnique({
+        where: {
+          id: input.organizationId,
+          members: {
+            some: {
+              userId: ctx.session.user.id,
+            },
+          },
+        },
+        select: {
+          members: {
+            include: {
+              user: {
+                select: {
+                  name: true,
+                  email: true,
+                  image: true,
+                },
+              },
+            },
+            orderBy: {
+              createdAt: "asc",
+            },
+          },
+          invitations: {
+            where: {
+              status: "pending",
+            },
+          },
+        },
+      });
+
+      return members;
+    }),
+  delete: protectedProcedure
     .input(
       z.object({
         organizationId: z.string(),

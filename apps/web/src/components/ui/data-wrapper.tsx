@@ -11,13 +11,13 @@ export function DataWrapper<T>({
   errorState,
   children,
 }: {
-  data: T[] | undefined;
+  data: T | undefined | null;
   isLoading?: boolean;
   error?: { message: string } | any;
   loadingState?: ReactNode;
   emptyState?: ReactNode;
   errorState?: ReactNode;
-  children: (data: T[]) => ReactNode;
+  children: (data: T) => ReactNode;
 }) {
   if (error)
     return errorState || <div>{error.message || "An error occurred"}</div>;
@@ -25,7 +25,7 @@ export function DataWrapper<T>({
   if (isLoading || !data)
     return loadingState || <Loader2Icon className="size-4 animate-spin" />;
 
-  if (data.length === 0 && emptyState) return emptyState;
+  if (Array.isArray(data) && data.length === 0 && emptyState) return emptyState;
 
   return children(data);
 }

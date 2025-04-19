@@ -110,12 +110,12 @@ export default function PlanUsage() {
             limit={activeOrganization.searchLimit}
           />
 
-          <UsageTabCard
+          {/* <UsageTabCard
             icon={UsersIcon}
             title="Users"
-            usage={activeOrganization.members.length}
+            usage={1} // TODO: get from API
             limit={10} // TODO: get from API
-          />
+          /> */}
 
           <Card className="gap-0 px-4 py-3 lg:px-5 lg:py-5">
             <PlugIcon className="text-muted-foreground size-4" />

@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/card";
 import { authClient } from "@/lib/auth-client";
 import { useMutation } from "@tanstack/react-query";
-import { AlertCircle, BuildingIcon, CheckIcon, XIcon } from "lucide-react";
+import { AlertCircleIcon, BuildingIcon, CheckIcon, XIcon } from "lucide-react";
 import { toast } from "sonner";
 
 import { InvitationStatus } from "./invitation-status";
@@ -136,7 +136,7 @@ export function InvitationCard({
   if (invitation.status === "rejected") {
     return (
       <InvitationStatus
-        icon={AlertCircle}
+        icon={AlertCircleIcon}
         iconContainerClassName="bg-slate-100"
         iconClassName="text-slate-600"
         title="Invitation Declined"
@@ -160,7 +160,7 @@ export function InvitationCard({
   if (acceptInvitationError || rejectInvitationError) {
     return (
       <InvitationStatus
-        icon={AlertCircle}
+        icon={AlertCircleIcon}
         iconContainerClassName="bg-red-100"
         iconClassName="text-red-600"
         title="Invitation Error"

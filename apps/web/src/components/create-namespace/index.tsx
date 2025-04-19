@@ -69,9 +69,7 @@ export default function CreateNamespaceForm({
           router.push(`/${organization.slug}/${data.slug}`);
         }
 
-        void queryClient.invalidateQueries(
-          trpc.organization.getOrganizations.queryFilter(),
-        );
+        void queryClient.invalidateQueries(trpc.organization.all.queryFilter());
       },
       onError: (error) => {
         toast.error(error.message);
