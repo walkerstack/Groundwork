@@ -1,10 +1,12 @@
 import type { LucideIcon } from "lucide-react";
+import Image from "next/image";
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
   SidebarRail,
+  SidebarSeparator,
 } from "@/components/ui/sidebar";
 
 import { NavMain } from "./nav-main";
@@ -30,21 +32,32 @@ export type SidebarItemType = {
 
 export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
   return (
-    <Sidebar collapsible="icon" variant="inset" {...props}>
+    <Sidebar variant="inset" {...props}>
+      <div className="flex items-center justify-between px-3 py-2">
+        <Image
+          src="https://assets.agentset.ai/logo-full.png"
+          alt="Agentset"
+          height={28}
+          width={112}
+          className="h-6 w-auto object-contain"
+        />
+        <NavUser />
+      </div>
+
       <SidebarHeader>
         <OrganizationSwitcher />
       </SidebarHeader>
 
+      <SidebarSeparator />
+
       <SidebarContent>
         <NavMain />
         <NavNamespace />
-        <NavSecondary />
       </SidebarContent>
 
       <SidebarFooter>
-        <NavUser />
+        <NavSecondary />
       </SidebarFooter>
-      <SidebarRail />
     </Sidebar>
   );
 }

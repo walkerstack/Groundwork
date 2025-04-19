@@ -3,7 +3,6 @@ import {
   CodeIcon,
   CreditCardIcon,
   FilesIcon,
-  FoldersIcon,
   HelpCircleIcon,
   HomeIcon,
   LockIcon,
@@ -16,21 +15,7 @@ import type { SidebarItemType } from ".";
 
 const createOrgUrl = (url: string) => `/{slug}${url}`;
 
-export const mainItems: SidebarItemType[] = [
-  {
-    title: "Namespaces",
-    url: createOrgUrl("/"),
-    icon: FoldersIcon,
-    exact: true,
-  },
-];
-
 export const secondaryItems: SidebarItemType[] = [
-  {
-    title: "Settings",
-    icon: SettingsIcon,
-    url: createOrgUrl("/settings"),
-  },
   {
     title: "Get Help",
     icon: HelpCircleIcon,

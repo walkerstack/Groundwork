@@ -17,11 +17,6 @@ export default function DashboardPageWrapper({
     <>
       <header className="flex h-16 shrink-0 items-center justify-between gap-2 px-4 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 lg:px-6">
         <div className="flex w-full items-center gap-1 lg:gap-2">
-          <SidebarTrigger className="-ml-1" />
-          <Separator
-            orientation="vertical"
-            className="mx-2 data-[orientation=vertical]:h-4"
-          />
           <h1 className="text-base font-medium">{title}</h1>
         </div>
 

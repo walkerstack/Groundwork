@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState } from "react";
+import { createContext, use, useEffect, useState } from "react";
 import { useSession } from "@/hooks/use-session";
 
 import type { Invitation, Member, Organization, User } from "@agentset/db";
@@ -31,6 +31,10 @@ export function OrganizationProvider({
   const [activeOrganization, setActiveOrganization] =
     useState<ActiveOrganization>(initialActiveOrganization);
 
+  useEffect(() => {
+    setActiveOrganization(initialActiveOrganization);
+  }, [initialActiveOrganization]);
+
   return (
     <OrganizationContext.Provider
       value={{ activeOrganization, setActiveOrganization }}
@@ -41,7 +45,7 @@ export function OrganizationProvider({
 }
 
 export function useOrganization() {
-  const context = useContext(OrganizationContext);
+  const context = use(OrganizationContext);
 
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (!context) {

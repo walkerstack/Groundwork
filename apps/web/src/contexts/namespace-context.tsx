@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState } from "react";
+import { createContext, use, useEffect, useState } from "react";
 
 import type { Namespace } from "@agentset/db";
 
@@ -26,6 +26,10 @@ export function NamespaceProvider({
     initialActiveNamespace,
   );
 
+  useEffect(() => {
+    setActiveNamespace(initialActiveNamespace);
+  }, [initialActiveNamespace]);
+
   return (
     <NamespaceContext.Provider value={{ activeNamespace, setActiveNamespace }}>
       {children}
@@ -34,7 +38,7 @@ export function NamespaceProvider({
 }
 
 export function useNamespace() {
-  const context = useContext(NamespaceContext);
+  const context = use(NamespaceContext);
 
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (!context) {

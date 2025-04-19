@@ -11,21 +11,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  useSidebar,
-} from "@/components/ui/sidebar";
 import { useSession } from "@/hooks/use-session";
 import { authClient } from "@/lib/auth-client";
 import { useRouter } from "@bprogress/next/app";
-import { BadgeCheckIcon, LogOutIcon, MoreVerticalIcon } from "lucide-react";
+import { BadgeCheckIcon, LogOutIcon } from "lucide-react";
 
 import { Skeleton } from "../ui/skeleton";
 
 export function NavUser() {
-  const { isMobile } = useSidebar();
   const { session, isLoading } = useSession();
 
   const router = useRouter();
@@ -43,71 +36,63 @@ export function NavUser() {
     setIsSigningOut(false);
   };
 
-  if (isLoading || !session) return <Skeleton className="h-12 w-full" />;
+  if (isLoading || !session)
+    return (
+      <Skeleton className="size-8 rounded-full border-2 border-transparent" />
+    );
+
   const { user } = session;
 
   return (
-    <SidebarMenu>
-      <SidebarMenuItem>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <SidebarMenuButton
-              size="lg"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-            >
-              <EntityAvatar
-                entity={user}
-                fallbackClassName="bg-muted text-foreground"
-              />
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <button className="border-border overflow-hidden rounded-full border-2 data-[state=open]:border-black">
+          <EntityAvatar
+            entity={user}
+            fallbackClassName="bg-muted text-foreground "
+          />
+        </button>
+      </DropdownMenuTrigger>
 
-              <div className="grid flex-1 text-left text-sm leading-tight">
-                {user.name ? (
-                  <>
-                    <span className="truncate font-semibold">{user.name}</span>
-                    <span className="truncate text-xs">{user.email}</span>
-                  </>
-                ) : (
-                  <span className="truncate font-semibold">{user.email}</span>
-                )}
-              </div>
-              <MoreVerticalIcon className="ml-auto size-4" />
-            </SidebarMenuButton>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent
-            className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
-            side={isMobile ? "bottom" : "right"}
-            align="end"
-            sideOffset={4}
-          >
-            <DropdownMenuLabel className="p-0 font-normal">
-              <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                <EntityAvatar
-                  entity={user}
-                  fallbackClassName="bg-muted text-foreground"
-                />
-                <div className="grid flex-1 text-left text-sm leading-tight">
+      <DropdownMenuContent
+        className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
+        side="bottom"
+        align="start"
+        sideOffset={4}
+      >
+        <DropdownMenuLabel className="p-0 font-normal">
+          <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+            <EntityAvatar
+              entity={user}
+              fallbackClassName="bg-muted text-foreground"
+            />
+            <div className="grid flex-1 text-left text-sm leading-tight">
+              {user.name ? (
+                <>
                   <span className="truncate font-semibold">{user.name}</span>
                   <span className="truncate text-xs">{user.email}</span>
-                </div>
-              </div>
-            </DropdownMenuLabel>
+                </>
+              ) : (
+                <span className="truncate font-semibold">{user.email}</span>
+              )}
+            </div>
+          </div>
+        </DropdownMenuLabel>
 
-            <DropdownMenuSeparator />
+        <DropdownMenuSeparator />
 
-            <DropdownMenuItem asChild>
-              <Link href="/profile">
-                <BadgeCheckIcon />
-                Account
-              </Link>
-            </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href="/profile">
+            <BadgeCheckIcon />
+            Account
+          </Link>
+        </DropdownMenuItem>
 
-            <DropdownMenuItem onClick={handleSignOut} disabled={isSigningOut}>
-              <LogOutIcon />
-              Log out
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </SidebarMenuItem>
-    </SidebarMenu>
+        <DropdownMenuItem onClick={handleSignOut} disabled={isSigningOut}>
+          <LogOutIcon />
+          Log out
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }

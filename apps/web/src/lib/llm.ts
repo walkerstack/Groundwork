@@ -9,10 +9,10 @@ export const getNamespaceLanguageModel = async (config?: LLMConfig) => {
     const defaultAzure = createAzure({
       baseURL: env.DEFAULT_AZURE_BASE_URL,
       apiKey: env.DEFAULT_AZURE_API_KEY,
-      apiVersion: env.DEFAULT_AZURE_GPT_4O_VERSION,
+      apiVersion: env.DEFAULT_AZURE_GPT_4_1_VERSION,
     });
 
-    return defaultAzure.languageModel(env.DEFAULT_AZURE_GPT_4O_DEPLOYMENT);
+    return defaultAzure.languageModel(env.DEFAULT_AZURE_GPT_4_1_DEPLOYMENT);
   }
 
   switch (config.provider) {

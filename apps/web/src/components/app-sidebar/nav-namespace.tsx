@@ -9,5 +9,5 @@ export function NavNamespace() {
   const slug = useParams().namespaceSlug;
   if (!slug) return null;
 
-  return <NavItems items={namespaceItems} label="Namespace" />;
+  return <NavItems items={namespaceItems} />;
 }

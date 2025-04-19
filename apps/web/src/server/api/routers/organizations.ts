@@ -17,13 +17,22 @@ export const organizationsRouter = createTRPCRouter({
         },
         status: OrganizationStatus.ACTIVE,
       },
-      include: {
-        members: {
-          include: {
-            user: true,
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        plan: true,
+        logo: true,
+        namespaces: {
+          select: {
+            id: true,
+            name: true,
+            slug: true,
           },
         },
-        invitations: true,
+      },
+      orderBy: {
+        createdAt: "asc",
       },
     });
 

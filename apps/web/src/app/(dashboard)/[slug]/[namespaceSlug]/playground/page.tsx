@@ -1,4 +1,5 @@
-import DashboardPageWrapper from "../../dashboard-page-wrapper";
+import DashboardPageWrapper from "@/components/dashboard-page-wrapper";
+
 import Chat from "./chat";
 import ChatActions from "./chat-actions";
 

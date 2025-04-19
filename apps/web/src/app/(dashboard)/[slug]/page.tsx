@@ -1,10 +1,26 @@
-import DashboardPageWrapper from "./dashboard-page-wrapper";
-import NamespacesList from "./namespaces-list";
+import { redirect } from "next/navigation";
 
-export default function NamespacesPage() {
-  return (
-    <DashboardPageWrapper title="Namespaces">
-      <NamespacesList />
-    </DashboardPageWrapper>
-  );
+import { db } from "@agentset/db";
+
+import type { OrganizationParams } from "./get-organization";
+import { getOrganization } from "./get-organization";
+
+export default async function NamespacesPage({
+  params,
+}: {
+  params: OrganizationParams;
+}) {
+  const { slug } = await params;
+  const organization = await getOrganization(slug);
+  const firstNamespace = await db.namespace.findFirst({
+    where: {
+      organizationId: organization.id,
+    },
+  });
+
+  if (firstNamespace) {
+    redirect(`/${organization.slug}/${firstNamespace.slug}`);
+  }
+
+  redirect(`/${organization.slug}/create-namespace`);
 }
