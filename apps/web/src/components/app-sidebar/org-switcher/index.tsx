@@ -23,6 +23,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useOrganization } from "@/contexts/organization-context";
 import { authClient } from "@/lib/auth-client";
 import { useTRPC } from "@/trpc/react";
@@ -117,11 +118,15 @@ export function OrganizationSwitcher() {
               <EntityAvatar entity={activeOrganization} />
 
               <div className="grid flex-1 text-left text-sm leading-tight">
-                {activeNamespace ? (
+                {namespaceSlug ? (
                   <>
-                    <span className="truncate font-semibold">
-                      {activeNamespace.name}
-                    </span>
+                    {activeNamespace ? (
+                      <span className="truncate font-semibold">
+                        {activeNamespace.name}
+                      </span>
+                    ) : (
+                      <Skeleton className="h-4 w-28" />
+                    )}
 
                     <span className="truncate text-xs">
                       {activeOrganization.name}

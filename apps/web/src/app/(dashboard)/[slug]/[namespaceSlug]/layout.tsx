@@ -1,7 +1,4 @@
 import { notFound } from "next/navigation";
-import { AppSidebar } from "@/components/app-sidebar";
-import { ModalProvider } from "@/components/modals";
-import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { NamespaceProvider } from "@/contexts/namespace-context";
 import { trpcApi } from "@/trpc/server";
 
@@ -24,12 +21,7 @@ export default async function NamespaceLayout({
 
   return (
     <NamespaceProvider activeNamespace={namespace}>
-      <ModalProvider>
-        <SidebarProvider>
-          <AppSidebar />
-          <SidebarInset>{children}</SidebarInset>
-        </SidebarProvider>
-      </ModalProvider>
+      {children}
     </NamespaceProvider>
   );
 }
