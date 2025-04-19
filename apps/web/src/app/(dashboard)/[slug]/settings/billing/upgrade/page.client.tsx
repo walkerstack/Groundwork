@@ -1,16 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useOrganization } from "@/contexts/organization-context";
+import { useCal } from "@/hooks/use-cal";
 import {
   ENTERPRISE_PLAN,
   FREE_PLAN,
   isDowngradePlan,
   PRO_PLAN,
 } from "@/lib/plans";
-import { getCalApi } from "@calcom/embed-react";
 import { ChevronLeftIcon } from "lucide-react";
 
 import PlanCard from "./plan-card";
@@ -22,12 +22,7 @@ export default function OrganizationBillingUpgradePageClient() {
   const { plan: currentPlan } = activeOrganization;
   const [period, setPeriod] = useState<"monthly" | "yearly">("yearly");
 
-  useEffect(() => {
-    void (async function () {
-      const cal = await getCalApi({ namespace: "demo" });
-      cal("ui", { hideEventTypeDetails: false, layout: "month_view" });
-    })();
-  }, []);
+  const { buttonProps } = useCal();
 
   return (
     <div>
@@ -58,10 +53,8 @@ export default function OrganizationBillingUpgradePageClient() {
       <p className="text-muted-foreground mt-6">
         Unsure what plan is right for?{" "}
         <button
-          data-cal-namespace="demo"
-          data-cal-link="agentset/demo"
-          data-cal-config='{"layout":"month_view"}'
           className="text-primary cursor-pointer underline"
+          {...buttonProps}
         >
           Book a call
         </button>

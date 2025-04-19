@@ -15,13 +15,13 @@ export default function DashboardPageWrapper({
 }) {
   return (
     <>
-      <header className="flex h-16 shrink-0 items-center justify-between gap-2 px-4 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 lg:px-6">
-        <div className="flex w-full items-center justify-between">
-          <h1 className="text-base font-medium">{title}</h1>
+      <header className="flex h-16 shrink-0 items-center justify-between px-4 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12 lg:px-6">
+        <h1 className="text-base font-medium">{title}</h1>
+
+        <div className="flex items-center gap-2">
+          {actions}
           <NavUser />
         </div>
-
-        {actions}
       </header>
 
       <div className={cn("flex flex-1 flex-col px-8 py-10", className)}>
