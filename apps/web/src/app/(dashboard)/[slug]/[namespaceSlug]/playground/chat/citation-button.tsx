@@ -16,7 +16,7 @@ export const CitationButton = ({
   className?: string;
 }) => {
   if (!children) return null;
-  console.log({ props, annotations });
+
   const idx = props["data-citation"] ? props["data-citation"] - 1 : undefined;
   const sources = annotations?.[0]?.["agentset_sources"] as
     | QueryVectorStoreResult

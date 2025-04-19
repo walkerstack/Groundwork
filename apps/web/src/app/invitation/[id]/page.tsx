@@ -22,7 +22,7 @@ export default async function InvitationPage({
       headers: allHeaders,
     })
     .catch((e) => {
-      console.log(e);
+      console.error(e);
       redirect(redirectUrl);
     });
 
