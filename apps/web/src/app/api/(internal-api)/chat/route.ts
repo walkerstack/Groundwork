@@ -105,6 +105,9 @@ export const POST = withAuthApiHandler(
           system: body.systemPrompt,
           messages: newMessages,
           temperature: body.temperature,
+          onError: (error) => {
+            console.error(error);
+          },
         });
 
         dataStream.writeMessageAnnotation({
