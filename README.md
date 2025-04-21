@@ -1,5 +1,5 @@
 <a href="https://agentset.ai">
-  <img alt="Agentset is the open-source RAG platform." src="">
+  <img alt="Agentset is the open-source RAG platform." src="https://repository-images.githubusercontent.com/945763259/9a3ddd06-12c2-4122-990e-d9390101ce31">
 </a>
 
 <h3 align="center">Agentset</h3>
