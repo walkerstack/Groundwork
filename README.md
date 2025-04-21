@@ -44,7 +44,7 @@ Agentset is the open-source RAG platform for developers.
 
 ## Self-Hosting
 
-_A complete self-hosting guide is coming soon. For now, you can follow the steps below to get the platform up and running on your local machine._
+_A complete self-hosting guide is coming soon. For now, please follow the steps below to get the platform up and running._
 
 ## Development
 
