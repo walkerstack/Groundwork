@@ -32,9 +32,10 @@ Agentset is the open-source RAG platform for developers.
 - [Next.js](https://nextjs.org/) – framework
 - [TypeScript](https://www.typescriptlang.org/) – language
 - [Tailwind](https://tailwindcss.com/) – CSS
+- [Shadcn/ui](https://ui.shadcn.com/) – components
 - [Upstash](https://upstash.com/) – redis, workflows
 - [Supabase](https://supabase.com/) – database
-- [Prisma](https://prisma.io/) – database
+- [Prisma](https://prisma.io/) - orm
 - [BetterAuth](https://better-auth.com/) – auth
 - [Turborepo](https://turbo.build/repo) – monorepo
 - [Stripe](https://stripe.com/) – payments
