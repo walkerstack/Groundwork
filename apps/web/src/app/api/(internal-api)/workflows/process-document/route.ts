@@ -64,7 +64,9 @@ export const { POST } = serve<TriggerDocumentJobBody>(
 
     if (status !== 200 || body.status !== 200) {
       throw new Error(
-        "message" in body ? (body.message as string) : "Partition error",
+        !!body && typeof body === "object" && "message" in body
+          ? (body.message as string)
+          : "Partition error",
         { cause: body },
       );
     }
