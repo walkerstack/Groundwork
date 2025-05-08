@@ -4,6 +4,7 @@ import type { RouterOutputs } from "@/trpc/react";
 import React, { useMemo, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import CreateNamespaceDialog from "@/components/create-namespace";
 import { EntityAvatar } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -32,7 +33,6 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { ChevronsUpDownIcon, PlusIcon, SettingsIcon } from "lucide-react";
 import { toast } from "sonner";
 
-import CreateNamespaceDialog from "./create-namespace-dialog";
 import CreateOrganizationDialog from "./create-org-dialog";
 
 type Organization = RouterOutputs["organization"]["all"][number];

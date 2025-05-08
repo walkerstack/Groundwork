@@ -102,7 +102,7 @@ export const { POST } = serve<TriggerDocumentJobBody>(
     );
 
     const [embeddingModel, vectorStore] = await Promise.all([
-      getNamespaceEmbeddingModel(namespace),
+      getNamespaceEmbeddingModel(namespace, "document"),
       getNamespaceVectorStore(namespace, document.tenantId ?? undefined),
     ]);
 

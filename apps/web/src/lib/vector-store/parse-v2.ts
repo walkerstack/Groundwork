@@ -56,7 +56,7 @@ export const queryVectorStoreV2 = async (
 ) => {
   // TODO: if the embedding model is managed, track the usage
   const [embeddingModel, vectorStore] = await Promise.all([
-    getNamespaceEmbeddingModel(namespace),
+    getNamespaceEmbeddingModel(namespace, "query"),
     getNamespaceVectorStore(namespace, options.tenantId),
   ]);
 

@@ -1,0 +1,205 @@
+"use client";
+
+import { useEffect, useMemo } from "react";
+import { Button } from "@/components/ui/button";
+import { DialogFooter } from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { camelCaseToWords, capitalize } from "@/lib/string-utils";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+
+import { VectorStoreSchema } from "@agentset/validation";
+
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
+import { Logo } from "../ui/logo";
+import { RadioGroup } from "../ui/radio-group";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
+import { vectorStores } from "./models";
+import RadioButton from "./radio-button";
+
+const formSchema = z.object({
+  vectorStore: VectorStoreSchema.optional(),
+});
+
+export default function CreateNamespaceVectorStoreStep({
+  onSubmit,
+  onBack,
+  isLoading,
+}: {
+  onSubmit: (values: z.infer<typeof formSchema>) => void;
+  isLoading: boolean;
+  onBack: () => void;
+}) {
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema, undefined),
+  });
+
+  // when the provider changes, set the model to the default model for the provider
+  const currentVectorProvider = form.watch("vectorStore")?.provider;
+
+  useEffect(() => {
+    if (currentVectorProvider) {
+      // reset other fields in the embeddingModel object
+      form.reset({
+        vectorStore: {
+          provider: currentVectorProvider,
+        } as z.infer<typeof VectorStoreSchema>,
+      });
+    } else {
+      form.setValue("vectorStore", undefined);
+    }
+    // eslint-disable-next-line react-compiler/react-compiler
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentVectorProvider]);
+
+  const currentVectorStoreOptions = useMemo(() => {
+    const shape =
+      VectorStoreSchema.optionsMap.get(currentVectorProvider)?.shape ?? {};
+    return {
+      fields: Object.keys(shape).filter((key) => key !== "provider"),
+      shape,
+    };
+  }, [currentVectorProvider]);
+
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)}>
+        <div className="flex flex-col gap-6">
+          <FormField
+            control={form.control}
+            name="vectorStore.provider"
+            render={({ field }) => (
+              <FormItem className="mt-3">
+                <FormControl>
+                  <RadioGroup
+                    onValueChange={(newValue) => {
+                      if (newValue === "agentset") {
+                        form.setValue("vectorStore", undefined);
+                      } else {
+                        field.onChange(newValue);
+                      }
+                    }}
+                    defaultValue={
+                      (field.value as typeof field.value | undefined) ??
+                      "agentset"
+                    }
+                    className="grid grid-cols-3 gap-4"
+                  >
+                    <RadioButton
+                      value="agentset"
+                      label="Agentset"
+                      icon={Logo}
+                      note="Default"
+                    />
+
+                    {vectorStores.map((store) => (
+                      <RadioButton
+                        key={store.value}
+                        value={store.value}
+                        label={capitalize(store.value)!}
+                        icon={store.icon}
+                        note={store.comingSoon ? "Coming Soon" : undefined}
+                        noteStyle="muted"
+                        disabled={store.comingSoon}
+                      />
+                    ))}
+                  </RadioGroup>
+                </FormControl>
+
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* render other fields based on the provider dynamically */}
+          {currentVectorProvider ? (
+            currentVectorStoreOptions.fields.map((key) => (
+              <FormField
+                key={key}
+                control={form.control}
+                name={
+                  `vectorStore.${key}` as `vectorStore.${keyof z.infer<typeof VectorStoreSchema>}`
+                }
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      {camelCaseToWords(key)}{" "}
+                      {currentVectorStoreOptions.shape[
+                        key
+                      ]?.isOptional() ? null : (
+                        <span className="text-destructive-foreground">*</span>
+                      )}
+                    </FormLabel>
+
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
+
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            ))
+          ) : (
+            <div className="flex flex-col gap-2">
+              <Label data-slot="form-label">Vector Store</Label>
+
+              <Select disabled value="default">
+                <SelectTrigger className="w-xs">
+                  <SelectValue placeholder="Select a vector store" />
+                </SelectTrigger>
+
+                <SelectContent>
+                  <SelectItem value="default">Pinecone</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+        </div>
+
+        <DialogFooter className="mt-10 flex-row items-center justify-between sm:justify-between">
+          <p className="text-muted-foreground text-xs">
+            Can't find the vector store you need?{" "}
+            <a
+              href="mailto:support@agentset.ai"
+              target="_blank"
+              rel="noreferrer"
+              className="text-primary underline"
+            >
+              Contact us
+            </a>
+          </p>
+
+          <div className="flex gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onBack}
+              disabled={isLoading}
+            >
+              Back
+            </Button>
+            <Button type="submit" isLoading={isLoading}>
+              Create
+            </Button>
+          </div>
+        </DialogFooter>
+      </form>
+    </Form>
+  );
+}

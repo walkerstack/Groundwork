@@ -1,0 +1,103 @@
+"use client";
+
+import { useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { DialogFooter } from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { toSlug } from "@/lib/slug";
+import { trpcClient } from "@/trpc/react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+
+const formSchema = z.object({
+  name: z.string().min(1),
+  slug: z
+    .string()
+    .min(1)
+    .trim()
+    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)
+    .refine(
+      async (value) => {
+        if (value === "") return false;
+        const result = await trpcClient.namespace.checkSlug.query(value);
+        return !result;
+      },
+      { message: "Slug is already taken" },
+    ),
+});
+
+export default function CreateNamespaceDetailsStep({
+  onSubmit,
+  defaultValues,
+}: {
+  onSubmit: (values: z.infer<typeof formSchema>) => void;
+  defaultValues?: Partial<z.infer<typeof formSchema>>;
+}) {
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema, undefined, { mode: "async" }),
+    reValidateMode: "onBlur",
+    defaultValues: defaultValues ?? {
+      name: "",
+      slug: "",
+    },
+  });
+
+  const name = form.watch("name");
+  const { formState, setValue } = form;
+  useEffect(() => {
+    if (!formState.touchedFields.slug) {
+      setValue("slug", toSlug(name));
+    }
+  }, [name, formState, setValue]);
+
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)}>
+        <div className="flex flex-col gap-6">
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Name</FormLabel>
+                <FormControl>
+                  <Input placeholder="Example" {...field} />
+                </FormControl>
+
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="slug"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Slug</FormLabel>
+                <FormControl>
+                  <Input placeholder="example" {...field} />
+                </FormControl>
+
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        <DialogFooter className="mt-6">
+          <Button type="submit">Next</Button>
+        </DialogFooter>
+      </form>
+    </Form>
+  );
+}

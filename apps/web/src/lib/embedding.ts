@@ -4,6 +4,7 @@ import type { Namespace } from "@agentset/db";
 
 export const getNamespaceEmbeddingModel = async (
   namespace: Pick<Namespace, "embeddingConfig">,
+  type?: "document" | "query",
 ) => {
   const config = namespace.embeddingConfig;
 
@@ -22,14 +23,6 @@ export const getNamespaceEmbeddingModel = async (
   }
 
   switch (config.provider) {
-    case "OPENAI": {
-      const { createOpenAI } = await import("@ai-sdk/openai");
-
-      const { apiKey, model } = config;
-      const openai = createOpenAI({ apiKey });
-      return openai.textEmbeddingModel(model);
-    }
-
     case "AZURE_OPENAI": {
       const { createAzure } = await import("@ai-sdk/azure");
 
@@ -40,6 +33,32 @@ export const getNamespaceEmbeddingModel = async (
         baseURL: baseUrl,
       });
       return azure.textEmbeddingModel(deployment);
+    }
+
+    case "OPENAI": {
+      const { createOpenAI } = await import("@ai-sdk/openai");
+
+      const { apiKey, model } = config;
+      const openai = createOpenAI({ apiKey });
+      return openai.textEmbeddingModel(model);
+    }
+
+    case "VOYAGE": {
+      const { createVoyage } = await import("voyage-ai-provider");
+
+      const { apiKey, model } = config;
+      const voyage = createVoyage({ apiKey });
+      return voyage.textEmbeddingModel(model, {
+        inputType: type === "document" ? "document" : "query",
+      });
+    }
+
+    case "GOOGLE": {
+      const { createGoogleGenerativeAI } = await import("@ai-sdk/google");
+
+      const { apiKey, model } = config;
+      const google = createGoogleGenerativeAI({ apiKey });
+      return google.textEmbeddingModel(model);
     }
 
     default: {

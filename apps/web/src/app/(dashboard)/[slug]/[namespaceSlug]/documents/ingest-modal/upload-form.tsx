@@ -20,13 +20,19 @@ import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-const schema = z.object({
-  name: z.string().optional(),
-  files: z
-    .array(z.instanceof(File))
-    .min(1, { message: "File is required" })
-    .max(1),
-});
+import { configSchema } from "@agentset/validation";
+
+import IngestConfig from "./config";
+
+const schema = z
+  .object({
+    name: z.string().optional(),
+    files: z
+      .array(z.instanceof(File))
+      .min(1, { message: "File is required" })
+      .max(1),
+  })
+  .merge(configSchema);
 
 export default function UploadForm({ onSuccess }: { onSuccess: () => void }) {
   const { activeNamespace } = useNamespace();
@@ -68,6 +74,14 @@ export default function UploadForm({ onSuccess }: { onSuccess: () => void }) {
         name: data.name ?? uploadedFile.name,
         key: uploadedFile.key,
       },
+      config:
+        data.chunkSize || data.chunkOverlap || data.metadata
+          ? {
+              chunkSize: data.chunkSize,
+              chunkOverlap: data.chunkOverlap,
+              metadata: data.metadata,
+            }
+          : undefined,
     });
   };
 
@@ -77,47 +91,45 @@ export default function UploadForm({ onSuccess }: { onSuccess: () => void }) {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleFileSubmit)}>
         <div className="flex flex-col gap-6 py-4">
-          <div className="flex flex-col gap-2">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Name</FormLabel>
-                  <FormControl>
-                    <Input placeholder="example.txt" {...field} />
-                  </FormControl>
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Name</FormLabel>
+                <FormControl>
+                  <Input placeholder="example.txt" {...field} />
+                </FormControl>
 
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-          <div className="flex flex-col gap-2">
-            <FormField
-              control={form.control}
-              name="files"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>File</FormLabel>
-                  <FormControl>
-                    <FileUploader
-                      value={field.value}
-                      onValueChange={field.onChange}
-                      maxFileCount={1}
-                      maxSize={MAX_UPLOAD_SIZE}
-                      progresses={progresses}
-                      accept={{}}
-                      disabled={isPending}
-                    />
-                  </FormControl>
+          <FormField
+            control={form.control}
+            name="files"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>File</FormLabel>
+                <FormControl>
+                  <FileUploader
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    maxFileCount={1}
+                    maxSize={MAX_UPLOAD_SIZE}
+                    progresses={progresses}
+                    accept={{}}
+                    disabled={isPending}
+                  />
+                </FormControl>
 
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <IngestConfig form={form} />
         </div>
 
         <DialogFooter>

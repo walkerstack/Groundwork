@@ -17,10 +17,16 @@ import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-const schema = z.object({
-  name: z.string().optional(),
-  text: z.string().min(10, "Text must be at least 10 characters"),
-});
+import { configSchema } from "@agentset/validation";
+
+import IngestConfig from "./config";
+
+const schema = z
+  .object({
+    name: z.string().optional(),
+    text: z.string().min(10, "Text must be at least 10 characters"),
+  })
+  .merge(configSchema);
 
 export default function TextForm({ onSuccess }: { onSuccess: () => void }) {
   const { activeNamespace } = useNamespace();
@@ -44,6 +50,14 @@ export default function TextForm({ onSuccess }: { onSuccess: () => void }) {
         name: data.name,
         text: data.text,
       },
+      config:
+        data.chunkSize || data.chunkOverlap || data.metadata
+          ? {
+              chunkSize: data.chunkSize,
+              chunkOverlap: data.chunkOverlap,
+              metadata: data.metadata,
+            }
+          : undefined,
     });
   };
 
@@ -51,44 +65,42 @@ export default function TextForm({ onSuccess }: { onSuccess: () => void }) {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleTextSubmit)}>
         <div className="flex flex-col gap-6 py-4">
-          <div className="flex flex-col gap-2">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Name</FormLabel>
-                  <FormControl>
-                    <Input placeholder="example.txt" {...field} />
-                  </FormControl>
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Name</FormLabel>
+                <FormControl>
+                  <Input placeholder="example.txt" {...field} />
+                </FormControl>
 
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-          <div className="flex flex-col gap-2">
-            <FormField
-              control={form.control}
-              name="text"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Text</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      id="text"
-                      placeholder="Enter your text here"
-                      className="min-h-[200px]"
-                      {...field}
-                    />
-                  </FormControl>
+          <FormField
+            control={form.control}
+            name="text"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Text</FormLabel>
+                <FormControl>
+                  <Textarea
+                    id="text"
+                    placeholder="Enter your text here"
+                    className="min-h-[200px]"
+                    {...field}
+                  />
+                </FormControl>
 
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <IngestConfig form={form} />
         </div>
 
         <DialogFooter>

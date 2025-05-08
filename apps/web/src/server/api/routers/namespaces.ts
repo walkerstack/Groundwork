@@ -1,7 +1,13 @@
 import type { ProtectedProcedureContext } from "@/server/api/trpc";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
+import {
+  validateEmbeddingModel,
+  validateVectorStoreConfig,
+} from "@/services/namespaces/validate";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
+
+import { EmbeddingConfigSchema, VectorStoreSchema } from "@agentset/validation";
 
 const validateIsMember = async (
   ctx: ProtectedProcedureContext,
@@ -72,9 +78,38 @@ export const namespaceRouter = createTRPCRouter({
       return !!namespace;
     }),
   createNamespace: protectedProcedure
-    .input(z.object({ orgId: z.string(), name: z.string(), slug: z.string() }))
+    .input(
+      z.object({
+        orgId: z.string(),
+        name: z.string(),
+        slug: z.string(),
+        embeddingConfig: EmbeddingConfigSchema.optional(),
+        vectorStoreConfig: VectorStoreSchema.optional(),
+      }),
+    )
     .mutation(async ({ ctx, input }) => {
       await validateIsMember(ctx, input.orgId, ["admin", "owner"]);
+
+      const { success: isValidEmbedding, error: embeddingError } =
+        await validateEmbeddingModel(input.embeddingConfig);
+      if (!isValidEmbedding) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: embeddingError,
+        });
+      }
+
+      const { success: isValidVectorStore, error: vectorStoreError } =
+        await validateVectorStoreConfig(
+          input.vectorStoreConfig,
+          input.embeddingConfig,
+        );
+      if (!isValidVectorStore) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: vectorStoreError,
+        });
+      }
 
       const [namespace] = await ctx.db.$transaction([
         ctx.db.namespace.create({
@@ -82,6 +117,8 @@ export const namespaceRouter = createTRPCRouter({
             name: input.name,
             slug: input.slug,
             organizationId: input.orgId,
+            embeddingConfig: input.embeddingConfig,
+            vectorStoreConfig: input.vectorStoreConfig,
           },
         }),
         ctx.db.organization.update({

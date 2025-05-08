@@ -39,3 +39,10 @@ export function capitalize(str?: string | null) {
     )
     .join(" ");
 }
+
+export function camelCaseToWords(str: string) {
+  return str
+    .split(/(?=[A-Z])/)
+    .map(capitalize)
+    .join(" ");
+}

@@ -1,6 +1,6 @@
 "use client";
 
-import CreateNamespaceDialog from "@/components/app-sidebar/org-switcher/create-namespace-dialog";
+import CreateNamespaceDialog from "@/components/create-namespace";
 import { useOrganization } from "@/contexts/organization-context";
 
 export default function CreateNamespacePage() {

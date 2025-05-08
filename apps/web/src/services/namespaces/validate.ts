@@ -8,8 +8,20 @@ const modelToDimensions: Record<
   PrismaJson.NamespaceEmbeddingConfig["model"],
   number
 > = {
+  // openai
   "text-embedding-3-large": 3072,
   "text-embedding-3-small": 1536,
+
+  // google
+  "text-embedding-004": 768,
+
+  // voyage
+  "voyage-3-large": 1024,
+  "voyage-3": 1024,
+  "voyage-3-lite": 512,
+  "voyage-code-3": 1024,
+  "voyage-finance-2": 1024,
+  "voyage-law-2": 1024,
 };
 
 export const validateVectorStoreConfig = async (
