@@ -1,73 +1,14 @@
 /* eslint-disable @typescript-eslint/no-namespace */
+import type {
+  DocumentPayload as _DocumentPayload,
+  DocumentProperties as _DocumentProperties,
+  IngestJobConfig as _IngestJobConfig,
+  IngestJobPayload as _IngestJobPayload,
+  EmbeddingConfig,
+  VectorStoreConfig,
+} from "@agentset/validation";
 
-type IngestJobPayloadText = {
-  type: "TEXT";
-  text: string;
-  name?: string | null;
-};
-
-type IngestJobPayloadFile = {
-  type: "FILE";
-  fileUrl: string;
-  name?: string | null;
-};
-
-type IngestJobPayloadManagedFile = {
-  type: "MANAGED_FILE";
-  key: string;
-  name?: string | null;
-};
-
-type DocPayload =
-  | Omit<IngestJobPayloadText, "name">
-  | Omit<IngestJobPayloadFile, "name">
-  | Omit<IngestJobPayloadManagedFile, "name">;
-
-type IngestJobPayloadConnection = {
-  type: "CONNECTION";
-  connectionId: string;
-};
-
-type IngestJobPayloadUrls = {
-  type: "URLS";
-  urls: string[];
-};
-
-type IngestJobPayloadSitemap = {
-  type: "SITEMAP";
-  sitemapUrl: string;
-};
-
-type IngestJobPayloadS3 = {
-  type: "S3";
-  bucket: string;
-  prefix?: string;
-  fileTypes?: string[];
-};
-
-type IngestJobPayloadGoogleDrive = {
-  type: "GOOGLE_DRIVE";
-  folderId: string;
-  fileTypes?: string[];
-};
-
-type Payload =
-  | IngestJobPayloadText
-  | IngestJobPayloadConnection
-  | IngestJobPayloadFile
-  | IngestJobPayloadUrls
-  | IngestJobPayloadSitemap
-  | IngestJobPayloadS3
-  | IngestJobPayloadGoogleDrive
-  | IngestJobPayloadManagedFile;
-
-type OpenAIEmbeddingModel = "text-embedding-3-small" | "text-embedding-3-large";
 type OpenAILanguageModel = "gpt-4o" | "gpt-4o-mini";
-
-type Config = {
-  chunkSize?: number;
-  chunkOverlap?: number;
-};
 
 export type LLMConfig =
   | {
@@ -94,17 +35,9 @@ declare global {
       };
     };
 
-    type IngestJobPayload = Payload;
-
-    type IngestJobConfig = Config & {
-      metadata?: Record<string, unknown>;
-    };
-
-    type NamespaceVectorStoreConfig = {
-      provider: "PINECONE";
-      apiKey: string;
-      indexHost: string;
-    };
+    type IngestJobPayload = _IngestJobPayload;
+    type IngestJobConfig = _IngestJobConfig;
+    type NamespaceVectorStoreConfig = VectorStoreConfig;
 
     type NamespaceFileStoreConfig = {
       provider: "S3";
@@ -116,29 +49,11 @@ declare global {
       prefix?: string;
     };
 
-    type NamespaceEmbeddingConfig =
-      | {
-          provider: "OPENAI";
-          model: OpenAIEmbeddingModel;
-          apiKey: string;
-        }
-      | {
-          provider: "AZURE_OPENAI";
-          model: OpenAIEmbeddingModel;
-          baseUrl: string;
-          deployment: string;
-          apiKey: string;
-          apiVersion?: string;
-        };
-
+    type NamespaceEmbeddingConfig = EmbeddingConfig;
     type NamespaceLLMConfig = LLMConfig;
+    type DocumentProperties = _DocumentProperties;
 
-    type DocumentProperties = {
-      fileSize: number;
-      mimeType?: string;
-    };
-
-    type DocumentSource = DocPayload;
+    type DocumentSource = _DocumentPayload;
     type DocumentMetadata = Record<string, unknown>;
   }
 }

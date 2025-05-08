@@ -3,12 +3,10 @@ import {
   IngestJobSchema,
   IngestJobStatusSchema,
 } from "@/schemas/api/ingest-job";
-import {
-  EmbeddingConfigSchema,
-  NamespaceSchema,
-  VectorStoreSchema,
-} from "@/schemas/api/namespace";
+import { NamespaceSchema } from "@/schemas/api/namespace";
 import { createDocument } from "zod-openapi";
+
+import { EmbeddingConfigSchema, VectorStoreSchema } from "@agentset/validation";
 
 import { openApiErrorResponses } from "./responses";
 import { v1Paths } from "./v1";

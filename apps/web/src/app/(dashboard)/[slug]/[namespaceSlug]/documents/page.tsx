@@ -1,11 +1,16 @@
 import DashboardPageWrapper from "@/components/dashboard-page-wrapper";
 
-import DocumentsPageClient from "./page.client";
+import { IngestModal } from "./ingest-modal";
+import JobsPageClient from "./page.client";
 
 export default function DocumentsPage() {
   return (
     <DashboardPageWrapper title="Documents">
-      <DocumentsPageClient />
+      <div className="mb-10">
+        <IngestModal />
+      </div>
+
+      <JobsPageClient />
     </DashboardPageWrapper>
   );
 }

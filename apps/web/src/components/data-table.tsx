@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  type ColumnDef,
-  flexRender,
-  getCoreRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
-
+import type { ColumnDef, TableMeta } from "@tanstack/react-table";
 import {
   Table,
   TableBody,
@@ -15,22 +9,30 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  flexRender,
+  getCoreRowModel,
+  useReactTable,
+} from "@tanstack/react-table";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data?: TData[];
   isLoading?: boolean;
+  meta?: TableMeta<TData>;
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data = [],
   isLoading,
+  meta,
 }: DataTableProps<TData, TValue>) {
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
+    meta,
   });
 
   return (
@@ -61,7 +63,7 @@ export function DataTable<TData, TValue>({
                 Loading...
               </TableCell>
             </TableRow>
-          ) : table.getRowModel().rows?.length ? (
+          ) : table.getRowModel().rows.length ? (
             table.getRowModel().rows.map((row) => (
               <TableRow
                 key={row.id}

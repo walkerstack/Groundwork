@@ -35,7 +35,7 @@ export default function CreateNamespaceDialog({
         setOpen(newOpen);
       }}
     >
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-xl">
         <DialogHeader>
           <DialogTitle>Create namespace</DialogTitle>
           <DialogDescription>

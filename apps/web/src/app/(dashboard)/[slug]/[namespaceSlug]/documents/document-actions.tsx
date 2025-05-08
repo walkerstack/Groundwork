@@ -13,20 +13,21 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { CopyIcon, EllipsisVerticalIcon, Trash2Icon } from "lucide-react";
 import { toast } from "sonner";
 
-import { IngestJobStatus } from "@agentset/db";
+import { DocumentStatus } from "@agentset/db";
 
-import type { JobCol } from "./columns";
+import type { DocumentCol } from "./documents-columns";
 
-export function JobActions({ row }: { row: Row<JobCol> }) {
-  const queryClient = useQueryClient();
+export default function DocumentActions({ row }: { row: Row<DocumentCol> }) {
   const { activeNamespace } = useNamespace();
   const trpc = useTRPC();
-  const { mutate: deleteJob, isPending } = useMutation(
-    trpc.ingestJob.delete.mutationOptions({
+  const queryClient = useQueryClient();
+
+  const { isPending, mutate: deleteDocument } = useMutation(
+    trpc.document.delete.mutationOptions({
       onSuccess: () => {
-        toast.success("Job deleted successfully");
+        toast.success("Document deleted successfully");
         void queryClient.invalidateQueries(
-          trpc.ingestJob.all.queryFilter({
+          trpc.document.all.queryFilter({
             namespaceId: activeNamespace.id,
           }),
         );
@@ -38,21 +39,21 @@ export function JobActions({ row }: { row: Row<JobCol> }) {
   );
 
   const handleCopy = async () => {
-    await navigator.clipboard.writeText(prefixId(row.original.id, "job_"));
+    await navigator.clipboard.writeText(prefixId(row.original.id, "doc_"));
     toast.success("Copied ID");
   };
 
   const handleDelete = () => {
-    deleteJob({
+    deleteDocument({
+      documentId: row.original.id,
       namespaceId: activeNamespace.id,
-      jobId: row.original.id,
     });
   };
 
   const isDeleteDisabled =
     isPending ||
-    row.original.status === IngestJobStatus.DELETING ||
-    row.original.status === IngestJobStatus.QUEUED_FOR_DELETE;
+    row.original.status === DocumentStatus.DELETING ||
+    row.original.status === DocumentStatus.QUEUED_FOR_DELETE;
 
   return (
     <DropdownMenu>

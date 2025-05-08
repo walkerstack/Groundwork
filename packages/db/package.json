@@ -28,6 +28,7 @@
     "@agentset/eslint-config": "workspace:*",
     "@agentset/prettier-config": "workspace:*",
     "@agentset/tsconfig": "workspace:*",
+    "@agentset/validation": "workspace:*",
     "dotenv-cli": "^8.0.0",
     "eslint": "catalog:",
     "prettier": "catalog:",

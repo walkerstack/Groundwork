@@ -11,7 +11,12 @@ import { getNamespaceByUser } from "../auth";
 
 export const documentsRouter = createTRPCRouter({
   all: protectedProcedure
-    .input(getDocumentsSchema.extend({ namespaceId: z.string() }))
+    .input(
+      getDocumentsSchema.extend({
+        namespaceId: z.string(),
+        ingestJobId: z.string().optional(),
+      }),
+    )
     .query(async ({ ctx, input }) => {
       const namespace = await getNamespaceByUser(ctx, {
         id: input.namespaceId,
@@ -25,6 +30,7 @@ export const documentsRouter = createTRPCRouter({
         where: {
           ingestJob: {
             namespaceId: namespace.id,
+            ...(input.ingestJobId && { id: input.ingestJobId }),
           },
           ...(input.statuses &&
             input.statuses.length > 0 && { status: { in: input.statuses } }),

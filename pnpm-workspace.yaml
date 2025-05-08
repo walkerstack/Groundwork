@@ -12,6 +12,7 @@ catalog:
 
   # Misc
   zod: ^3.24.2
+  zod-openapi: ^4.2.3
 
   # Tanstack & tRPC
   "@tanstack/react-query": ^5.69.0

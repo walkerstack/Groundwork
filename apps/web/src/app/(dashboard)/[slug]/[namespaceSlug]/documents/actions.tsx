@@ -13,21 +13,20 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { CopyIcon, EllipsisVerticalIcon, Trash2Icon } from "lucide-react";
 import { toast } from "sonner";
 
-import { DocumentStatus } from "@agentset/db";
+import { IngestJobStatus } from "@agentset/db";
 
-import type { DocumentCol } from "./columns";
+import type { JobCol } from "./columns";
 
-export function DocumentActions({ row }: { row: Row<DocumentCol> }) {
+export function JobActions({ row }: { row: Row<JobCol> }) {
+  const queryClient = useQueryClient();
   const { activeNamespace } = useNamespace();
   const trpc = useTRPC();
-  const queryClient = useQueryClient();
-
-  const { isPending, mutate: deleteDocument } = useMutation(
-    trpc.document.delete.mutationOptions({
+  const { mutate: deleteJob, isPending } = useMutation(
+    trpc.ingestJob.delete.mutationOptions({
       onSuccess: () => {
-        toast.success("Document deleted successfully");
+        toast.success("Job deleted successfully");
         void queryClient.invalidateQueries(
-          trpc.document.all.queryFilter({
+          trpc.ingestJob.all.queryFilter({
             namespaceId: activeNamespace.id,
           }),
         );
@@ -39,21 +38,21 @@ export function DocumentActions({ row }: { row: Row<DocumentCol> }) {
   );
 
   const handleCopy = async () => {
-    await navigator.clipboard.writeText(prefixId(row.original.id, "doc_"));
+    await navigator.clipboard.writeText(prefixId(row.original.id, "job_"));
     toast.success("Copied ID");
   };
 
   const handleDelete = () => {
-    deleteDocument({
-      documentId: row.original.id,
+    deleteJob({
       namespaceId: activeNamespace.id,
+      jobId: row.original.id,
     });
   };
 
   const isDeleteDisabled =
     isPending ||
-    row.original.status === DocumentStatus.DELETING ||
-    row.original.status === DocumentStatus.QUEUED_FOR_DELETE;
+    row.original.status === IngestJobStatus.DELETING ||
+    row.original.status === IngestJobStatus.QUEUED_FOR_DELETE;
 
   return (
     <DropdownMenu>

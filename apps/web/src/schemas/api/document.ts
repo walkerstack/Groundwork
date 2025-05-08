@@ -1,12 +1,11 @@
 import z from "@/lib/zod";
 
 import { DocumentStatus } from "@agentset/db";
-
 import {
-  filePayloadSchema,
-  managedFilePayloadSchema,
-  textPayloadSchema,
-} from "./ingest-job";
+  documentPayloadSchema,
+  documentPropertiesSchema,
+} from "@agentset/validation";
+
 import { paginationSchema } from "./pagination";
 
 const nameSchema = z
@@ -14,25 +13,6 @@ const nameSchema = z
   .nullable()
   .default(null)
   .describe("The name of the document.");
-
-export const documentSourceSchema = z
-  .discriminatedUnion("type", [
-    textPayloadSchema.omit({ name: true }),
-    filePayloadSchema.omit({ name: true }),
-    managedFilePayloadSchema.omit({ name: true }),
-  ])
-  .describe("The source of the document.");
-
-const documentPropertiesSchema = z
-  .object({
-    fileSize: z.number().describe("The size of the file in bytes."),
-    mimeType: z
-      .string()
-      .nullable()
-      .default(null)
-      .describe("The MIME type of the file."),
-  })
-  .describe("The properties of the document.");
 
 export const DocumentStatusSchema = z
   .nativeEnum(DocumentStatus)
@@ -61,7 +41,7 @@ export const DocumentSchema = z
       .describe(
         "The error message of the document. Only exists when the status is failed.",
       ),
-    source: documentSourceSchema,
+    source: documentPayloadSchema,
     properties: documentPropertiesSchema.nullable().default(null),
     totalChunks: z.number().describe("The total number of chunks."),
     totalTokens: z.number().describe("The total number of tokens."),
@@ -117,6 +97,10 @@ export const DocumentsQuerySchema = z.object({
     .optional()
     .default("desc")
     .describe("The order to sort by. Default is `desc`."),
+  ingestJobId: z
+    .string()
+    .optional()
+    .describe("The ingest job ID to filter documents by."),
 });
 
 export const getDocumentsSchema = DocumentsQuerySchema.merge(paginationSchema);

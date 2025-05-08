@@ -8,7 +8,6 @@ import {
   LockIcon,
   SettingsIcon,
   UsersIcon,
-  WrenchIcon,
 } from "lucide-react";
 
 import type { SidebarItemType } from ".";
@@ -31,11 +30,6 @@ export const namespaceItems: SidebarItemType[] = [
     url: createNamespaceUrl("/"),
     icon: HomeIcon,
     exact: true,
-  },
-  {
-    title: "Ingestion",
-    url: createNamespaceUrl("/jobs"),
-    icon: WrenchIcon,
   },
   {
     title: "Documents",
