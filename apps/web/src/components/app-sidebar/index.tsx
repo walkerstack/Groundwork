@@ -4,7 +4,6 @@ import {
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
-  SidebarSeparator,
 } from "@/components/ui/sidebar";
 
 import { NavMain } from "./nav-main";
@@ -39,7 +38,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
         <NavNamespace />
       </SidebarContent>
 
-      <SidebarFooter>
+      <SidebarFooter className="pb-5">
         <NavSecondary />
       </SidebarFooter>
     </Sidebar>

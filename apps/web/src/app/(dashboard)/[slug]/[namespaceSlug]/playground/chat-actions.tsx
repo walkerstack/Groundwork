@@ -15,7 +15,7 @@ export default function ChatActions() {
   };
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-2 pr-10">
       <Button variant="outline" onClick={resetChat}>
         <PlusIcon className="size-4" />
         New Chat

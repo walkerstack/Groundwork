@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { DialogFooter } from "@/components/ui/dialog";
 import {
@@ -12,37 +12,49 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { useOrganization } from "@/contexts/organization-context";
 import { toSlug } from "@/lib/slug";
 import { trpcClient } from "@/trpc/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-const formSchema = z.object({
-  name: z.string().min(1),
-  slug: z
-    .string()
-    .min(1)
-    .trim()
-    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)
-    .refine(
-      async (value) => {
-        if (value === "") return false;
-        const result = await trpcClient.namespace.checkSlug.query(value);
-        return !result;
-      },
-      { message: "Slug is already taken" },
-    ),
-});
+const createFormSchema = (orgId: string) =>
+  z.object({
+    name: z.string().min(1),
+    slug: z
+      .string()
+      .min(1)
+      .trim()
+      .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)
+      .refine(
+        async (value) => {
+          if (value === "") return false;
+          const result = await trpcClient.namespace.checkSlug.query({
+            slug: value,
+            orgId,
+          });
+          return !result;
+        },
+        { message: "Slug is already taken" },
+      ),
+  });
+type FormSchema = z.infer<ReturnType<typeof createFormSchema>>;
 
 export default function CreateNamespaceDetailsStep({
   onSubmit,
   defaultValues,
 }: {
-  onSubmit: (values: z.infer<typeof formSchema>) => void;
-  defaultValues?: Partial<z.infer<typeof formSchema>>;
+  onSubmit: (values: FormSchema) => void;
+  defaultValues?: Partial<FormSchema>;
 }) {
-  const form = useForm<z.infer<typeof formSchema>>({
+  const { activeOrganization } = useOrganization();
+  const formSchema = useMemo(
+    () => createFormSchema(activeOrganization.id),
+    [activeOrganization.id],
+  );
+
+  const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema, undefined, { mode: "async" }),
     reValidateMode: "onBlur",
     defaultValues: defaultValues ?? {

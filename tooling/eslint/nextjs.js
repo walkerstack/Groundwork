@@ -1,3 +1,4 @@
+// @ts-nocheck
 import nextPlugin from "@next/eslint-plugin-next";
 
 /** @type {Awaited<import('typescript-eslint').Config>} */

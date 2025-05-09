@@ -21,6 +21,7 @@ import { EmbeddingConfigSchema } from "@agentset/validation";
 
 import { Label } from "../ui/label";
 import { Logo } from "../ui/logo";
+import RadioButton from "../ui/radio-button";
 import { RadioGroup } from "../ui/radio-group";
 import {
   Select,
@@ -30,7 +31,6 @@ import {
   SelectValue,
 } from "../ui/select";
 import { embeddingModels } from "./models";
-import RadioButton from "./radio-button";
 
 const formSchema = z.object({
   embeddingModel: EmbeddingConfigSchema.optional(),

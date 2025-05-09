@@ -4,7 +4,6 @@ const nameSchema = z
   .string()
   .nullable()
   .optional()
-  .default(null)
   .describe("The name of the ingest job.");
 
 export const textPayloadSchema = z

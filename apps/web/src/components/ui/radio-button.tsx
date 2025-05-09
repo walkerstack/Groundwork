@@ -1,9 +1,9 @@
 import { cn } from "@/lib/utils";
 import { InfoIcon } from "lucide-react";
 
-import { Label } from "../ui/label";
-import { RadioGroupItem } from "../ui/radio-group";
-import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
+import { Label } from "./label";
+import { RadioGroupItem } from "./radio-group";
+import { Tooltip, TooltipContent, TooltipTrigger } from "./tooltip";
 
 export default function RadioButton({
   icon: Icon,

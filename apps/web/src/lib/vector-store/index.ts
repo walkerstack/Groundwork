@@ -41,4 +41,3 @@ export const getNamespaceVectorStore = async (
 };
 
 export { queryVectorStore } from "./parse";
-export { queryVectorStoreV2 } from "./parse-v2";

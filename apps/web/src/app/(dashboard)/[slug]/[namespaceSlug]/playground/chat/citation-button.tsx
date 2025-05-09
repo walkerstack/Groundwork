@@ -1,4 +1,4 @@
-import type { QueryVectorStoreResult } from "@/lib/vector-store/parse-v2";
+import type { QueryVectorStoreResult } from "@/lib/vector-store/parse";
 import { cn } from "@/lib/utils";
 
 import { CitationModal } from "./citation-modal";

@@ -8,7 +8,7 @@ import {
   CONDENSE_USER_PROMPT,
   NEW_MESSAGE_PROMPT,
 } from "@/lib/prompts";
-import { queryVectorStoreV2 } from "@/lib/vector-store";
+import { queryVectorStore } from "@/lib/vector-store";
 import { createDataStreamResponse, generateText, streamText } from "ai";
 
 import { chatSchema } from "./schema";
@@ -65,7 +65,7 @@ export const POST = withAuthApiHandler(
     }
 
     // TODO: track the usage
-    const data = await queryVectorStoreV2(namespace, {
+    const data = await queryVectorStore(namespace, {
       query,
       tenantId,
       topK: body.topK,

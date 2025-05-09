@@ -2,7 +2,7 @@ import { AgentsetApiError, exceededLimitError } from "@/lib/api/errors";
 import { withNamespaceApiHandler } from "@/lib/api/handler";
 import { makeApiSuccessResponse } from "@/lib/api/response";
 import { parseRequestBody } from "@/lib/api/utils";
-import { queryVectorStoreV2 } from "@/lib/vector-store";
+import { queryVectorStore } from "@/lib/vector-store";
 import { queryVectorStoreSchema } from "@/schemas/api/query";
 import { waitUntil } from "@vercel/functions";
 
@@ -29,7 +29,7 @@ export const POST = withNamespaceApiHandler(
     );
 
     // TODO: track the usage
-    const data = await queryVectorStoreV2(namespace, {
+    const data = await queryVectorStore(namespace, {
       query: body.query,
       tenantId,
       topK: body.topK,

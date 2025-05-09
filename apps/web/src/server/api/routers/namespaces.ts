@@ -69,10 +69,20 @@ export const namespaceRouter = createTRPCRouter({
       return namespace;
     }),
   checkSlug: protectedProcedure
-    .input(z.string())
+    .input(
+      z.object({
+        orgId: z.string(),
+        slug: z.string(),
+      }),
+    )
     .query(async ({ ctx, input }) => {
       const namespace = await ctx.db.namespace.findUnique({
-        where: { slug: input },
+        where: {
+          organizationId_slug: {
+            slug: input.slug,
+            organizationId: input.orgId,
+          },
+        },
       });
 
       return !!namespace;

@@ -1,86 +1,76 @@
-import { z } from "zod";
+import type { BaseNode, Metadata } from "llamaindex";
+import { metadataDictToNode } from "@llamaindex/core/vector-store";
+import { embed } from "ai";
+import { MetadataMode } from "llamaindex";
 
-import type { getNamespaceVectorStore } from ".";
+import type { Namespace } from "@agentset/db";
+
+import { getNamespaceVectorStore } from ".";
+import { getNamespaceEmbeddingModel } from "../embedding";
+import { filterFalsy } from "../functions";
 import { rerankResults } from "../rerank/cohere";
 
-type VectorStore = Awaited<ReturnType<typeof getNamespaceVectorStore>>;
-
-const jsonArraySchema = (type: z.ZodType) =>
-  z.preprocess(
-    (val) => (typeof val === "string" ? JSON.parse(val) : val),
-    z.array(type),
-  );
-
-const nodeMetadataSchema = z.object({
-  link_texts: jsonArraySchema(z.string()).optional(),
-  link_urls: jsonArraySchema(z.string()).optional(),
-  languages: jsonArraySchema(z.string()).optional(),
-  file_directory: z.string(),
-  filename: z.string(),
-  filetype: z.string(),
-  sequence_number: z.number().optional(),
-});
-
-const nodeSchema = z.object({
-  id: z.string(),
-  score: z.number(),
-  metadata: nodeMetadataSchema,
-  // embedding: z.any().nullable(),
-  // excluded_embed_metadata_keys: z.array(z.string()),
-  // excluded_llm_metadata_keys: z.array(z.string()),
-  relationships: z
-    .record(
-      z.string(),
-      z.object({
-        node_id: z.string(),
-        node_type: z.string(),
-        metadata: nodeMetadataSchema,
-        hash: z.string(),
-        class_name: z.string(),
-      }),
-    )
-    .optional(),
-  metadata_template: z.string(),
-  metadata_separator: z.string(),
-  text: z.string(),
-  mimetype: z.string(),
-  start_char_idx: z.number().nullable(),
-  end_char_idx: z.number().nullable(),
-  metadata_seperator: z.string(),
-  text_template: z.string(),
-  class_name: z.string(),
-});
-
-const excludeKeys = <T extends Record<string, unknown>, K extends string[]>(
-  obj: T,
-  keys: K,
-) => {
-  return Object.fromEntries(
-    Object.entries(obj).filter(([key]) => !keys.includes(key)),
-  ) as Omit<T, (typeof keys)[number]>;
+type Result = {
+  id: string;
+  node: BaseNode<Metadata>;
+  score?: number;
+  rerankScore?: number;
 };
 
-export const queryVectorStore = async <IncludeMetadata extends boolean>(
-  vectorStore: VectorStore,
-  embedding: number[],
-  options: {
-    topK: number;
-    minScore?: number;
-    filter?: Record<string, string>;
-    includeMetadata?: IncludeMetadata;
-    includeRelationships?: boolean;
-    rerankLimit?: number;
-    query?: string;
-    rerank?: boolean;
-  },
+const formatResults = (
+  results: Result[],
+  {
+    includeMetadata,
+    includeRelationships,
+  }: { includeMetadata?: boolean; includeRelationships?: boolean },
 ) => {
+  return results.map((result) => {
+    return {
+      id: result.id,
+      text: result.node.getContent(MetadataMode.NONE),
+      metadata: includeMetadata ? result.node.metadata : undefined,
+      relationships: includeRelationships
+        ? result.node.relationships
+        : undefined,
+      score: result.score,
+      rerankScore: result.rerankScore,
+    };
+  });
+};
+
+export type QueryVectorStoreOptions = {
+  query: string;
+  topK: number;
+  tenantId?: string;
+  minScore?: number;
+  filter?: Record<string, string>;
+  includeMetadata?: boolean;
+  includeRelationships?: boolean;
+  rerankLimit?: number;
+  rerank?: boolean;
+};
+
+export const queryVectorStore = async (
+  namespace: Namespace,
+  options: QueryVectorStoreOptions,
+) => {
+  // TODO: if the embedding model is managed, track the usage
+  const [embeddingModel, vectorStore] = await Promise.all([
+    getNamespaceEmbeddingModel(namespace, "query"),
+    getNamespaceVectorStore(namespace, options.tenantId),
+  ]);
+
+  const embedding = await embed({
+    model: embeddingModel,
+    value: options.query,
+  });
+
   // TODO: track usage
-  const vectorLimit = options.rerankLimit || options.topK;
   let { matches } = await vectorStore.query({
-    vector: embedding,
-    topK: vectorLimit,
+    vector: embedding.embedding,
+    topK: options.topK,
     filter: options.filter,
-    includeMetadata: options.includeMetadata,
+    includeMetadata: true,
   });
 
   if (options.minScore !== undefined) {
@@ -89,67 +79,49 @@ export const queryVectorStore = async <IncludeMetadata extends boolean>(
     );
   }
 
-  if (!options.includeMetadata) {
-    return matches.map((match) => ({
-      id: match.id,
-      score: match.score,
-    })) as unknown as IncludeMetadata extends true
-      ? never
-      : {
-          id: string;
-          score?: number;
-        };
-  }
+  const parsedResults = filterFalsy(
+    matches.map((match) => {
+      const nodeContent = match.metadata?._node_content;
+      if (!nodeContent) return null;
 
-  try {
-    const parsedNodes = await z.array(nodeSchema).parseAsync(
-      matches.map((match) => {
-        if (!match.metadata) {
-          throw new Error("No metadata found");
-        }
-
+      try {
         return {
           id: match.id,
           score: match.score,
-          ...(JSON.parse(
-            (match.metadata as unknown as { _node_content: string })[
-              "_node_content"
-            ],
-          ) as Record<string, unknown>),
+          node: metadataDictToNode(match.metadata!),
         };
-      }),
-    );
-    let processedNodes = parsedNodes.map((node) => {
-      const rest = excludeKeys(node, [
-        "start_char_idx",
-        "end_char_idx",
-        "metadata_seperator",
-        "text_template",
-        "metadata_template",
-        "class_name",
-        "metadata_separator",
-      ] as const);
+      } catch (e) {
+        console.error(e);
+        return null;
+      }
+    }),
+  );
 
-      return {
-        ...rest,
-        relationships: options.includeRelationships
-          ? node.relationships
-          : undefined,
-        metadata: options.includeMetadata ? node.metadata : undefined,
-      };
-    });
-
-    // If reranking is enabled and we have a query, perform reranking
-    if (options.query && options.rerank) {
-      processedNodes = await rerankResults(processedNodes, {
-        limit: options.rerankLimit || options.topK,
-        query: options.query,
-      });
-    }
-
-    return processedNodes;
-  } catch (e) {
-    console.error(e);
+  if (matches.length > 0 && parsedResults.length === 0) {
     return null;
   }
+
+  // If re-ranking is enabled and we have a query, perform reranking
+  let rerankedResults: typeof parsedResults | null = null;
+  if (options.rerank) {
+    rerankedResults = await rerankResults(parsedResults, {
+      limit: options.rerankLimit || options.topK,
+      query: options.query,
+    });
+  }
+
+  return {
+    query: options.query,
+    unorderedIds: rerankedResults
+      ? parsedResults.map((result) => result.id)
+      : null,
+    results: formatResults(rerankedResults ?? parsedResults, {
+      includeMetadata: options.includeMetadata,
+      includeRelationships: options.includeRelationships,
+    }),
+  };
 };
+
+export type QueryVectorStoreResult = NonNullable<
+  Awaited<ReturnType<typeof queryVectorStore>>
+>;

@@ -1,4 +1,4 @@
-import type { QueryVectorStoreResult } from "@/lib/vector-store/parse-v2";
+import type { QueryVectorStoreResult } from "@/lib/vector-store/parse";
 import type { Message } from "ai";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";

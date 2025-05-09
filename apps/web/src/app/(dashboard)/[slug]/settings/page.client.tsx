@@ -72,7 +72,8 @@ export default function SettingsPage() {
       if (data.data) {
         setActiveOrganization({
           ...activeOrganization,
-          ...data.data,
+          name: data.data.name,
+          slug: data.data.slug,
         });
       }
       toast.success("Organization updated");
