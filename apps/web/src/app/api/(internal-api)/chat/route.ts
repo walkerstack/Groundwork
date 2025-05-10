@@ -9,7 +9,10 @@ import {
   NEW_MESSAGE_PROMPT,
 } from "@/lib/prompts";
 import { queryVectorStore } from "@/lib/vector-store";
+import { waitUntil } from "@vercel/functions";
 import { createDataStreamResponse, generateText, streamText } from "ai";
+
+import { db } from "@agentset/db";
 
 import { chatSchema } from "./schema";
 
@@ -96,6 +99,20 @@ export const POST = withAuthApiHandler(
         }),
       },
     ];
+
+    waitUntil(
+      (async () => {
+        // track usage
+        await db.namespace.update({
+          where: {
+            id: namespace.id,
+          },
+          data: {
+            totalPlaygroundUsage: { increment: 1 },
+          },
+        });
+      })(),
+    );
 
     // add the sources to the stream
     return createDataStreamResponse({

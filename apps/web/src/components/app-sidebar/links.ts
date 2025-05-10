@@ -6,7 +6,9 @@ import {
   HelpCircleIcon,
   HomeIcon,
   LockIcon,
+  RocketIcon,
   SettingsIcon,
+  UnplugIcon,
   UsersIcon,
 } from "lucide-react";
 
@@ -26,7 +28,13 @@ const createNamespaceUrl = (url: string) => `/{slug}/{namespaceSlug}${url}`;
 
 export const namespaceItems: SidebarItemType[] = [
   {
-    title: "Home",
+    title: "Get Started",
+    url: createNamespaceUrl("/get-started"),
+    icon: RocketIcon,
+    exact: true,
+  },
+  {
+    title: "Dashboard",
     url: createNamespaceUrl("/"),
     icon: HomeIcon,
     exact: true,
@@ -36,6 +44,11 @@ export const namespaceItems: SidebarItemType[] = [
     url: createNamespaceUrl("/documents"),
     icon: FilesIcon,
   },
+  // {
+  //   title: "Connectors",
+  //   url: createNamespaceUrl("/connectors"),
+  //   icon: UnplugIcon,
+  // },
   {
     title: "Playground",
     url: createNamespaceUrl("/playground"),

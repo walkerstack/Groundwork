@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { toSlug } from "@/lib/slug";
 import { useTRPC } from "@/trpc/react";
 import { useRouter } from "@bprogress/next/app";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -24,7 +25,7 @@ export default function CreateNamespaceDialog({
   open,
   setOpen,
 }: {
-  organization?: { id: string; slug: string } | null;
+  organization?: { id: string; slug: string; name: string } | null;
   open: boolean;
   setOpen: (open: boolean) => void;
 }) {
@@ -36,8 +37,20 @@ export default function CreateNamespaceDialog({
     "details",
   );
 
-  const [name, setName] = useState("Default");
-  const [slug, setSlug] = useState("default");
+  const defaultName = useMemo(() => {
+    return organization?.name
+      ? `${organization.name}'s First Namespace`
+      : "Default";
+  }, [organization]);
+  const defaultSlug = useMemo(() => toSlug(defaultName), [defaultName]);
+
+  const [name, setName] = useState(defaultName);
+  const [slug, setSlug] = useState(defaultSlug);
+
+  useEffect(() => {
+    setName(defaultName);
+    setSlug(toSlug(defaultName));
+  }, [defaultName]);
 
   const [embeddingModel, setEmbeddingModel] = useState<
     EmbeddingConfig | undefined
@@ -49,13 +62,14 @@ export default function CreateNamespaceDialog({
         toast.success("Namespace created");
         setOpen(false);
 
-        setName("Default");
-        setSlug("default");
+        setName(defaultName);
+        setSlug(defaultSlug);
+
         setEmbeddingModel(undefined);
         setStep("details");
 
         if (organization) {
-          router.push(`/${organization.slug}/${data.slug}`);
+          router.push(`/${organization.slug}/${data.slug}/get-started`);
         }
 
         void queryClient.invalidateQueries(trpc.organization.all.queryFilter());

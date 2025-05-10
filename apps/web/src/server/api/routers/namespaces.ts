@@ -52,7 +52,6 @@ export const namespaceRouter = createTRPCRouter({
 
       return namespaces;
     }),
-
   getNamespaceBySlug: protectedProcedure
     .input(z.object({ orgSlug: z.string(), slug: z.string() }))
     .query(async ({ ctx, input }) => {
@@ -67,6 +66,43 @@ export const namespaceRouter = createTRPCRouter({
       });
 
       return namespace;
+    }),
+  getOnboardingStatus: protectedProcedure
+    .input(z.object({ orgSlug: z.string(), slug: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const namespace = await ctx.db.namespace.findFirst({
+        where: {
+          slug: input.slug,
+          organization: {
+            slug: input.orgSlug,
+            members: { some: { userId: ctx.session.user.id } },
+          },
+        },
+        select: {
+          totalIngestJobs: true,
+          totalPlaygroundUsage: true,
+          organization: {
+            select: {
+              apiKeys: {
+                take: 1,
+                select: {
+                  id: true,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      if (!namespace) {
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
+
+      return {
+        ingestDocuments: namespace.totalIngestJobs > 0,
+        playground: namespace.totalPlaygroundUsage > 0,
+        createApiKey: namespace.organization.apiKeys.length > 0,
+      };
     }),
   checkSlug: protectedProcedure
     .input(

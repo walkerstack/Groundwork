@@ -22,6 +22,8 @@ model Namespace {
   totalDocuments  Int @default(0) // Total number of documents in the namespace
   totalPages      Int @default(0)
 
+  totalPlaygroundUsage Int @default(0) // Total number of playground requests in the namespace
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

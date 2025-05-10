@@ -1,5 +1,11 @@
+import DashboardPageWrapper from "@/components/dashboard-page-wrapper";
+
 import NamespacePageClient from "./page.client";
 
 export default function NamespacePage() {
-  return <NamespacePageClient />;
+  return (
+    <DashboardPageWrapper title="Dashboard">
+      <NamespacePageClient />
+    </DashboardPageWrapper>
+  );
 }

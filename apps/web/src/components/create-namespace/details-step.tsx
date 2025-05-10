@@ -46,7 +46,7 @@ export default function CreateNamespaceDetailsStep({
   defaultValues,
 }: {
   onSubmit: (values: FormSchema) => void;
-  defaultValues?: Partial<FormSchema>;
+  defaultValues: Partial<FormSchema>;
 }) {
   const { activeOrganization } = useOrganization();
   const formSchema = useMemo(
@@ -57,10 +57,7 @@ export default function CreateNamespaceDetailsStep({
   const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema, undefined, { mode: "async" }),
     reValidateMode: "onBlur",
-    defaultValues: defaultValues ?? {
-      name: "",
-      slug: "",
-    },
+    defaultValues: defaultValues,
   });
 
   const name = form.watch("name");
