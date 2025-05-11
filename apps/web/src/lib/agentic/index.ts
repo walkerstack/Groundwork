@@ -60,7 +60,7 @@ const agenticPipeline = (
       dataStream.writeMessageAnnotation({
         type: "status",
         value: "searching",
-        queries: queries.object,
+        queries: queries.object.queries,
       });
 
       const data = (
