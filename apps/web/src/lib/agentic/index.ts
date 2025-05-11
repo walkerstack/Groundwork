@@ -41,14 +41,19 @@ const agenticPipeline = (
       const queries = await generateObject({
         model,
         system: GENERATE_QUERIES_PROMPT,
+        temperature: 0,
         messages: [
           ...messagesWithoutQuery,
           { role: "user", content: lastMessage },
         ],
-        output: "array",
+        // output: "array",
         schema: z.object({
-          type: z.enum(["keyword", "semantic"]),
-          query: z.string(),
+          queries: z.array(
+            z.object({
+              type: z.enum(["keyword", "semantic"]),
+              query: z.string(),
+            }),
+          ),
         }),
       });
 
@@ -60,7 +65,7 @@ const agenticPipeline = (
 
       const data = (
         await Promise.all(
-          queries.object.map(async (query) => {
+          queries.object.queries.map(async (query) => {
             return queryVectorStore(namespace, {
               query: query.query,
               ...(queryOptions ?? { topK: 10 }),
