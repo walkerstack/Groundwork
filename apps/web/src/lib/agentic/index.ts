@@ -1,5 +1,10 @@
 import type { CoreMessage, JSONValue, LanguageModelV1 } from "ai";
-import { createDataStreamResponse, generateObject, streamText } from "ai";
+import {
+  createDataStreamResponse,
+  generateObject,
+  generateText,
+  streamText,
+} from "ai";
 import { z } from "zod";
 
 import type { Namespace } from "@agentset/db";
@@ -37,8 +42,17 @@ const agenticPipeline = (
         value: "generating-queries",
       });
 
+      const schema = z.object({
+        queries: z.array(
+          z.object({
+            type: z.enum(["keyword", "semantic"]),
+            query: z.string(),
+          }),
+        ),
+      });
+
       // step 1. generate queries
-      const queries = await generateObject({
+      const queriesResult = await generateText({
         model,
         system: GENERATE_QUERIES_PROMPT,
         temperature: 0,
@@ -46,26 +60,19 @@ const agenticPipeline = (
           ...messagesWithoutQuery,
           { role: "user", content: lastMessage },
         ],
-        // output: "array",
-        schema: z.object({
-          queries: z.array(
-            z.object({
-              type: z.enum(["keyword", "semantic"]),
-              query: z.string(),
-            }),
-          ),
-        }),
       });
+
+      const queries = schema.parse(JSON.parse(queriesResult.text));
 
       dataStream.writeMessageAnnotation({
         type: "status",
         value: "searching",
-        queries: queries.object.queries,
+        queries: queries.queries,
       });
 
       const data = (
         await Promise.all(
-          queries.object.queries.map(async (query) => {
+          queries.queries.map(async (query) => {
             return queryVectorStore(namespace, {
               query: query.query,
               ...(queryOptions ?? { topK: 10 }),
