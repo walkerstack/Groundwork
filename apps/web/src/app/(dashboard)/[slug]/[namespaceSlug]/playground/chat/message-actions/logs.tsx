@@ -87,8 +87,10 @@ const Chunk = ({
 
 export default function MessageLogs({ message }: { message: Message }) {
   const sources = (
-    message.annotations?.[0] as Record<string, unknown> | undefined
-  )?.["agentset_sources"] as QueryVectorStoreResult | undefined;
+    message.annotations as Record<string, unknown>[] | undefined
+  )?.find((a) => a.type === "agentset_sources")?.value as
+    | QueryVectorStoreResult
+    | undefined;
 
   return (
     <Dialog>

@@ -22,7 +22,11 @@
     "with-env": "dotenv -e ../../.env --"
   },
   "dependencies": {
-    "@prisma/client": "^6.5.0"
+    "@prisma/adapter-pg": "^6.7.0",
+    "@prisma/client": "^6.7.0"
+  },
+  "prisma": {
+    "schema": "prisma/schema"
   },
   "devDependencies": {
     "@agentset/eslint-config": "workspace:*",
@@ -32,7 +36,7 @@
     "dotenv-cli": "^8.0.0",
     "eslint": "catalog:",
     "prettier": "catalog:",
-    "prisma": "^6.5.0",
+    "prisma": "^6.7.0",
     "prisma-json-types-generator": "^3.2.2",
     "typescript": "catalog:"
   },

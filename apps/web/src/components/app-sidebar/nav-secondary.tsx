@@ -19,12 +19,12 @@ export function NavSecondary() {
   };
 
   return (
-    <div className="mt-auto">
+    <div className="mt-4">
       <div className="w-full px-2">
         <div>
           <p className="text-muted-foreground text-sm font-medium">Usage</p>
 
-          <div className="mt-5 flex flex-col gap-4">
+          <div className="mt-4 flex flex-col gap-4">
             <div className="text-foreground text-xs font-medium">
               <div className="mb-2 flex justify-between">
                 <p>Pages</p>

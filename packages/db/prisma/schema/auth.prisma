@@ -10,6 +10,10 @@ model User {
   accounts      Account[]
   members       Member[]
   invitations   Invitation[]
+  role          String       @default("user")
+  banned        Boolean? //	Indicates whether the user is banned.
+  banReason     String? // The reason for the user's ban.
+  banExpires    DateTime?
 
   @@unique([email])
   @@map("user")
@@ -23,6 +27,7 @@ model Session {
   updatedAt            DateTime
   ipAddress            String?
   userAgent            String?
+  impersonatedBy       String?
   userId               String
   user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   activeOrganizationId String?

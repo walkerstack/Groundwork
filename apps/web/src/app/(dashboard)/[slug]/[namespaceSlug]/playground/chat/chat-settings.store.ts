@@ -6,6 +6,7 @@ interface NamespaceState {
   rerankLimit: number;
   systemPrompt: string | null;
   temperature: number;
+  mode?: "normal" | "agentic" | "deepResearch";
 }
 
 interface ChatState {
@@ -19,6 +20,10 @@ interface ChatActions {
   setTopK: (namespaceId: string, topK: number) => void;
   setRerankLimit: (namespaceId: string, rerankLimit: number) => void;
   reset: (namespaceId: string) => NamespaceState;
+  setMode: (
+    namespaceId: string,
+    mode: "normal" | "agentic" | "deepResearch",
+  ) => void;
 }
 
 type ChatSettings = ChatState & ChatActions;
@@ -28,6 +33,7 @@ const defaultState: NamespaceState = {
   rerankLimit: 5,
   systemPrompt: null,
   temperature: 0,
+  mode: "normal",
 };
 
 const updateNamespace = (
@@ -61,6 +67,10 @@ export const useChatSettings = create<ChatSettings>()(
         set((state) => updateNamespace(state, namespaceId, { systemPrompt })),
       setTemperature: (namespaceId: string, temperature: number) =>
         set((state) => updateNamespace(state, namespaceId, { temperature })),
+      setMode: (
+        namespaceId: string,
+        mode: "normal" | "agentic" | "deepResearch",
+      ) => set((state) => updateNamespace(state, namespaceId, { mode })),
       reset: (namespaceId: string) => {
         set((state) => updateNamespace(state, namespaceId, defaultState));
         return defaultState;

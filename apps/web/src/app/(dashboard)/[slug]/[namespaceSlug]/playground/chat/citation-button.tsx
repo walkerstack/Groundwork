@@ -18,9 +18,8 @@ export const CitationButton = ({
   if (!children) return null;
 
   const idx = props["data-citation"] ? props["data-citation"] - 1 : undefined;
-  const sources = annotations?.[0]?.["agentset_sources"] as
-    | QueryVectorStoreResult
-    | undefined;
+  const sources = annotations?.find((a) => a.type === "agentset_sources")
+    ?.value as QueryVectorStoreResult | undefined;
 
   if (idx === undefined || !sources || !sources.results[idx])
     return <span {...props}>{children}</span>;

@@ -1,7 +1,7 @@
 "use client";
 
 import type { UseChatHelpers } from "@ai-sdk/react";
-import type { UIMessage } from "ai";
+import type { JSONValue, UIMessage } from "ai";
 import { memo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,6 +18,55 @@ import { Markdown } from "./markdown";
 import { MessageActions } from "./message-actions";
 import { MessageEditor } from "./message-editor";
 import { MessageReasoning } from "./message-reasoning";
+
+type StatusAnnotation = {
+  type: "status";
+  value: "generating-queries" | "searching" | "generating-answer";
+  queries?: {
+    type: "keyword" | "semantic";
+    query: string;
+  }[];
+};
+
+const Annotations = ({
+  annotations,
+  isLoading,
+}: {
+  annotations?: JSONValue[];
+  isLoading: boolean;
+}) => {
+  if (!annotations) return null;
+
+  // get the last item with type status
+  const statuses = annotations.filter(
+    (a) => !!a && typeof a === "object" && "type" in a && a.type === "status",
+  ) as StatusAnnotation[];
+
+  if (statuses.length === 0) return null;
+
+  const queries = statuses.find((s) => !!s.queries)?.queries;
+  const status = statuses[statuses.length - 1]!;
+
+  return (
+    <div>
+      <p className="text-muted-foreground">
+        {isLoading
+          ? {
+              "generating-queries": "Generating queries...",
+              searching: "Searching...",
+              "generating-answer": "Generating answer...",
+            }[status.value]
+          : ""}
+      </p>
+      {queries ? (
+        <p className="border-border text-muted-foreground mt-2 rounded-md border p-2 text-sm">
+          <span className="font-medium">Queries:</span>{" "}
+          {queries.map((q) => q.query).join(", ")}
+        </p>
+      ) : null}
+    </div>
+  );
+};
 
 const PurePreviewMessage = ({
   chatId,
@@ -65,6 +114,10 @@ const PurePreviewMessage = ({
           )}
 
           <div className="flex w-full flex-col gap-4">
+            <Annotations
+              annotations={message.annotations}
+              isLoading={isLoading}
+            />
             {message.parts.map((part, index) => {
               const { type } = part;
               const key = `message-${message.id}-part-${index}`;
@@ -227,6 +280,8 @@ export const PreviewMessage = memo(
     if (prevProps.isLoading !== nextProps.isLoading) return false;
     if (prevProps.message.id !== nextProps.message.id) return false;
     if (!equal(prevProps.message.parts, nextProps.message.parts)) return false;
+    if (!equal(prevProps.message.annotations, nextProps.message.annotations))
+      return false;
     // if (!equal(prevProps.vote, nextProps.vote)) return false;
 
     return true;

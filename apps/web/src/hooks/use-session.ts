@@ -14,9 +14,12 @@ export function useSession() {
     staleTime: Infinity,
   });
 
+  const isAdmin = session?.user.role === "admin";
+
   return {
     session,
     refetch,
     isLoading,
+    isAdmin,
   };
 }

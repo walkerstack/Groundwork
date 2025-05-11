@@ -2,7 +2,7 @@ import { cache } from "react";
 import { headers } from "next/headers";
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
-import { magicLink, organization } from "better-auth/plugins";
+import { admin, magicLink, organization } from "better-auth/plugins";
 
 import { db } from "@agentset/db";
 import { InviteUserEmail, LoginEmail } from "@agentset/emails";
@@ -24,6 +24,7 @@ export const auth = betterAuth({
     },
   },
   plugins: [
+    admin(),
     organization({
       sendInvitationEmail: async ({ email, organization, id, inviter }) => {
         const url = `${getBaseUrl()}/invitation/${id}`;

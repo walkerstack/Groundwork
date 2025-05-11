@@ -28,8 +28,8 @@ const createNamespaceUrl = (url: string) => `/{slug}/{namespaceSlug}${url}`;
 
 export const namespaceItems: SidebarItemType[] = [
   {
-    title: "Get Started",
-    url: createNamespaceUrl("/get-started"),
+    title: "Quick Start",
+    url: createNamespaceUrl("/quick-start"),
     icon: RocketIcon,
     exact: true,
   },
@@ -44,11 +44,11 @@ export const namespaceItems: SidebarItemType[] = [
     url: createNamespaceUrl("/documents"),
     icon: FilesIcon,
   },
-  // {
-  //   title: "Connectors",
-  //   url: createNamespaceUrl("/connectors"),
-  //   icon: UnplugIcon,
-  // },
+  {
+    title: "Connectors",
+    url: createNamespaceUrl("/connectors"),
+    icon: UnplugIcon,
+  },
   {
     title: "Playground",
     url: createNamespaceUrl("/playground"),

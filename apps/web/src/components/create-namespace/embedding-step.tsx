@@ -207,7 +207,7 @@ export default function CreateNamespaceEmbeddingStep({
 
                 <SelectContent>
                   <SelectItem value="default">
-                    openai:text-embedding-3-large
+                    OpenAI / text-embedding-3-large
                   </SelectItem>
                 </SelectContent>
               </Select>

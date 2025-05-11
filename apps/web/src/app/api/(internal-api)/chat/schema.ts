@@ -17,5 +17,6 @@ export const chatSchema = refineRereankLimit(
       ),
     messages: z.array(coreMessageSchema),
     temperature: z.number().optional(),
+    mode: z.enum(["normal", "agentic", "deepResearch"]).optional(),
   }),
 );

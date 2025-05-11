@@ -5,12 +5,25 @@ import type { Message } from "ai";
 import type React from "react";
 import type { Dispatch, SetStateAction } from "react";
 import { memo, useCallback, useEffect, useRef } from "react";
+import dynamic from "next/dynamic";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { ArrowUpIcon } from "lucide-react";
 import { toast } from "sonner";
 import { useLocalStorage, useWindowSize } from "usehooks-ts";
+
+const ChatInputModes = dynamic(() => import("./chat-input-modes"), {
+  ssr: false,
+  loading: () => (
+    <div className="absolute bottom-0 left-0 flex w-fit flex-row justify-end gap-2 p-2">
+      <Skeleton className="h-8 w-18 rounded-full" />
+      <Skeleton className="h-8 w-23 rounded-full" />
+      <Skeleton className="h-8 w-36 rounded-full" />
+    </div>
+  ),
+});
 
 function PureMultimodalInput({
   input,
@@ -48,7 +61,7 @@ function PureMultimodalInput({
   const resetHeight = () => {
     if (textareaRef.current) {
       textareaRef.current.style.height = "auto";
-      textareaRef.current.style.height = "98px";
+      textareaRef.current.style.height = "112px";
     }
   };
 
@@ -98,7 +111,7 @@ function PureMultimodalInput({
         value={input}
         onChange={handleInput}
         className={cn(
-          "bg-muted max-h-[calc(35dvh)] min-h-20 resize-none overflow-hidden rounded-lg pt-3 pb-10 text-base",
+          "bg-muted max-h-[calc(35dvh)] min-h-28 resize-none overflow-hidden rounded-lg pt-3 pb-14 text-base",
           className,
         )}
         rows={2}
@@ -119,6 +132,8 @@ function PureMultimodalInput({
           }
         }}
       />
+
+      <ChatInputModes />
 
       <div className="absolute right-0 bottom-0 flex w-fit flex-row justify-end p-2">
         {status === "submitted" ? (

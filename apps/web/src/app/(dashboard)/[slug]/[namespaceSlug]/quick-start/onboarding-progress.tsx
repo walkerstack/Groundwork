@@ -51,9 +51,9 @@ const NamespaceOnboardingProgress = ({
                         !step.description && "self-center",
                       )}
                     >
-                      <span className="text-sm font-medium">{step.name}</span>
+                      <span className="text-base font-medium">{step.name}</span>
                       {step.description && (
-                        <span className="text-muted-foreground text-sm">
+                        <span className="text-muted-foreground text-base">
                           {step.description}
                         </span>
                       )}
@@ -86,9 +86,9 @@ const NamespaceOnboardingProgress = ({
                         !step.description && "self-center",
                       )}
                     >
-                      <span className="text-sm font-medium">{step.name}</span>
+                      <span className="text-base font-medium">{step.name}</span>
                       {step.description && (
-                        <span className="text-muted-foreground text-sm">
+                        <span className="text-muted-foreground text-base">
                           {step.description}
                         </span>
                       )}
@@ -119,11 +119,11 @@ const NamespaceOnboardingProgress = ({
                         !step.description && "self-center",
                       )}
                     >
-                      <span className="text-primary text-sm font-medium">
+                      <span className="text-primary text-base font-medium">
                         {step.name}
                       </span>
                       {step.description && (
-                        <span className="text-muted-foreground text-sm">
+                        <span className="text-muted-foreground text-base">
                           {step.description}
                         </span>
                       )}
@@ -153,11 +153,11 @@ const NamespaceOnboardingProgress = ({
                         !step.description && "self-center",
                       )}
                     >
-                      <span className="text-muted-foreground text-sm font-medium">
+                      <span className="text-muted-foreground text-base font-medium">
                         {step.name}
                       </span>
                       {step.description && (
-                        <span className="text-muted-foreground text-sm">
+                        <span className="text-muted-foreground text-base">
                           {step.description}
                         </span>
                       )}

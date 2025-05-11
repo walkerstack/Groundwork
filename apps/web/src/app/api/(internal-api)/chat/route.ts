@@ -1,7 +1,9 @@
 import type { CoreMessage, JSONValue } from "ai";
+import agenticPipeline from "@/lib/agentic";
 import { AgentsetApiError } from "@/lib/api/errors";
 import { withAuthApiHandler } from "@/lib/api/handler";
 import { parseRequestBody } from "@/lib/api/utils";
+import { DeepResearchPipeline } from "@/lib/deep-research";
 import { getNamespaceLanguageModel } from "@/lib/llm";
 import {
   CONDENSE_SYSTEM_PROMPT,
@@ -15,6 +17,22 @@ import { createDataStreamResponse, generateText, streamText } from "ai";
 import { db } from "@agentset/db";
 
 import { chatSchema } from "./schema";
+
+const incrementUsage = (namespaceId: string) => {
+  waitUntil(
+    (async () => {
+      // track usage
+      await db.namespace.update({
+        where: {
+          id: namespaceId,
+        },
+        data: {
+          totalPlaygroundUsage: { increment: 1 },
+        },
+      });
+    })(),
+  );
+};
 
 // export const runtime = "edge";
 export const preferredRegion = "iad1"; // make this closer to the DB
@@ -41,7 +59,7 @@ export const POST = withAuthApiHandler(
     const languageModel = await getNamespaceLanguageModel();
 
     let query: string;
-    if (messagesWithoutQuery.length === 0) {
+    if (messagesWithoutQuery.length === 0 || body.mode === "agentic") {
       query = lastMessage;
     } else {
       // limit messagesWithoutQuery to the last 10 messages
@@ -65,6 +83,56 @@ export const POST = withAuthApiHandler(
           }),
         })
       ).text;
+    }
+
+    if (body.mode === "deepResearch") {
+      const pipeline = new DeepResearchPipeline(namespace, {
+        modelConfig: {
+          json: languageModel,
+          planning: languageModel,
+          summary: languageModel,
+          answer: languageModel,
+        },
+        queryOptions: {
+          tenantId,
+          topK: body.topK,
+          minScore: body.minScore,
+          filter: body.filter,
+          includeMetadata: body.includeMetadata,
+          includeRelationships: body.includeRelationships,
+          rerankLimit: body.rerankLimit,
+          rerank: body.rerank,
+        },
+        // maxQueries
+      });
+
+      const answer = await pipeline.runResearch(query);
+      incrementUsage(namespace.id);
+
+      return answer.toDataStreamResponse({ headers });
+    }
+
+    if (body.mode === "agentic") {
+      const result = agenticPipeline(namespace, {
+        model: languageModel,
+        queryOptions: {
+          tenantId,
+          topK: body.topK,
+          minScore: body.minScore,
+          filter: body.filter,
+          includeMetadata: body.includeMetadata,
+          includeRelationships: body.includeRelationships,
+          rerankLimit: body.rerankLimit,
+          rerank: body.rerank,
+        },
+        systemPrompt: body.systemPrompt,
+        temperature: body.temperature,
+        messagesWithoutQuery,
+        lastMessage,
+      });
+
+      incrementUsage(namespace.id);
+      return result;
     }
 
     // TODO: track the usage
@@ -100,19 +168,7 @@ export const POST = withAuthApiHandler(
       },
     ];
 
-    waitUntil(
-      (async () => {
-        // track usage
-        await db.namespace.update({
-          where: {
-            id: namespace.id,
-          },
-          data: {
-            totalPlaygroundUsage: { increment: 1 },
-          },
-        });
-      })(),
-    );
+    incrementUsage(namespace.id);
 
     // add the sources to the stream
     return createDataStreamResponse({
@@ -128,7 +184,8 @@ export const POST = withAuthApiHandler(
         });
 
         dataStream.writeMessageAnnotation({
-          agentset_sources: data as unknown as JSONValue,
+          type: "agentset_sources",
+          value: data as unknown as JSONValue,
         });
         messageStream.mergeIntoDataStream(dataStream);
       },

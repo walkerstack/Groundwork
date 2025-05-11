@@ -20,6 +20,7 @@ export function useNamespaceChat() {
       rerankLimit: settings.rerankLimit,
       temperature: settings.temperature,
       includeMetadata: true,
+      mode: settings.mode ?? "normal",
       ...(settings.systemPrompt && { systemPrompt: settings.systemPrompt }),
     },
     experimental_throttle: 100,
