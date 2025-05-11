@@ -47,7 +47,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 
       <SidebarSeparator className="mr-0 -ml-2 w-[calc(100%+1rem)]!" />
 
-      <SidebarFooter className="pb-10">
+      <SidebarFooter className="pb-5">
         <NavSecondary />
       </SidebarFooter>
     </Sidebar>
