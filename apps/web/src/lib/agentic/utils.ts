@@ -11,7 +11,7 @@ export const formatChatHistory = (messages: CoreMessage[]) => {
 
 export const formatSources = (sources: QueryVectorStoreResult["results"]) => {
   return sources
-    .map((s) => `<source_${s.id}>\n${s.text}\n</source_${s.id}>`)
+    .map((s, idx) => `<source_${idx + 1}>\n${s.text}\n</source_${idx + 1}>`)
     .join("\n\n");
 };
 
