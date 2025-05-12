@@ -4,6 +4,7 @@ import type { UseChatHelpers } from "@ai-sdk/react";
 import type { JSONValue, UIMessage } from "ai";
 import { memo, useState } from "react";
 import { Button } from "@/components/ui/button";
+import ShinyText from "@/components/ui/shiny-text";
 import {
   Tooltip,
   TooltipContent,
@@ -45,26 +46,26 @@ const Annotations = ({
   if (statuses.length === 0) return null;
 
   const queries = statuses.find((s) => !!s.queries)?.queries;
+  const queryString = queries
+    ? queries.map((q) => `"${q.query}"`).join(", ")
+    : "";
+
   const status = statuses[statuses.length - 1]!;
 
   return (
-    <div>
-      <p className="text-muted-foreground">
-        {isLoading
-          ? {
-              "generating-queries": "Generating queries...",
-              searching: "Searching...",
-              "generating-answer": "Generating answer...",
-            }[status.value]
-          : ""}
-      </p>
-      {queries ? (
-        <p className="border-border text-muted-foreground mt-2 rounded-md border p-2 text-sm">
-          <span className="font-medium">Queries:</span>{" "}
-          {queries.map((q) => q.query).join(", ")}
-        </p>
-      ) : null}
-    </div>
+    <ShinyText
+      className="w-fit font-medium"
+      shimmerWidth={status.value === "searching" ? 40 : 100}
+      disabled={!isLoading}
+    >
+      {isLoading
+        ? {
+            "generating-queries": "Generating queries...",
+            searching: "Searching: ",
+            "generating-answer": "Generating answer: ",
+          }[status.value] + queryString
+        : "Answered using: " + queryString}
+    </ShinyText>
   );
 };
 

@@ -77,7 +77,7 @@ export function IngestModal() {
               <TooltipTrigger asChild>
                 <span>
                   <Button disabled>
-                    <PlusIcon className="mr-2 h-4 w-4" /> Ingest
+                    <PlusIcon className="h-4 w-4" /> Ingest
                   </Button>
                 </span>
               </TooltipTrigger>
@@ -87,7 +87,7 @@ export function IngestModal() {
             </Tooltip>
           ) : (
             <Button>
-              <PlusIcon className="mr-2 h-4 w-4" /> Ingest
+              <PlusIcon className="h-4 w-4" /> Ingest
             </Button>
           )}
         </DialogTrigger>

@@ -14,9 +14,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
-import { SettingsIcon } from "lucide-react";
 
 export default function IngestConfig({
   form,
@@ -29,9 +27,10 @@ export default function IngestConfig({
     <>
       <Accordion type="single" collapsible>
         <AccordionItem value="item-1">
-          <AccordionTrigger className="hover:bg-muted/70 items-center justify-start duration-75 hover:no-underline">
-            <SettingsIcon className="size-4" /> Chunking Settings
+          <AccordionTrigger className="hover:bg-muted/70 items-center justify-start rounded-none duration-75 hover:no-underline">
+            Chunking Settings
           </AccordionTrigger>
+
           <AccordionContent className="mt-6 flex flex-col gap-6">
             <FormField
               control={form.control}
@@ -68,7 +67,7 @@ export default function IngestConfig({
               name="metadata"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Metadata (optional)</FormLabel>
+                  <FormLabel>Metadata JSON (optional)</FormLabel>
                   <FormControl>
                     <Textarea
                       value={metadata}

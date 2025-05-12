@@ -22,53 +22,45 @@ const ChatInputModes = memo(() => {
     }),
   );
 
-  const mode = settings.mode ?? "normal";
+  const currentMode = settings.mode ?? "normal";
+
+  const toggleMode = (mode: typeof currentMode) => {
+    settings.setMode(
+      activeNamespace.id,
+      mode === currentMode ? "normal" : mode,
+    );
+  };
 
   return (
     <div className="absolute bottom-0 left-0 flex w-fit flex-row justify-end gap-2 p-2">
       <Button
-        variant={mode === "normal" ? "default" : "outline"}
+        variant={currentMode === "agentic" ? "default" : "outline"}
         className={cn(
           "rounded-full",
-          mode === "normal" ? "border border-transparent" : "",
+          currentMode === "agentic" ? "border border-transparent" : "",
         )}
-        onClick={() => settings.setMode(activeNamespace.id, "normal")}
+        onClick={() => toggleMode("agentic")}
         size="sm"
         type="button"
       >
-        Normal
+        <BotIcon className="size-4" />
+        Agentic
       </Button>
 
       {isAdmin && (
-        <>
-          <Button
-            variant={mode === "agentic" ? "default" : "outline"}
-            className={cn(
-              "rounded-full",
-              mode === "agentic" ? "border border-transparent" : "",
-            )}
-            onClick={() => settings.setMode(activeNamespace.id, "agentic")}
-            size="sm"
-            type="button"
-          >
-            <BotIcon className="size-4" />
-            Agentic
-          </Button>
-
-          <Button
-            variant={mode === "deepResearch" ? "default" : "outline"}
-            className={cn(
-              "rounded-full",
-              mode === "deepResearch" ? "border border-transparent" : "",
-            )}
-            onClick={() => settings.setMode(activeNamespace.id, "deepResearch")}
-            size="sm"
-            type="button"
-          >
-            <TelescopeIcon className="size-4" />
-            Deep Research
-          </Button>
-        </>
+        <Button
+          variant={currentMode === "deepResearch" ? "default" : "outline"}
+          className={cn(
+            "rounded-full",
+            currentMode === "deepResearch" ? "border border-transparent" : "",
+          )}
+          onClick={() => toggleMode("deepResearch")}
+          size="sm"
+          type="button"
+        >
+          <TelescopeIcon className="size-4" />
+          Deep Research
+        </Button>
       )}
     </div>
   );

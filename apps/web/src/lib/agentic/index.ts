@@ -25,6 +25,7 @@ const agenticPipeline = (
     temperature,
     messagesWithoutQuery,
     lastMessage,
+    afterQueries,
   }: {
     model: LanguageModelV1;
     queryOptions?: Omit<QueryVectorStoreOptions, "query">;
@@ -33,6 +34,7 @@ const agenticPipeline = (
     temperature?: number;
     messagesWithoutQuery: CoreMessage[];
     lastMessage: string;
+    afterQueries?: (totalQueries: number) => void;
   },
 ) => {
   return createDataStreamResponse({
@@ -70,30 +72,40 @@ const agenticPipeline = (
         queries: queries.queries,
       });
 
+      let totalQueries = 0;
       const data = (
         await Promise.all(
           queries.queries.map(async (query) => {
-            return queryVectorStore(namespace, {
+            const queryResult = await queryVectorStore(namespace, {
               query: query.query,
               ...(queryOptions ?? { topK: 10 }),
             });
+            totalQueries++;
+            return queryResult;
           }),
         )
-      ).flatMap((d) => d?.results ?? []);
+      ).filter((d) => d !== null);
+
+      afterQueries?.(totalQueries);
 
       dataStream.writeMessageAnnotation({
         type: "status",
         value: "generating-answer",
       });
 
-      const ids: string[] = [];
-      const dedupedData = data.filter((d) => {
-        if (ids.includes(d.id)) {
-          return false;
-        }
-        ids.push(d.id);
-        return true;
-      });
+      const dedupedData = Object.values(
+        data
+          .flatMap((d) => d.results)
+          .reduce(
+            (acc, chunk) => {
+              if (acc[chunk.id]) return acc;
+
+              acc[chunk.id] = chunk;
+              return acc;
+            },
+            {} as Record<string, (typeof data)[number]["results"][number]>,
+          ),
+      );
 
       const newMessages: CoreMessage[] = [
         ...messagesWithoutQuery,
@@ -124,11 +136,8 @@ const agenticPipeline = (
 
       dataStream.writeMessageAnnotation({
         type: "agentset_sources",
-        value: {
-          query: "",
-          unorderedIds: [],
-          results: data,
-        } as unknown as JSONValue,
+        value: { results: dedupedData } as unknown as JSONValue,
+        logs: data as unknown as JSONValue,
       });
       messageStream.mergeIntoDataStream(dataStream);
     },
@@ -136,6 +145,7 @@ const agenticPipeline = (
       console.error(error);
       return "An error occurred";
     },
+
     headers,
   });
 };

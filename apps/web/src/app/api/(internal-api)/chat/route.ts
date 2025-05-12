@@ -18,7 +18,7 @@ import { db } from "@agentset/db";
 
 import { chatSchema } from "./schema";
 
-const incrementUsage = (namespaceId: string) => {
+const incrementUsage = (namespaceId: string, queries: number) => {
   waitUntil(
     (async () => {
       // track usage
@@ -28,6 +28,11 @@ const incrementUsage = (namespaceId: string) => {
         },
         data: {
           totalPlaygroundUsage: { increment: 1 },
+          organization: {
+            update: {
+              searchUsage: { increment: queries },
+            },
+          },
         },
       });
     })(),
@@ -107,7 +112,7 @@ export const POST = withAuthApiHandler(
       });
 
       const answer = await pipeline.runResearch(query);
-      incrementUsage(namespace.id);
+      incrementUsage(namespace.id, 1);
 
       return answer.toDataStreamResponse({ headers });
     }
@@ -129,9 +134,11 @@ export const POST = withAuthApiHandler(
         temperature: body.temperature,
         messagesWithoutQuery,
         lastMessage,
+        afterQueries: (totalQueries) => {
+          incrementUsage(namespace.id, totalQueries);
+        },
       });
 
-      incrementUsage(namespace.id);
       return result;
     }
 
@@ -168,7 +175,7 @@ export const POST = withAuthApiHandler(
       },
     ];
 
-    incrementUsage(namespace.id);
+    incrementUsage(namespace.id, 1);
 
     // add the sources to the stream
     return createDataStreamResponse({
