@@ -1,3 +1,0 @@
-- sidebar divider
-- ingest modal (accordion + chunking strategy)
-- quick start page revamp

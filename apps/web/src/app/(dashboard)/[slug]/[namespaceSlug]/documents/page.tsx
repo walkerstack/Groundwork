@@ -1,7 +1,6 @@
 import DashboardPageWrapper from "@/components/dashboard-page-wrapper";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { ArrowUpRightIcon, CodeIcon } from "lucide-react";
+import { CodeIcon } from "lucide-react";
 
 import { IngestModal } from "./ingest-modal";
 import JobsPageClient from "./page.client";
