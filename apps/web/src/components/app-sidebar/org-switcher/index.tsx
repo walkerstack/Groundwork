@@ -133,9 +133,14 @@ export function OrganizationSwitcher() {
                     </span>
                   </>
                 ) : (
-                  <span className="truncate font-semibold">
-                    {activeOrganization.name}
-                  </span>
+                  <>
+                    <span className="truncate font-semibold">
+                      {activeOrganization.name}
+                    </span>
+                    <span className="truncate text-xs">
+                      Navigate to namespace
+                    </span>
+                  </>
                 )}
               </div>
               <ChevronsUpDownIcon className="ml-auto" />

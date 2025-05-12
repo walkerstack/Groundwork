@@ -1,19 +1,17 @@
 import type { CoreMessage, JSONValue, LanguageModelV1 } from "ai";
-import {
-  createDataStreamResponse,
-  generateObject,
-  generateText,
-  streamText,
-} from "ai";
-import { z } from "zod";
+import { createDataStreamResponse, streamText } from "ai";
 
 import type { Namespace } from "@agentset/db";
 
-import type { QueryVectorStoreOptions } from "../vector-store/parse";
+import type {
+  QueryVectorStoreOptions,
+  QueryVectorStoreResult,
+} from "../vector-store/parse";
+import type { Queries } from "./utils";
 // import { AgentsetApiError } from "../api/errors";
 import { NEW_MESSAGE_PROMPT } from "../prompts";
 import { queryVectorStore } from "../vector-store/parse";
-import { GENERATE_QUERIES_PROMPT } from "./prompts";
+import { evaluateQueries, generateQueries } from "./utils";
 
 const agenticPipeline = (
   namespace: Namespace,
@@ -26,6 +24,8 @@ const agenticPipeline = (
     messagesWithoutQuery,
     lastMessage,
     afterQueries,
+    maxEvals = 3,
+    tokenBudget = 8152,
   }: {
     model: LanguageModelV1;
     queryOptions?: Omit<QueryVectorStoreOptions, "query">;
@@ -35,8 +35,15 @@ const agenticPipeline = (
     messagesWithoutQuery: CoreMessage[];
     lastMessage: string;
     afterQueries?: (totalQueries: number) => void;
+    maxEvals?: number;
+    tokenBudget?: number;
   },
 ) => {
+  const messages: CoreMessage[] = [
+    ...messagesWithoutQuery,
+    { role: "user", content: lastMessage },
+  ];
+
   return createDataStreamResponse({
     execute: async (dataStream) => {
       dataStream.writeMessageAnnotation({
@@ -44,47 +51,60 @@ const agenticPipeline = (
         value: "generating-queries",
       });
 
-      const schema = z.object({
-        queries: z.array(
-          z.object({
-            type: z.enum(["keyword", "semantic"]),
-            query: z.string(),
-          }),
-        ),
-      });
-
       // step 1. generate queries
-      const queriesResult = await generateText({
-        model,
-        system: GENERATE_QUERIES_PROMPT,
-        temperature: 0,
-        messages: [
-          ...messagesWithoutQuery,
-          { role: "user", content: lastMessage },
-        ],
-      });
-
-      const queries = schema.parse(JSON.parse(queriesResult.text));
-
-      dataStream.writeMessageAnnotation({
-        type: "status",
-        value: "searching",
-        queries: queries.queries,
-      });
-
+      const queries: Queries = [];
+      const chunks: Record<string, QueryVectorStoreResult["results"][number]> =
+        {};
+      const queryToResult: Record<string, QueryVectorStoreResult> = {};
       let totalQueries = 0;
-      const data = (
-        await Promise.all(
-          queries.queries.map(async (query) => {
-            const queryResult = await queryVectorStore(namespace, {
-              query: query.query,
-              ...(queryOptions ?? { topK: 10 }),
-            });
-            totalQueries++;
-            return queryResult;
-          }),
-        )
-      ).filter((d) => d !== null);
+      const totalTokens = 0;
+
+      for (let i = 0; i < maxEvals; i++) {
+        console.log(`[EVAL LOOP] ${i + 1} / ${maxEvals}`);
+
+        const newQueries = await generateQueries(model, messages, queries);
+        newQueries.forEach((q) => {
+          if (queries.includes(q)) return;
+          queries.push(q);
+        });
+
+        dataStream.writeMessageAnnotation({
+          type: "status",
+          value: "searching",
+          queries: newQueries,
+        });
+
+        const data = (
+          await Promise.all(
+            newQueries.map(async (query) => {
+              const queryResult = await queryVectorStore(namespace, {
+                query: query.query,
+                topK: 50,
+                rerankLimit: 10,
+              });
+              totalQueries++;
+              return queryResult;
+            }),
+          )
+        ).filter((d) => d !== null);
+
+        data.forEach((d) => {
+          queryToResult[d.query] = d;
+
+          d.results.forEach((r) => {
+            if (chunks[r.id]) return;
+            chunks[r.id] = r;
+          });
+        });
+
+        const canAnswer = await evaluateQueries(
+          model,
+          messages,
+          Object.values(chunks),
+        );
+
+        if (canAnswer) break;
+      }
 
       afterQueries?.(totalQueries);
 
@@ -93,20 +113,8 @@ const agenticPipeline = (
         value: "generating-answer",
       });
 
-      const dedupedData = Object.values(
-        data
-          .flatMap((d) => d.results)
-          .reduce(
-            (acc, chunk) => {
-              if (acc[chunk.id]) return acc;
-
-              acc[chunk.id] = chunk;
-              return acc;
-            },
-            {} as Record<string, (typeof data)[number]["results"][number]>,
-          ),
-      );
-
+      // TODO: shrink chunks and only select relevant ones to pass to the LLM
+      const dedupedData = Object.values(chunks);
       const newMessages: CoreMessage[] = [
         ...messagesWithoutQuery,
         {
@@ -137,7 +145,7 @@ const agenticPipeline = (
       dataStream.writeMessageAnnotation({
         type: "agentset_sources",
         value: { results: dedupedData } as unknown as JSONValue,
-        logs: data as unknown as JSONValue,
+        logs: Object.values(queryToResult) as unknown as JSONValue,
       });
       messageStream.mergeIntoDataStream(dataStream);
     },

@@ -26,11 +26,7 @@ export function constructMetadata({
   manifest?: string | URL | null;
 } = {}): Metadata {
   return {
-    title:
-      fullTitle ||
-      (title
-        ? `${title} | Agentset.ai`
-        : "Agentset.ai - AI-powered search for your data"),
+    title: fullTitle || (title ? `${title} | Agentset` : "Agentset Console"),
     description,
     openGraph: {
       title,

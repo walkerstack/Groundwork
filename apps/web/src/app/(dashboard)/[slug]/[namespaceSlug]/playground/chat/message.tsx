@@ -46,7 +46,10 @@ const Annotations = ({
 
   if (statuses.length === 0) return null;
 
-  const queries = statuses.find((s) => !!s.queries)?.queries;
+  const reversed = statuses.reverse();
+  // we reverse the statuses to get the latest queries
+  const queries = reversed.find((s) => !!s.queries)?.queries;
+
   const queryString = queries
     ? queries.map((q, idx) => (
         <i key={idx}>
@@ -56,8 +59,10 @@ const Annotations = ({
       ))
     : null;
 
-  const status = statuses[statuses.length - 1]!;
+  // get the first item (latest) with type status
+  const status = reversed[0]!;
 
+  // TODO: Searched for 1, 2, 3, +x other terms
   return (
     <ShinyText
       className="w-fit font-medium"
@@ -121,7 +126,9 @@ const PurePreviewMessage = ({
           <div
             className={cn(
               "flex w-full flex-col gap-4",
-              requiresScrollPadding ? "min-h-96" : "",
+              requiresScrollPadding && message.role === "assistant"
+                ? "min-h-96"
+                : "",
             )}
           >
             <Annotations

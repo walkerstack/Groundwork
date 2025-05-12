@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useNamespace } from "@/contexts/namespace-context";
 import { useSession } from "@/hooks/use-session";
 import { cn } from "@/lib/utils";
-import { BotIcon, TelescopeIcon } from "lucide-react";
+import { BoxIcon, TelescopeIcon } from "lucide-react";
 import { useShallow } from "zustand/react/shallow";
 
 import { useChatSettings } from "./chat-settings.store";
@@ -43,7 +43,7 @@ const ChatInputModes = memo(() => {
         size="sm"
         type="button"
       >
-        <BotIcon className="size-4" />
+        <BoxIcon className="size-4" />
         Agentic
       </Button>
 
