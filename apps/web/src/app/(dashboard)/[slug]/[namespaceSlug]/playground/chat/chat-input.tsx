@@ -18,7 +18,6 @@ const ChatInputModes = dynamic(() => import("./chat-input-modes"), {
   ssr: false,
   loading: () => (
     <div className="absolute bottom-0 left-0 flex w-fit flex-row justify-end gap-2 p-2">
-      <Skeleton className="h-8 w-18 rounded-full" />
       <Skeleton className="h-8 w-23 rounded-full" />
       <Skeleton className="h-8 w-36 rounded-full" />
     </div>
