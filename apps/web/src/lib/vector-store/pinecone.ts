@@ -23,7 +23,12 @@ export class Pinecone {
     this.namespace = namespace;
   }
 
-  private async makeRequest<T>(method: string, path: string, body?: object) {
+  private async makeRequest<T>(
+    method: string,
+    path: string,
+    body?: object,
+    { includeBody = true }: { includeBody?: boolean } = {},
+  ) {
     const combinedBody = {
       namespace: this.namespace,
       ...body,
@@ -31,15 +36,18 @@ export class Pinecone {
 
     let finalPath = path;
     let finalBody = undefined;
-    if (method === "GET") {
-      const cleanObject = Object.fromEntries(
-        Object.entries(combinedBody as Record<string, string>).filter(
-          ([_, value]) => value !== undefined,
-        ),
-      );
-      finalPath = `${path}?${new URLSearchParams(cleanObject).toString()}`;
-    } else {
-      finalBody = JSON.stringify(combinedBody);
+
+    if (includeBody) {
+      if (method === "GET") {
+        const cleanObject = Object.fromEntries(
+          Object.entries(combinedBody as Record<string, string>).filter(
+            ([_, value]) => value !== undefined,
+          ),
+        );
+        finalPath = `${path}?${new URLSearchParams(cleanObject).toString()}`;
+      } else {
+        finalBody = JSON.stringify(combinedBody);
+      }
     }
 
     const response = await fetch(`${this.indexHost}${finalPath}`, {
@@ -117,6 +125,8 @@ export class Pinecone {
     const response = await this.makeRequest<{ dimensions: number }>(
       "GET",
       "/describe_index_stats",
+      undefined,
+      { includeBody: false },
     );
     return response.dimensions;
   }
