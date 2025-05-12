@@ -80,7 +80,8 @@ const agenticPipeline = (
               const queryResult = await queryVectorStore(namespace, {
                 query: query.query,
                 topK: 50,
-                rerankLimit: 10,
+                rerankLimit: 15,
+                rerank: true,
               });
               totalQueries++;
               return queryResult;
