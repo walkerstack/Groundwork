@@ -14,6 +14,13 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 
 export default function IngestConfig({
@@ -55,6 +62,62 @@ export default function IngestConfig({
                   <FormLabel>Chunk overlap (optional)</FormLabel>
                   <FormControl>
                     <Input placeholder="32" {...field} />
+                  </FormControl>
+
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="chunkingStrategy"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Chunking strategy</FormLabel>
+                  <FormControl>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value ?? "basic"}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select a strategy" />
+                      </SelectTrigger>
+
+                      <SelectContent>
+                        <SelectItem value="basic">Basic</SelectItem>
+                        <SelectItem value="by_title">By title</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="strategy"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Strategy</FormLabel>
+                  <FormControl>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value ?? "auto"}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select a strategy" />
+                      </SelectTrigger>
+
+                      <SelectContent>
+                        <SelectItem value="auto">Auto</SelectItem>
+                        <SelectItem value="fast">Fast</SelectItem>
+                        <SelectItem value="hi_res">Hi-res</SelectItem>
+                        <SelectItem value="ocr_only">OCR only</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </FormControl>
 
                   <FormMessage />

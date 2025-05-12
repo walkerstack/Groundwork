@@ -9,7 +9,6 @@ interface PartitionBody {
 
   filename: string;
   extra_metadata?: Record<string, unknown>;
-  // tokenizer_model?: PrismaJson.NamespaceEmbeddingConfig["model"];
   batch_size?: number; // default to 5
   unstructured_args?: {
     overlap?: number;
@@ -62,17 +61,18 @@ export const getPartitionDocumentBody = async (
       unstructuredArgs.new_after_n_chars = ingestJob.config.chunkSize;
     }
 
-    // chunking_strategy: basic, by_title
-    // strategy: auto, fast, hi_res, ocr_only
+    if (ingestJob.config.chunkingStrategy) {
+      unstructuredArgs.chunking_strategy = ingestJob.config.chunkingStrategy;
+    }
+
+    if (ingestJob.config.strategy) {
+      unstructuredArgs.strategy = ingestJob.config.strategy;
+    }
   }
 
   if (Object.keys(unstructuredArgs).length > 0) {
     body.unstructured_args = unstructuredArgs;
   }
-
-  // if (namespace.embeddingConfig?.model) {
-  //   body.tokenizer_model = namespace.embeddingConfig.model;
-  // }
 
   body.batch_size = 30;
 

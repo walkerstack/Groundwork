@@ -82,6 +82,15 @@ export const configSchema = z
       .record(z.string(), z.unknown())
       .optional()
       .describe("Custom metadata to be added to the ingested documents."),
+    chunkingStrategy: z
+      .enum(["basic", "by_title"])
+      .optional()
+      .describe("The chunking strategy to use. Defaults to `basic`."),
+    strategy: z
+      .enum(["auto", "fast", "hi_res", "ocr_only"])
+      .optional()
+      .describe("The strategy to use. Defaults to `auto`."),
+    // languages: z.array(z.string()).optional().describe("The languages to use."),
   })
   .describe("The ingest job config.");
 
