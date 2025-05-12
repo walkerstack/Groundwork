@@ -7,5 +7,5 @@ A good keyword search query contains one (or max two) words that are key to find
 
 The results should be returned in the format: 
 
-{"queries": [{type: 'keyword', query: '...'}, ...]}
+{"queries": [{"type": "keyword", "query": "..."}, ...]}
 `;

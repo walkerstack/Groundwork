@@ -47,8 +47,13 @@ const Annotations = ({
 
   const queries = statuses.find((s) => !!s.queries)?.queries;
   const queryString = queries
-    ? queries.map((q) => `"${q.query}"`).join(", ")
-    : "";
+    ? queries.map((q, idx) => (
+        <i key={idx}>
+          {q.query}
+          {idx < queries.length - 1 && ", "}
+        </i>
+      ))
+    : null;
 
   const status = statuses[statuses.length - 1]!;
 
@@ -61,10 +66,11 @@ const Annotations = ({
       {isLoading
         ? {
             "generating-queries": "Generating queries...",
-            searching: "Searching: ",
-            "generating-answer": "Generating answer: ",
-          }[status.value] + queryString
-        : "Answered using: " + queryString}
+            searching: "Searching for ",
+            "generating-answer": "Searched for ",
+          }[status.value]
+        : "Searched for "}
+      {queryString}
     </ShinyText>
   );
 };
