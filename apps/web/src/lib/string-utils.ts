@@ -46,3 +46,7 @@ export function camelCaseToWords(str: string) {
     .map(capitalize)
     .join(" ");
 }
+
+export function sanitizeText(text: string) {
+  return text.replaceAll("<has_function_call>", "");
+}

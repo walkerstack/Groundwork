@@ -1,32 +1,55 @@
-import type { RefObject } from "react";
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
+import { create } from "zustand";
 
-export function useScrollToBottom<T extends HTMLElement>(): [
-  RefObject<T | null>,
-  RefObject<T | null>,
-] {
-  const containerRef = useRef<T | null>(null);
-  const endRef = useRef<T | null>(null);
+type ScrollFlag = ScrollBehavior | false;
+
+const useScrollStore = create<{
+  isAtBottom: boolean;
+  scrollBehavior: ScrollFlag;
+  setIsAtBottom: (isAtBottom: boolean) => void;
+  setScrollBehavior: (scrollBehavior: ScrollFlag) => void;
+}>((set) => ({
+  isAtBottom: false,
+  setIsAtBottom: (isAtBottom: boolean) => set({ isAtBottom }),
+  scrollBehavior: false,
+  setScrollBehavior: (scrollBehavior: ScrollFlag) => set({ scrollBehavior }),
+}));
+
+export function useScrollToBottom() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const endRef = useRef<HTMLDivElement>(null);
+
+  const { isAtBottom, scrollBehavior, setIsAtBottom, setScrollBehavior } =
+    useScrollStore();
 
   useEffect(() => {
-    const container = containerRef.current;
-    const end = endRef.current;
-
-    if (container && end) {
-      const observer = new MutationObserver(() => {
-        end.scrollIntoView({ behavior: "instant", block: "end" });
-      });
-
-      observer.observe(container, {
-        childList: true,
-        subtree: true,
-        attributes: true,
-        characterData: true,
-      });
-
-      return () => observer.disconnect();
+    if (scrollBehavior) {
+      endRef.current?.scrollIntoView({ behavior: scrollBehavior });
+      setScrollBehavior(false);
     }
-  }, []);
+  }, [setScrollBehavior, scrollBehavior]);
 
-  return [containerRef, endRef];
+  const scrollToBottom = useCallback(
+    (scrollBehavior: ScrollBehavior = "smooth") => {
+      setScrollBehavior(scrollBehavior);
+    },
+    [setScrollBehavior],
+  );
+
+  function onViewportEnter() {
+    setIsAtBottom(true);
+  }
+
+  function onViewportLeave() {
+    setIsAtBottom(false);
+  }
+
+  return {
+    containerRef,
+    endRef,
+    isAtBottom,
+    scrollToBottom,
+    onViewportEnter,
+    onViewportLeave,
+  };
 }

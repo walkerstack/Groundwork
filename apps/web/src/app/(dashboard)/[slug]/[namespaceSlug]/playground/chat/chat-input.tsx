@@ -9,8 +9,10 @@ import dynamic from "next/dynamic";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
+import { useScrollToBottom } from "@/hooks/use-scroll-to-bottom";
 import { cn } from "@/lib/utils";
-import { ArrowUpIcon } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import { ArrowDownIcon, ArrowUpIcon } from "lucide-react";
 import { toast } from "sonner";
 import { useLocalStorage, useWindowSize } from "usehooks-ts";
 
@@ -101,8 +103,41 @@ function PureMultimodalInput({
     }
   }, [handleSubmit, setLocalStorageInput, width]);
 
+  const { isAtBottom, scrollToBottom } = useScrollToBottom();
+
+  useEffect(() => {
+    if (status === "submitted") {
+      scrollToBottom();
+    }
+  }, [status, scrollToBottom]);
+
   return (
     <div className="relative flex w-full flex-col gap-4">
+      <AnimatePresence>
+        {!isAtBottom && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 10 }}
+            transition={{ type: "spring", stiffness: 300, damping: 20 }}
+            className="absolute bottom-32 left-1/2 z-50 -translate-x-1/2"
+          >
+            <Button
+              data-testid="scroll-to-bottom-button"
+              className="rounded-full"
+              size="icon"
+              variant="outline"
+              onClick={(event) => {
+                event.preventDefault();
+                scrollToBottom();
+              }}
+            >
+              <ArrowDownIcon className="size-4" />
+            </Button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <Textarea
         data-testid="multimodal-input"
         ref={textareaRef}

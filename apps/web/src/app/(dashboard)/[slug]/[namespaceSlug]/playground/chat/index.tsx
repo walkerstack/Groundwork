@@ -22,7 +22,6 @@ export default function Chat() {
       <Messages
         chatId={id}
         status={status}
-        // votes={votes}
         messages={messages}
         setMessages={setMessages}
         reload={reload}

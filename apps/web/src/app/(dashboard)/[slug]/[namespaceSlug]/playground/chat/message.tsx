@@ -10,6 +10,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { sanitizeText } from "@/lib/string-utils";
 import { cn } from "@/lib/utils";
 import equal from "fast-deep-equal";
 import { AnimatePresence, motion } from "framer-motion";
@@ -78,19 +79,19 @@ const Annotations = ({
 const PurePreviewMessage = ({
   chatId,
   message,
-  // vote,
   isLoading,
   setMessages,
   reload,
   isReadonly,
+  requiresScrollPadding,
 }: {
   chatId: string;
   message: UIMessage;
-  // vote: Vote | undefined;
   isLoading: boolean;
   setMessages: UseChatHelpers["setMessages"];
   reload: UseChatHelpers["reload"];
   isReadonly: boolean;
+  requiresScrollPadding: boolean;
 }) => {
   const [mode, setMode] = useState<"view" | "edit">("view");
 
@@ -106,25 +107,28 @@ const PurePreviewMessage = ({
         <div
           className={cn(
             "flex w-full gap-4 group-data-[role=user]/message:ml-auto group-data-[role=user]/message:max-w-2xl",
-            {
-              "w-full": mode === "edit",
-              "group-data-[role=user]/message:w-fit": mode !== "edit",
-            },
+            mode === "edit" ? "w-full" : "group-data-[role=user]/message:w-fit",
           )}
         >
           {message.role === "assistant" && (
             <div className="ring-border bg-background flex size-8 shrink-0 items-center justify-center rounded-full ring-1">
               <div className="translate-y-px">
-                <SparklesIcon size={14} />
+                <SparklesIcon className="size-3.5" />
               </div>
             </div>
           )}
 
-          <div className="flex w-full flex-col gap-4">
+          <div
+            className={cn(
+              "flex w-full flex-col gap-4",
+              requiresScrollPadding ? "min-h-96" : "",
+            )}
+          >
             <Annotations
               annotations={message.annotations}
               isLoading={isLoading}
             />
+
             {message.parts.map((part, index) => {
               const { type } = part;
               const key = `message-${message.id}-part-${index}`;
@@ -149,10 +153,9 @@ const PurePreviewMessage = ({
                             <Button
                               data-testid="message-edit-button"
                               variant="ghost"
-                              className="text-muted-foreground h-fit rounded-full px-2 opacity-0 group-hover/message:opacity-100"
-                              onClick={() => {
-                                setMode("edit");
-                              }}
+                              size="icon"
+                              className="text-muted-foreground rounded-full opacity-0 group-hover/message:opacity-100"
+                              onClick={() => setMode("edit")}
                             >
                               <PencilIcon />
                             </Button>
@@ -163,17 +166,18 @@ const PurePreviewMessage = ({
 
                       <div
                         data-testid="message-content"
-                        className={cn("flex flex-col gap-4", {
-                          "bg-primary text-primary-foreground rounded-xl px-3 py-2":
-                            message.role === "user",
-                        })}
+                        className={cn(
+                          "flex flex-col gap-4",
+                          message.role === "user" &&
+                            "bg-primary text-primary-foreground rounded-xl px-3 py-2",
+                        )}
                       >
                         <Markdown
                           annotations={
                             message.annotations as Record<string, unknown>[]
                           }
                         >
-                          {part.text}
+                          {sanitizeText(part.text)}
                         </Markdown>
                       </div>
                     </div>
@@ -270,7 +274,6 @@ const PurePreviewMessage = ({
                 key={`action-${message.id}`}
                 chatId={chatId}
                 message={message}
-                // vote={vote}
                 isLoading={isLoading}
               />
             )}
@@ -289,7 +292,8 @@ export const PreviewMessage = memo(
     if (!equal(prevProps.message.parts, nextProps.message.parts)) return false;
     if (!equal(prevProps.message.annotations, nextProps.message.annotations))
       return false;
-    // if (!equal(prevProps.vote, nextProps.vote)) return false;
+    if (prevProps.requiresScrollPadding !== nextProps.requiresScrollPadding)
+      return false;
 
     return true;
   },
@@ -309,13 +313,11 @@ export const ThinkingMessage = () => {
       <div
         className={cn(
           "flex w-full gap-4 rounded-xl group-data-[role=user]/message:ml-auto group-data-[role=user]/message:w-fit group-data-[role=user]/message:max-w-2xl group-data-[role=user]/message:px-3 group-data-[role=user]/message:py-2",
-          {
-            "group-data-[role=user]/message:bg-muted": true,
-          },
+          "group-data-[role=user]/message:bg-muted",
         )}
       >
         <div className="ring-border flex size-8 shrink-0 items-center justify-center rounded-full ring-1">
-          <SparklesIcon size={14} />
+          <SparklesIcon className="size-3.5" />
         </div>
 
         <div className="flex w-full flex-col gap-2">
