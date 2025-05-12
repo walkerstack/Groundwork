@@ -25,7 +25,7 @@ const agenticPipeline = (
     lastMessage,
     afterQueries,
     maxEvals = 3,
-    tokenBudget = 10_000,
+    tokenBudget = 4096,
   }: {
     model: LanguageModelV1;
     queryOptions?: Omit<QueryVectorStoreOptions, "query">;

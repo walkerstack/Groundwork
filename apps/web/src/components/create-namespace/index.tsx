@@ -69,7 +69,7 @@ export default function CreateNamespaceDialog({
         setStep("details");
 
         if (organization) {
-          router.push(`/${organization.slug}/${data.slug}/get-started`);
+          router.push(`/${organization.slug}/${data.slug}/quick-start`);
         }
 
         void queryClient.invalidateQueries(trpc.organization.all.queryFilter());
