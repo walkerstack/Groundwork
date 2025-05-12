@@ -1,6 +1,4 @@
-import type { Queries } from "./utils";
-
-export const GENERATE_QUERIES_PROMPT = (oldQueries: Queries) => `
+export const GENERATE_QUERIES_PROMPT = `
 Given a user question (or a chat history), list the appropriate search queries to find answers. 
 
 There are two apis to use: keyword search and semantic search. You should return a maximum of 10 queries.
@@ -9,14 +7,6 @@ A good keyword search query contains one (or max two) words that are key to find
 
 The results should be returned in the format: 
 {"queries": [{"type": "keyword", "query": "..."}, ...]}
-
-${
-  oldQueries.length > 0
-    ? `
-The queries you return should be quite different from what was tried so far: 
-` + oldQueries.map((q) => `- ${q.query}`).join("\n")
-    : ""
-}
 `;
 
 export const EVALUATE_QUERIES_PROMPT = `

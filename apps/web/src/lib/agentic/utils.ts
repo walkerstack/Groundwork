@@ -5,6 +5,16 @@ import { z } from "zod";
 import type { QueryVectorStoreResult } from "../vector-store/parse";
 import { EVALUATE_QUERIES_PROMPT, GENERATE_QUERIES_PROMPT } from "./prompts";
 
+export const formatChatHistory = (messages: CoreMessage[]) => {
+  return messages.map((m) => `${m.role}: ${m.content}`).join("\n");
+};
+
+export const formatSources = (sources: QueryVectorStoreResult["results"]) => {
+  return sources
+    .map((s) => `<source_${s.id}>\n${s.text}\n</source_${s.id}>`)
+    .join("\n\n");
+};
+
 const schema = z.object({
   queries: z.array(
     z.object({
@@ -23,12 +33,25 @@ export const generateQueries = async (
 ) => {
   const queriesResult = await generateText({
     model,
-    system: GENERATE_QUERIES_PROMPT(oldQueries),
     temperature: 0,
-    messages,
+    system: GENERATE_QUERIES_PROMPT,
+    prompt: `
+${
+  oldQueries.length > 0
+    ? "The queries you return should be different from these ones that were tried so far:\n" +
+      oldQueries.map((q) => `- ${q.query}`).join("\n")
+    : ""
+}
+
+Chat history:
+${formatChatHistory(messages)}
+`.trim(),
   });
 
-  return schema.parse(JSON.parse(queriesResult.text)).queries;
+  return {
+    queries: schema.parse(JSON.parse(queriesResult.text)).queries,
+    totalTokens: queriesResult.usage.totalTokens || 0,
+  };
 };
 
 const evalSchema = z.object({
@@ -42,21 +65,20 @@ export const evaluateQueries = async (
 ) => {
   const evaluateQueriesResult = await generateText({
     model,
-    system: EVALUATE_QUERIES_PROMPT,
     temperature: 0,
-    messages: [
-      {
-        role: "user",
-        content: `
+    system: EVALUATE_QUERIES_PROMPT,
+    prompt: `
 Chat history:
-${messages.map((m) => `${m.role}: ${m.content}`).join("\n")}
+${formatChatHistory(messages)}
 
 Retrieved sources:
-${sources.map((s, idx) => `<source_${idx}>\n${s.text}\n</source_${idx}>`).join("\n\n")}
-        `,
-      },
-    ],
+${formatSources(sources)}
+ `,
   });
 
-  return evalSchema.parse(JSON.parse(evaluateQueriesResult.text)).canAnswer;
+  return {
+    canAnswer: evalSchema.parse(JSON.parse(evaluateQueriesResult.text))
+      .canAnswer,
+    totalTokens: evaluateQueriesResult.usage.totalTokens || 0,
+  };
 };

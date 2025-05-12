@@ -11,7 +11,7 @@ import type { Queries } from "./utils";
 // import { AgentsetApiError } from "../api/errors";
 import { NEW_MESSAGE_PROMPT } from "../prompts";
 import { queryVectorStore } from "../vector-store/parse";
-import { evaluateQueries, generateQueries } from "./utils";
+import { evaluateQueries, formatSources, generateQueries } from "./utils";
 
 const agenticPipeline = (
   namespace: Namespace,
@@ -25,7 +25,7 @@ const agenticPipeline = (
     lastMessage,
     afterQueries,
     maxEvals = 3,
-    tokenBudget = 8152,
+    tokenBudget = 10_000,
   }: {
     model: LanguageModelV1;
     queryOptions?: Omit<QueryVectorStoreOptions, "query">;
@@ -57,16 +57,19 @@ const agenticPipeline = (
         {};
       const queryToResult: Record<string, QueryVectorStoreResult> = {};
       let totalQueries = 0;
-      const totalTokens = 0;
+      let totalTokens = 0;
 
       for (let i = 0; i < maxEvals; i++) {
         console.log(`[EVAL LOOP] ${i + 1} / ${maxEvals}`);
 
-        const newQueries = await generateQueries(model, messages, queries);
+        const { queries: newQueries, totalTokens: queriesTokens } =
+          await generateQueries(model, messages, queries);
         newQueries.forEach((q) => {
           if (queries.includes(q)) return;
           queries.push(q);
         });
+
+        totalTokens += queriesTokens;
 
         dataStream.writeMessageAnnotation({
           type: "status",
@@ -98,13 +101,14 @@ const agenticPipeline = (
           });
         });
 
-        const canAnswer = await evaluateQueries(
+        const { canAnswer, totalTokens: evalsTokens } = await evaluateQueries(
           model,
           messages,
           Object.values(chunks),
         );
+        totalTokens += evalsTokens;
 
-        if (canAnswer) break;
+        if (canAnswer || totalTokens >= tokenBudget) break;
       }
 
       afterQueries?.(totalQueries);
@@ -121,12 +125,7 @@ const agenticPipeline = (
         {
           role: "user",
           content: NEW_MESSAGE_PROMPT.compile({
-            chunks: dedupedData
-              .map(
-                (chunk, idx) =>
-                  `<chunk_${idx + 1}>\n${chunk.text}\n</chunk_${idx + 1}>`,
-              )
-              .join("\n\n"),
+            chunks: formatSources(dedupedData),
             // put the original query in the message to help with context
             query: `<query>${lastMessage}</query>`,
           }),
