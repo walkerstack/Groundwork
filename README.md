@@ -18,6 +18,9 @@
 <p align="center">
   <a href="https://github.com/agentset-ai/agentset/blob/main/LICENSE.md">
     <img src="https://img.shields.io/github/license/agentset-ai/agentset?label=license&logo=github&color=000&logoColor=fff" alt="License" />
+  </a> ·
+  <a href="https://github.com/agentset-ai/agentset">
+    <img src="https://img.shields.io/github/stars/agentset-ai/agentset" alt="Stars" />
   </a>
 </p>
 
