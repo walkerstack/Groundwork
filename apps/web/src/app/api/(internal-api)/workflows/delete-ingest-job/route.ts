@@ -129,9 +129,11 @@ export const { POST } = serve<DeleteIngestJobBody>(
         await db.$transaction([
           db.ingestJob.delete({
             where: { id: ingestJob.id },
+            select: { id: true },
           }),
           db.namespace.update({
             where: { id: namespace.id },
+            select: { id: true },
             data: {
               totalIngestJobs: { decrement: 1 },
               organization: {
@@ -152,9 +154,13 @@ export const { POST } = serve<DeleteIngestJobBody>(
 
         if (!job) {
           await db.$transaction([
-            db.namespace.delete({ where: { id: namespace.id } }),
+            db.namespace.delete({
+              where: { id: namespace.id },
+              select: { id: true },
+            }),
             db.organization.update({
               where: { id: namespace.organizationId },
+              select: { id: true },
               data: { totalNamespaces: { decrement: 1 } },
             }),
           ]);

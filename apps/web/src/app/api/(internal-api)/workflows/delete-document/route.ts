@@ -135,11 +135,25 @@ export const { POST } = serve<DeleteDocumentBody>(
 
         if (!document) {
           // TODO: delete payload
-          await db.ingestJob
-            .delete({
-              where: { id: ingestJob.id },
-              select: { id: true },
-            })
+          await db
+            .$transaction([
+              db.ingestJob.delete({
+                where: { id: ingestJob.id },
+                select: { id: true },
+              }),
+              db.namespace.update({
+                where: { id: namespace.id },
+                select: { id: true },
+                data: {
+                  totalIngestJobs: { decrement: 1 },
+                  organization: {
+                    update: {
+                      totalIngestJobs: { decrement: 1 },
+                    },
+                  },
+                },
+              }),
+            ])
             .catch((e) => {
               if (e.code === "P2025") {
                 return null; // already deleted
@@ -164,9 +178,13 @@ export const { POST } = serve<DeleteDocumentBody>(
 
         if (!job) {
           await db.$transaction([
-            db.namespace.delete({ where: { id: namespace.id } }),
+            db.namespace.delete({
+              where: { id: namespace.id },
+              select: { id: true },
+            }),
             db.organization.update({
               where: { id: namespace.organizationId },
+              select: { id: true },
               data: { totalNamespaces: { decrement: 1 } },
             }),
           ]);
