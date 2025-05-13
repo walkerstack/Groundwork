@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useParams, usePathname } from "next/navigation";
+import { useParams, usePathname, useRouter } from "next/navigation";
 import {
   Collapsible,
   CollapsibleContent,
@@ -38,6 +38,7 @@ export function NavItems({
   items: SidebarItemType[];
   label?: string;
 } & React.ComponentPropsWithoutRef<typeof SidebarGroup>) {
+  const router = useRouter();
   const { slug, namespaceSlug } = useParams();
   const { isAdmin } = useOrganization();
 
@@ -71,7 +72,13 @@ export function NavItems({
                 tooltip={item.title}
                 isActive={isActive(url, item.exact)}
               >
-                <Link href={url} target={item.external ? "_blank" : undefined}>
+                <Link
+                  href={url}
+                  target={item.external ? "_blank" : undefined}
+                  onMouseEnter={() => {
+                    router.prefetch(url);
+                  }}
+                >
                   {item.icon && <item.icon />}
                   <span>{item.title}</span>
                   {item.external && <ArrowUpRightIcon className="ml-auto" />}
