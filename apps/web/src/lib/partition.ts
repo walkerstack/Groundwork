@@ -1,8 +1,10 @@
+import { v4 as uuidv4 } from "uuid";
+
 import type { Document, IngestJob, Namespace } from "@agentset/db";
 
 import { presignGetUrl } from "./s3";
 
-interface PartitionBody {
+export interface PartitionBody {
   // one of url or text is required
   url?: string;
   text?: string;
@@ -19,6 +21,8 @@ interface PartitionBody {
     strategy?: "auto" | "fast" | "hi_res" | "ocr_only";
     languages?: string[];
   };
+
+  notify_id: string;
 }
 
 export const getPartitionDocumentBody = async (
@@ -26,7 +30,9 @@ export const getPartitionDocumentBody = async (
   ingestJob: IngestJob,
   namespace: Pick<Namespace, "id" | "embeddingConfig">,
 ) => {
-  const body: Partial<PartitionBody> = {};
+  const body: Partial<PartitionBody> = {
+    notify_id: `partition-${uuidv4()}`,
+  };
 
   if (document.source.type === "TEXT") {
     body.text = document.source.text;
@@ -76,5 +82,5 @@ export const getPartitionDocumentBody = async (
 
   body.batch_size = 30;
 
-  return body;
+  return body as PartitionBody;
 };

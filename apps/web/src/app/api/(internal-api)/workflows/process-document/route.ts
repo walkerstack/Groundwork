@@ -1,3 +1,4 @@
+import type { PartitionBody } from "@/lib/partition";
 import type { TriggerDocumentJobBody } from "@/lib/workflow";
 import type { PartitionBatch, PartitionResult } from "@/types/partition";
 import type { WorkflowContext } from "@upstash/workflow";
@@ -50,6 +51,52 @@ const handleDocumentError = async (
   await updateDocumentStatusFailed(documentId, error);
 };
 
+const partitionDocument = async (
+  partitionBody: PartitionBody,
+  context: WorkflowContext<TriggerDocumentJobBody>,
+) => {
+  const { body, status } = await context.call<{ call_id: string } | undefined>(
+    "partition-document",
+    {
+      url: env.PARTITION_API_URL,
+      method: "POST",
+      headers: {
+        "api-key": env.PARTITION_API_KEY,
+      },
+      body: partitionBody,
+    },
+  );
+
+  if (status !== 200 || !body?.call_id) {
+    return {
+      result: null,
+      error: "Partition error",
+    };
+  }
+
+  // Step 2: Wait for the document to be processed
+  const { eventData, timeout } = await context.waitForEvent(
+    "wait-for-partition-processing",
+    partitionBody.notify_id,
+    {
+      timeout: "2h", // 2 hour timeout
+    },
+  );
+
+  const typedData = eventData as PartitionResult | undefined;
+  if (timeout || !typedData || typedData.status !== 200) {
+    return {
+      result: null,
+      error: "Partition error",
+    };
+  }
+
+  return {
+    result: typedData,
+    error: null,
+  } as const;
+};
+
 export const { POST } = serve<TriggerDocumentJobBody>(
   async (context) => {
     const {
@@ -87,26 +134,13 @@ export const { POST } = serve<TriggerDocumentJobBody>(
       },
     );
 
-    const { body, status } = await context.call<PartitionResult>(
-      "partition-document",
-      {
-        url: env.PARTITION_API_URL,
-        method: "POST",
-        timeout: "2h",
-        headers: {
-          "api-key": env.PARTITION_API_KEY,
-        },
-        body: partitionBody,
-      },
+    const { result: body, error } = await partitionDocument(
+      partitionBody,
+      context,
     );
 
-    if (status !== 200 || body.status !== 200) {
-      const errorMessage =
-        !!body && typeof body === "object" && "message" in body
-          ? (body.message as string)
-          : "Partition error";
-
-      await handleDocumentError(document.id, errorMessage, context);
+    if (error || !body) {
+      await handleDocumentError(document.id, error, context);
       return;
     }
 

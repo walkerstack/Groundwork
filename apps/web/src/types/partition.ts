@@ -1,5 +1,5 @@
 export type PartitionResult = {
-  status: 200;
+  status: number; // 200
   metadata: {
     filename: string;
     filetype: string;
