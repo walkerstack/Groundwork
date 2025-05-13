@@ -199,17 +199,17 @@ importers:
         specifier: 'catalog:'
         version: 11.1.0(@tanstack/react-query@5.69.0(react@19.1.0))(@trpc/client@11.1.0(@trpc/server@11.1.0(typescript@5.8.2))(typescript@5.8.2))(@trpc/server@11.1.0(typescript@5.8.2))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(typescript@5.8.2)
       '@upstash/qstash':
-        specifier: ^2.7.22
-        version: 2.7.22
+        specifier: ^2.8.1
+        version: 2.8.1
       '@upstash/ratelimit':
         specifier: ^2.0.5
-        version: 2.0.5(@upstash/redis@1.34.6)
+        version: 2.0.5(@upstash/redis@1.34.9)
       '@upstash/redis':
-        specifier: ^1.34.6
-        version: 1.34.6
+        specifier: ^1.34.9
+        version: 1.34.9
       '@upstash/workflow':
-        specifier: ^0.2.12
-        version: 0.2.12(react@19.1.0)
+        specifier: ^0.2.13
+        version: 0.2.13(react@19.1.0)
       '@vercel/functions':
         specifier: ^2.0.0
         version: 2.0.0(@aws-sdk/credential-provider-web-identity@3.772.0)
@@ -3337,19 +3337,19 @@ packages:
     resolution: {integrity: sha512-7qJHGxpQgQr9/vmeS1PktEwvNAF7TI4iJDi8Pu2CFZ9YUGHZH4fOP5TfYlZ4aVxfopnELiE4BS4FBjyK7V1/xQ==}
     engines: {node: '>=16.0.0'}
 
-  '@upstash/qstash@2.7.22':
-    resolution: {integrity: sha512-JFmISZd9U3hTI03ZNLBKrel3r61ojp+ZejBio9ECUAPAdDK8sU5nwXq/drkM1M789a8KFsZ2nKSOKY4gxI8DoQ==}
+  '@upstash/qstash@2.8.1':
+    resolution: {integrity: sha512-E+JoLHMqygQksWATjS/9AAo7Mhi/k21Tu0zDwMm9GyNyNVjEJntQvmrH5NC7x6kXwjCDTEWFtIWz0JXu9/9pMQ==}
 
   '@upstash/ratelimit@2.0.5':
     resolution: {integrity: sha512-1FRv0cs3ZlBjCNOCpCmKYmt9BYGIJf0J0R3pucOPE88R21rL7jNjXG+I+rN/BVOvYJhI9niRAS/JaSNjiSICxA==}
     peerDependencies:
       '@upstash/redis': ^1.34.3
 
-  '@upstash/redis@1.34.6':
-    resolution: {integrity: sha512-/ic+NszsXyIl2P8aExL7xETxgmzyhn6txG4senGDgd524bypGEJs1TMzLDeOV+PFVuacc10wZVJLIj6aRZZNaw==}
+  '@upstash/redis@1.34.9':
+    resolution: {integrity: sha512-7qzzF2FQP5VxR2YUNjemWs+hl/8VzJJ6fOkT7O7kt9Ct8olEVzb1g6/ik6B8Pb8W7ZmYv81SdlVV9F6O8bh/gw==}
 
-  '@upstash/workflow@0.2.12':
-    resolution: {integrity: sha512-bnpK1QR8sIS3LzcYaw+1d9fl5cyve7cYhBy23xo3tUK/NEHTx703NbssuYNXu8vOGQ3j0FHf8SgPPp25dMQ/Kw==}
+  '@upstash/workflow@0.2.13':
+    resolution: {integrity: sha512-TX2fOPnAWgW6ky7MoC9OCgVIu7rB1BRqfP+c8ILziR/I5vdpky5mrHvpSJq28Vqsq+rso0pyLW4Dmle1Hk56Rw==}
 
   '@vercel/functions@2.0.0':
     resolution: {integrity: sha512-BSwIihLHoV18gerKZJyGuqd3rtaYM6rJvET1kOwKktshucyaHXTJel7Cxegs+sdX0NZqsX4LO2MFnMU2jG01Cw==}
@@ -9817,27 +9817,27 @@ snapshots:
 
   '@upstash/core-analytics@0.0.10':
     dependencies:
-      '@upstash/redis': 1.34.6
+      '@upstash/redis': 1.34.9
 
-  '@upstash/qstash@2.7.22':
+  '@upstash/qstash@2.8.1':
     dependencies:
       crypto-js: 4.2.0
       jose: 5.10.0
       neverthrow: 7.2.0
 
-  '@upstash/ratelimit@2.0.5(@upstash/redis@1.34.6)':
+  '@upstash/ratelimit@2.0.5(@upstash/redis@1.34.9)':
     dependencies:
       '@upstash/core-analytics': 0.0.10
-      '@upstash/redis': 1.34.6
+      '@upstash/redis': 1.34.9
 
-  '@upstash/redis@1.34.6':
+  '@upstash/redis@1.34.9':
     dependencies:
       crypto-js: 4.2.0
 
-  '@upstash/workflow@0.2.12(react@19.1.0)':
+  '@upstash/workflow@0.2.13(react@19.1.0)':
     dependencies:
       '@ai-sdk/openai': 1.2.6(zod@3.24.2)
-      '@upstash/qstash': 2.7.22
+      '@upstash/qstash': 2.8.1
       ai: 4.1.63(react@19.1.0)(zod@3.24.2)
       zod: 3.24.2
     transitivePeerDependencies:
