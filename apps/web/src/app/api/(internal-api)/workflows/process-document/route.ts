@@ -1,5 +1,6 @@
 import type { TriggerDocumentJobBody } from "@/lib/workflow";
 import type { PartitionBatch, PartitionResult } from "@/types/partition";
+import type { WorkflowContext } from "@upstash/workflow";
 import { env } from "@/env";
 import { makeChunk } from "@/lib/chunk";
 import { getNamespaceEmbeddingModel } from "@/lib/embedding";
@@ -12,6 +13,42 @@ import { serve } from "@upstash/workflow/nextjs";
 import { embedMany } from "ai";
 
 import { db, DocumentStatus, IngestJobStatus } from "@agentset/db";
+
+const updateDocumentStatusFailed = async (
+  documentId: string,
+  error?: string,
+) => {
+  await db.document.update({
+    where: { id: documentId },
+    data: {
+      status: DocumentStatus.FAILED,
+      error: error || "Unknown error",
+      failedAt: new Date(),
+      ingestJob: {
+        update: {
+          status: IngestJobStatus.FAILED,
+          failedAt: new Date(),
+          error: error || "Unknown error",
+        },
+      },
+    },
+    select: { id: true },
+  });
+};
+
+const handleDocumentError = async (
+  documentId: string,
+  error?: string,
+  context?: WorkflowContext<TriggerDocumentJobBody>,
+) => {
+  if (context) {
+    return context.run("update-document-status-failed", async () => {
+      await updateDocumentStatusFailed(documentId, error);
+    });
+  }
+
+  await updateDocumentStatusFailed(documentId, error);
+};
 
 export const { POST } = serve<TriggerDocumentJobBody>(
   async (context) => {
@@ -55,6 +92,7 @@ export const { POST } = serve<TriggerDocumentJobBody>(
       {
         url: env.PARTITION_API_URL,
         method: "POST",
+        timeout: "2h",
         headers: {
           "api-key": env.PARTITION_API_KEY,
         },
@@ -63,12 +101,13 @@ export const { POST } = serve<TriggerDocumentJobBody>(
     );
 
     if (status !== 200 || body.status !== 200) {
-      throw new Error(
+      const errorMessage =
         !!body && typeof body === "object" && "message" in body
           ? (body.message as string)
-          : "Partition error",
-        { cause: body },
-      );
+          : "Partition error";
+
+      await handleDocumentError(document.id, errorMessage, context);
+      return;
     }
 
     // change status to processing
@@ -146,6 +185,7 @@ export const { POST } = serve<TriggerDocumentJobBody>(
             status: DocumentStatus.COMPLETED,
             totalTokens,
             completedAt: new Date(),
+            failedAt: null,
             error: null,
           },
           select: { id: true },
@@ -181,6 +221,7 @@ export const { POST } = serve<TriggerDocumentJobBody>(
           data: {
             status: IngestJobStatus.COMPLETED,
             completedAt: new Date(),
+            failedAt: null,
             error: null,
           },
           select: { id: true },
@@ -206,23 +247,7 @@ export const { POST } = serve<TriggerDocumentJobBody>(
     failureFunction: async ({ context, failResponse }) => {
       if (context.requestPayload && context.requestPayload.documentId) {
         const { documentId } = context.requestPayload;
-
-        await db.document.update({
-          where: { id: documentId },
-          data: {
-            status: DocumentStatus.FAILED,
-            error: failResponse || "Unknown error",
-            failedAt: new Date(),
-            ingestJob: {
-              update: {
-                status: IngestJobStatus.FAILED,
-                failedAt: new Date(),
-                error: failResponse || "Unknown error",
-              },
-            },
-          },
-          select: { id: true },
-        });
+        await handleDocumentError(documentId, failResponse);
       }
     },
     qstashClient: qstashClient,

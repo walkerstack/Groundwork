@@ -6,8 +6,8 @@ import { namespaceItems } from "./links";
 import { NavItems } from "./nav-items";
 
 export function NavNamespace() {
-  const slug = useParams().namespaceSlug;
-  if (!slug) return null;
+  const { namespaceSlug } = useParams();
+  if (!namespaceSlug) return null;
 
   return <NavItems items={namespaceItems} />;
 }

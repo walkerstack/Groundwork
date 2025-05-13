@@ -4,6 +4,11 @@ import type { BadgeProps } from "@/components/ui/badge";
 import type { ColumnDef } from "@tanstack/react-table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { capitalize } from "@/lib/string-utils";
 import { formatMs } from "@/lib/utils";
 import { ChevronDownIcon, ChevronRightIcon } from "lucide-react";
@@ -22,6 +27,8 @@ export interface JobCol {
   config: IngestJob["config"];
   tenantId?: IngestJob["tenantId"];
   completedAt?: IngestJob["completedAt"];
+  failedAt?: IngestJob["failedAt"];
+  error?: IngestJob["error"];
   queuedAt?: IngestJob["queuedAt"];
   createdAt: IngestJob["createdAt"];
 }
@@ -110,13 +117,22 @@ export const columns: ColumnDef<JobCol>[] = [
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => {
-      return (
+      const badge = (
         <Badge
           variant={statusToBadgeVariant(row.original.status)}
           className="capitalize"
         >
           {row.original.status.toLowerCase()}
         </Badge>
+      );
+
+      if (!row.original.error) return badge;
+
+      return (
+        <Tooltip>
+          <TooltipTrigger asChild>{badge}</TooltipTrigger>
+          <TooltipContent>{row.original.error}</TooltipContent>
+        </Tooltip>
       );
     },
   },
@@ -131,13 +147,11 @@ export const columns: ColumnDef<JobCol>[] = [
     id: "duration",
     header: "Duration",
     cell: ({ row }) => {
+      const finishDate = row.original.completedAt ?? row.original.failedAt;
       return (
         <p>
-          {row.original.completedAt && row.original.queuedAt
-            ? formatMs(
-                row.original.completedAt.getTime() -
-                  row.original.queuedAt.getTime(),
-              )
+          {finishDate && row.original.queuedAt
+            ? formatMs(finishDate.getTime() - row.original.queuedAt.getTime())
             : "-"}
         </p>
       );

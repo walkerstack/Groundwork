@@ -18,13 +18,17 @@ import DocumentActions from "./document-actions";
 export interface DocumentCol {
   id: string;
   status: DocumentStatus;
-  name?: string | null;
+  name?: Document["name"];
   source: Document["source"];
   totalChunks: number;
   totalCharacters: number;
   totalTokens: number;
+  totalPages: number;
   documentProperties?: Document["documentProperties"];
-  completedAt?: Date | null;
+  failedAt?: Document["failedAt"];
+  error?: Document["error"];
+  completedAt?: Document["completedAt"];
+  queuedAt?: Document["queuedAt"];
   createdAt: Date;
 }
 
@@ -132,6 +136,13 @@ export const documentColumns: ColumnDef<DocumentCol>[] = [
     },
   },
   {
+    accessorKey: "totalPages",
+    header: "Total Pages",
+    cell: ({ row }) => {
+      return <p>{formatNumber(row.original.totalPages, "compact")}</p>;
+    },
+  },
+  {
     id: "size",
     accessorKey: "documentProperties.fileSize",
     header: "Size",
@@ -149,7 +160,7 @@ export const documentColumns: ColumnDef<DocumentCol>[] = [
     id: "status",
     header: "Status",
     cell: ({ row }) => {
-      return (
+      const badge = (
         <Badge
           variant={statusToBadgeVariant(row.original.status)}
           className="capitalize"
@@ -157,19 +168,25 @@ export const documentColumns: ColumnDef<DocumentCol>[] = [
           {row.original.status.toLowerCase()}
         </Badge>
       );
+      if (!row.original.error) return badge;
+
+      return (
+        <Tooltip>
+          <TooltipTrigger asChild>{badge}</TooltipTrigger>
+          <TooltipContent>{row.original.error}</TooltipContent>
+        </Tooltip>
+      );
     },
   },
   {
     id: "duration",
     header: "Duration",
     cell: ({ row }) => {
+      const finishDate = row.original.completedAt ?? row.original.failedAt;
       return (
         <p>
-          {row.original.completedAt
-            ? formatMs(
-                row.original.completedAt.getTime() -
-                  row.original.createdAt.getTime(),
-              )
+          {finishDate && row.original.queuedAt
+            ? formatMs(finishDate.getTime() - row.original.queuedAt.getTime())
             : "-"}
         </p>
       );

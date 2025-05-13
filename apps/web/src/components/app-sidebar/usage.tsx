@@ -9,7 +9,7 @@ import { formatNumber } from "@/lib/utils";
 import { Button } from "../ui/button";
 import { Progress } from "../ui/progress";
 
-export function NavSecondary() {
+export function Usage() {
   const { activeOrganization } = useOrganization();
   const { buttonProps } = useCal();
 

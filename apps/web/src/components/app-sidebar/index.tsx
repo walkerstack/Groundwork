@@ -7,11 +7,11 @@ import {
   SidebarSeparator,
 } from "@/components/ui/sidebar";
 
-import { NavMain } from "./nav-main";
 import { NavNamespace } from "./nav-namespace";
-import { NavSecondary } from "./nav-secondary";
+import { NavOrgSettings } from "./nav-org-settings";
 import { OrganizationSwitcher } from "./org-switcher";
 import { SupportItems } from "./support-items";
+import { Usage } from "./usage";
 
 export type SidebarItemType = {
   title: string;
@@ -37,7 +37,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
 
       <SidebarContent>
-        <NavMain />
+        <NavOrgSettings />
         <NavNamespace />
       </SidebarContent>
 
@@ -48,7 +48,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
       <SidebarSeparator className="mr-0 -ml-2 w-[calc(100%+1rem)]!" />
 
       <SidebarFooter className="pb-5">
-        <NavSecondary />
+        <Usage />
       </SidebarFooter>
     </Sidebar>
   );

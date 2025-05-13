@@ -1,5 +1,7 @@
 import {
   AlertTriangleIcon,
+  BookIcon,
+  CircleHelpIcon,
   CreditCardIcon,
   FilesIcon,
   HelpCircleIcon,
@@ -83,5 +85,20 @@ export const settingsItems: SidebarItemType[] = [
     url: createOrgUrl("/settings/danger"),
     icon: AlertTriangleIcon,
     adminOnly: true,
+  },
+];
+
+export const supportItems: SidebarItemType[] = [
+  {
+    title: "Docs",
+    url: "https://docs.agentset.ai",
+    icon: BookIcon,
+    external: true,
+  },
+  {
+    title: "Help",
+    url: "mailto:support@agentset.ai",
+    icon: CircleHelpIcon,
+    external: true,
   },
 ];
