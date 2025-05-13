@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { DeleteConfirmation } from "@/components/delete-confirmation";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,8 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
-import { useNamespace } from "@/contexts/namespace-context";
+// import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import { TrashIcon } from "lucide-react";
 
@@ -41,11 +39,6 @@ const mockConnectors = [
 ];
 
 export default function ConnectorsPage() {
-  const { activeNamespace } = useNamespace();
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-
-  return <p>Coming Soon</p>;
-
   return (
     <div className="grid grid-cols-3 gap-4">
       {/* <ConnectorSkeleton />
@@ -96,27 +89,27 @@ export default function ConnectorsPage() {
   );
 }
 
-const ConnectorSkeleton = () => {
-  return (
-    <Card>
-      <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-2">
-        <div className="flex flex-col">
-          <Skeleton className="h-4 w-24" />
+// const ConnectorSkeleton = () => {
+//   return (
+//     <Card>
+//       <CardHeader className="flex flex-row items-start justify-between space-y-0 pb-2">
+//         <div className="flex flex-col">
+//           <Skeleton className="h-4 w-24" />
 
-          <CardDescription className="mt-1">
-            <Skeleton className="h-4 w-48" />
-          </CardDescription>
-        </div>
+//           <CardDescription className="mt-1">
+//             <Skeleton className="h-4 w-48" />
+//           </CardDescription>
+//         </div>
 
-        <Skeleton className="h-6 w-6" />
-      </CardHeader>
+//         <Skeleton className="h-6 w-6" />
+//       </CardHeader>
 
-      <CardContent>
-        <div className="flex items-center space-x-2">
-          <Skeleton className="h-2 w-2 rounded-full" />
-          <Skeleton className="h-2 w-24 rounded-full" />
-        </div>
-      </CardContent>
-    </Card>
-  );
-};
+//       <CardContent>
+//         <div className="flex items-center space-x-2">
+//           <Skeleton className="h-2 w-2 rounded-full" />
+//           <Skeleton className="h-2 w-24 rounded-full" />
+//         </div>
+//       </CardContent>
+//     </Card>
+//   );
+// };
