@@ -1,0 +1,90 @@
+import type { QueryVectorStoreResult } from "@/lib/vector-store/parse";
+import type { LanguageModelV1 } from "ai";
+import { formatSources } from "@/lib/agentic/utils";
+import z from "@/lib/zod";
+import { generateText } from "ai";
+
+import {
+  CORRECTNESS_SYSTEM_PROMPT,
+  FAITHFULNESS_SYSTEM_PROMPT,
+  RELEVANCY_SYSTEM_PROMPT,
+  USER_PROMPT,
+} from "./prompts";
+
+const correctnessSchema = z.object({
+  score: z.number(),
+  feedback: z.string(),
+});
+
+export const correctnessEval = async (
+  model: LanguageModelV1,
+  params: {
+    query: string;
+    generatedAnswer: string;
+  },
+) => {
+  const userPrompt = USER_PROMPT.compile({
+    query: params.query,
+    generatedAnswer: params.generatedAnswer,
+  });
+
+  const response = await generateText({
+    model,
+    system: CORRECTNESS_SYSTEM_PROMPT.compile(),
+    prompt: userPrompt,
+    temperature: 0,
+  });
+
+  return {
+    ...correctnessSchema.parse(JSON.parse(response.text)),
+    maxScore: 5,
+  };
+};
+
+const faithfulnessSchema = z.object({
+  faithful: z.boolean(),
+});
+
+export const faithfulnessEval = async (
+  model: LanguageModelV1,
+  params: {
+    query: string;
+    sources: QueryVectorStoreResult["results"];
+  },
+) => {
+  const response = await generateText({
+    model,
+    prompt: FAITHFULNESS_SYSTEM_PROMPT.compile({
+      query: params.query,
+      context: formatSources(params.sources),
+    }),
+    temperature: 0,
+  });
+
+  return faithfulnessSchema.parse(JSON.parse(response.text));
+};
+
+const relevanceSchema = z.object({
+  relevant: z.boolean(),
+});
+
+export const relevanceEval = async (
+  model: LanguageModelV1,
+  params: {
+    query: string;
+    generatedAnswer: string;
+    sources: QueryVectorStoreResult["results"];
+  },
+) => {
+  const response = await generateText({
+    model,
+    prompt: RELEVANCY_SYSTEM_PROMPT.compile({
+      query: params.query,
+      generatedAnswer: params.generatedAnswer,
+      context: formatSources(params.sources),
+    }),
+    temperature: 0,
+  });
+
+  return relevanceSchema.parse(JSON.parse(response.text));
+};

@@ -1,6 +1,7 @@
 import {
   AlertTriangleIcon,
   BookIcon,
+  ChartNoAxesColumnIcon,
   CircleHelpIcon,
   CreditCardIcon,
   FilesIcon,
@@ -50,6 +51,11 @@ export const namespaceItems: SidebarItemType[] = [
     title: "Connectors",
     url: createNamespaceUrl("/connectors"),
     icon: UnplugIcon,
+  },
+  {
+    title: "Benchmarks",
+    url: createNamespaceUrl("/benchmarks"),
+    icon: ChartNoAxesColumnIcon,
   },
   {
     title: "Playground",
