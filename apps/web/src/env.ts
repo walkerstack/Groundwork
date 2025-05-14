@@ -6,11 +6,12 @@ export const env = createEnv({
     NODE_ENV: z
       .enum(["development", "test", "production"])
       .default("development"),
+    NEXT_PUBLIC_HOME_DOMAIN: z.string().url(),
   },
   server: {
     DATABASE_URL: z.string().url(),
-    SUPABASE_URL: z.string().url(),
-    SUPABASE_ANON_KEY: z.string(),
+    SUPABASE_URL: z.string().url().optional(),
+    SUPABASE_ANON_KEY: z.string().optional(),
 
     RESEND_API_KEY: z.string(),
 
@@ -63,6 +64,7 @@ export const env = createEnv({
     NEXT_PUBLIC_STRIPE_PUBLIC_KEY: z.string(),
   },
   runtimeEnv: {
+    NEXT_PUBLIC_HOME_DOMAIN: process.env.NEXT_PUBLIC_HOME_DOMAIN,
     DATABASE_URL: process.env.DATABASE_URL,
     SUPABASE_URL: process.env.SUPABASE_URL,
     SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY,

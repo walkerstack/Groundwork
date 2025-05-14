@@ -6,12 +6,14 @@ import { DefaultLayout } from "../components/default-layout";
 const LoginEmail = ({
   loginLink = "https://portal.example.com/login",
   email = "john@doe.com",
+  domain = "https://app.agentset.ai",
 }: {
   loginLink: string;
   email: string;
+  domain?: string;
 }) => {
   return (
-    <DefaultLayout preview="Login to Agentset" footer={{ email }}>
+    <DefaultLayout preview="Login to Agentset" footer={{ email, domain }}>
       <Text className="text-sm leading-6 text-black">
         Here's your requested login link.
       </Text>

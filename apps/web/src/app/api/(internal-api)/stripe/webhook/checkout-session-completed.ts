@@ -1,5 +1,6 @@
 import type Stripe from "stripe";
 import { limiter } from "@/lib/bottleneck";
+import { HOME_DOMAIN } from "@/lib/constants";
 import { log } from "@/lib/log";
 import { getPlanFromPriceId, planToOrganizationFields } from "@/lib/plans";
 import { sendEmail } from "@/lib/resend";
@@ -88,6 +89,7 @@ export async function checkoutSessionCompleted(event: Stripe.Event) {
             name: user.name,
             email: user.email,
             plan,
+            domain: HOME_DOMAIN,
           }),
           variant: "marketing",
         }),

@@ -8,7 +8,9 @@ export function FailedPayment({
   organization = { name: "Agentset", slug: "agentset" },
   amountDue = 49,
   attemptCount = 2,
+  domain = "https://app.agentset.ai",
 }: {
+  domain?: string;
   user: { name?: string | null; email: string };
   organization: { name: string; slug: string };
   amountDue: number;
@@ -19,7 +21,7 @@ export function FailedPayment({
   }Your payment for Agentset failed`;
 
   return (
-    <DefaultLayout preview={title} footer={{ email: user.email }}>
+    <DefaultLayout preview={title} footer={{ email: user.email, domain }}>
       <Heading className="mx-0 my-7 p-0 text-lg font-medium text-black">
         {attemptCount == 2 ? "2nd " : attemptCount == 3 ? "3rd  " : ""}
         Failed Payment for Agentset
@@ -39,9 +41,7 @@ export function FailedPayment({
       </Text>
 
       <Section className="my-6">
-        <Button
-          href={`https://app.agentset.ai/${organization.slug}/settings/billing`}
-        >
+        <Button href={`${domain}/${organization.slug}/settings/billing`}>
           Update payment information
         </Button>
       </Section>

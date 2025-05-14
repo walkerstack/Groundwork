@@ -8,12 +8,14 @@ export function OrganizationInvite({
   organizationName = "Acme",
   organizationUser = "Brendon Urie",
   organizationUserEmail = "panic@thedis.co",
+  domain = "https://app.agentset.ai",
 }: {
   email: string;
   url: string;
   organizationName: string;
   organizationUser?: string | null;
   organizationUserEmail: string;
+  domain?: string;
 }) {
   const emailLink = (
     <Link
@@ -27,7 +29,7 @@ export function OrganizationInvite({
   return (
     <DefaultLayout
       preview={`Join ${organizationName} on Agentset`}
-      footer={{ email }}
+      footer={{ email, domain }}
     >
       <Heading className="mx-0 my-7 p-0 text-xl font-medium text-black">
         Join {organizationName} on Agentset

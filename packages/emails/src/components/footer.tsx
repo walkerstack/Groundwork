@@ -4,12 +4,14 @@ export type FooterProps = {
   email: string;
   marketing?: boolean;
   notificationSettingsUrl?: string;
+  domain: string;
 };
 
 export function Footer({
   email,
   marketing,
   notificationSettingsUrl,
+  domain,
 }: FooterProps) {
   if (marketing) {
     return (
@@ -20,7 +22,7 @@ export function Footer({
           Don't want to get these emails?{" "}
           <Link
             className="text-neutral-700 underline"
-            href="https://app.agentset.ai/account/settings"
+            href={`${domain}/account/settings`}
           >
             Unsubscribe here.
           </Link>

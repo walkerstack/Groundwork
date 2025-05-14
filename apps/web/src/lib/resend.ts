@@ -2,6 +2,8 @@ import type { CreateEmailOptions } from "resend";
 import { env } from "@/env";
 import { Resend } from "resend";
 
+import { HOME_DOMAIN } from "./constants";
+
 export const resend = new Resend(env.RESEND_API_KEY);
 
 interface ResendEmailOptions extends Omit<CreateEmailOptions, "to" | "from"> {
@@ -40,7 +42,7 @@ export const sendEmail = async (opts: ResendEmailOptions) => {
     scheduledAt,
     ...(variant === "marketing" && {
       headers: {
-        "List-Unsubscribe": "https://app.agentset.ai/account/settings",
+        "List-Unsubscribe": `${HOME_DOMAIN}/account/settings`,
       },
     }),
   });

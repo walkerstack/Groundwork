@@ -9,6 +9,7 @@ export function UpgradeEmail({
     name: "Pro",
     features: [],
   },
+  domain = "https://app.agentset.ai",
 }: {
   name: string | null;
   email: string;
@@ -20,6 +21,7 @@ export function UpgradeEmail({
       tooltip?: { title: string; cta: string; href: string };
     }[];
   };
+  domain?: string;
 }) {
   const finalFeatures = plan.features
     ? plan.features.filter((feature) => !feature.disabled)
@@ -28,7 +30,7 @@ export function UpgradeEmail({
   return (
     <DefaultLayout
       preview={`Thank you for upgrading to Agentset ${plan.name}!`}
-      footer={{ email }}
+      footer={{ email, domain }}
     >
       <Heading className="mx-0 my-7 p-0 text-xl font-medium text-black">
         Thank you for upgrading to Agentset {plan.name}!

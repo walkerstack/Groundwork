@@ -2,12 +2,18 @@ import { cache } from "react";
 import { headers } from "next/headers";
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
-import { admin, magicLink, organization } from "better-auth/plugins";
+import {
+  admin,
+  createAuthMiddleware,
+  magicLink,
+  organization,
+} from "better-auth/plugins";
 
 import { db } from "@agentset/db";
 import { InviteUserEmail, LoginEmail } from "@agentset/emails";
 
 import { env } from "../env";
+import { HOME_DOMAIN } from "./constants";
 import { sendEmail } from "./resend";
 import { getBaseUrl } from "./utils";
 
@@ -37,6 +43,7 @@ export const auth = betterAuth({
             organizationName: organization.name,
             organizationUserEmail: inviter.user.email,
             organizationUser: inviter.user.name,
+            domain: HOME_DOMAIN,
           }),
         });
       },
@@ -46,11 +53,21 @@ export const auth = betterAuth({
         await sendEmail({
           email,
           subject: "Your Agentset login link",
-          react: LoginEmail({ loginLink: url, email }),
+          react: LoginEmail({ loginLink: url, email, domain: HOME_DOMAIN }),
         });
       },
     }),
   ],
+  hooks: {
+    after: createAuthMiddleware(async (ctx) => {
+      if (ctx.path.startsWith("/sign-up")) {
+        const newSession = ctx.context.newSession;
+        if (newSession) {
+          // send an email
+        }
+      }
+    }),
+  },
   database: prismaAdapter(db, {
     provider: "postgresql",
   }),
