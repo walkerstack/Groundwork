@@ -706,7 +706,6 @@
                           "name": {
                             "type": "string",
                             "nullable": true,
-                            "default": null,
                             "description": "The name of the ingest job."
                           }
                         },
@@ -732,7 +731,6 @@
                           "name": {
                             "type": "string",
                             "nullable": true,
-                            "default": null,
                             "description": "The name of the ingest job."
                           }
                         },
@@ -758,7 +756,6 @@
                           "name": {
                             "type": "string",
                             "nullable": true,
-                            "default": null,
                             "description": "The name of the ingest job."
                           }
                         },
@@ -810,6 +807,24 @@
                         "type": "object",
                         "additionalProperties": {},
                         "description": "Custom metadata to be added to the ingested documents."
+                      },
+                      "chunkingStrategy": {
+                        "type": "string",
+                        "enum": [
+                          "basic",
+                          "by_title"
+                        ],
+                        "description": "The chunking strategy to use. Defaults to `basic`."
+                      },
+                      "strategy": {
+                        "type": "string",
+                        "enum": [
+                          "auto",
+                          "fast",
+                          "hi_res",
+                          "ocr_only"
+                        ],
+                        "description": "The strategy to use. Defaults to `auto`."
                       }
                     },
                     "description": "The ingest job config."
@@ -1154,6 +1169,15 @@
               ],
               "default": "desc",
               "description": "The order to sort by. Default is `desc`."
+            }
+          },
+          {
+            "in": "query",
+            "name": "ingestJobId",
+            "description": "The ingest job ID to filter documents by.",
+            "schema": {
+              "type": "string",
+              "description": "The ingest job ID to filter documents by."
             }
           },
           {
@@ -1763,6 +1787,63 @@
               "apiKey"
             ],
             "title": "Azure Embedding Config"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "provider": {
+                "type": "string",
+                "enum": [
+                  "VOYAGE"
+                ]
+              },
+              "model": {
+                "type": "string",
+                "enum": [
+                  "voyage-3-large",
+                  "voyage-3",
+                  "voyage-3-lite",
+                  "voyage-code-3",
+                  "voyage-finance-2",
+                  "voyage-law-2"
+                ]
+              },
+              "apiKey": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "provider",
+              "model",
+              "apiKey"
+            ],
+            "title": "Voyage Embedding Config"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "provider": {
+                "type": "string",
+                "enum": [
+                  "GOOGLE"
+                ]
+              },
+              "model": {
+                "type": "string",
+                "enum": [
+                  "text-embedding-004"
+                ]
+              },
+              "apiKey": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "provider",
+              "model",
+              "apiKey"
+            ],
+            "title": "Google Embedding Config"
           }
         ],
         "description": "The embedding model config. If not provided, our managed embedding model will be used. Note: You can't change the embedding model config after the namespace is created."
@@ -1896,14 +1977,12 @@
                   "name": {
                     "type": "string",
                     "nullable": true,
-                    "default": null,
                     "description": "The name of the ingest job."
                   }
                 },
                 "required": [
                   "type",
-                  "text",
-                  "name"
+                  "text"
                 ],
                 "title": "Text Payload"
               },
@@ -1923,14 +2002,12 @@
                   "name": {
                     "type": "string",
                     "nullable": true,
-                    "default": null,
                     "description": "The name of the ingest job."
                   }
                 },
                 "required": [
                   "type",
-                  "fileUrl",
-                  "name"
+                  "fileUrl"
                 ],
                 "title": "URL Payload"
               },
@@ -1950,14 +2027,12 @@
                   "name": {
                     "type": "string",
                     "nullable": true,
-                    "default": null,
                     "description": "The name of the ingest job."
                   }
                 },
                 "required": [
                   "type",
-                  "key",
-                  "name"
+                  "key"
                 ],
                 "title": "Managed File Payload"
               },
@@ -2004,6 +2079,24 @@
                 "type": "object",
                 "additionalProperties": {},
                 "description": "Custom metadata to be added to the ingested documents."
+              },
+              "chunkingStrategy": {
+                "type": "string",
+                "enum": [
+                  "basic",
+                  "by_title"
+                ],
+                "description": "The chunking strategy to use. Defaults to `basic`."
+              },
+              "strategy": {
+                "type": "string",
+                "enum": [
+                  "auto",
+                  "fast",
+                  "hi_res",
+                  "ocr_only"
+                ],
+                "description": "The strategy to use. Defaults to `auto`."
               }
             },
             "description": "The ingest job config.",
