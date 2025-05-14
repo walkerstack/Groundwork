@@ -86,7 +86,7 @@ export async function checkoutSessionCompleted(event: Stripe.Event) {
           replyTo: "abdellatif@agentset.ai",
           subject: `Thank you for upgrading to Agentset ${plan.name}!`,
           react: UpgradeEmail({
-            name: user.name,
+            name: user.name || null,
             email: user.email,
             plan,
             domain: HOME_DOMAIN,

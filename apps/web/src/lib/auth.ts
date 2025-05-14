@@ -10,7 +10,7 @@ import {
 } from "better-auth/plugins";
 
 import { db } from "@agentset/db";
-import { InviteUserEmail, LoginEmail } from "@agentset/emails";
+import { InviteUserEmail, LoginEmail, WelcomeEmail } from "@agentset/emails";
 
 import { env } from "../env";
 import { HOME_DOMAIN } from "./constants";
@@ -42,7 +42,7 @@ export const auth = betterAuth({
             url,
             organizationName: organization.name,
             organizationUserEmail: inviter.user.email,
-            organizationUser: inviter.user.name,
+            organizationUser: inviter.user.name || null,
             domain: HOME_DOMAIN,
           }),
         });
@@ -63,7 +63,16 @@ export const auth = betterAuth({
       if (ctx.path.startsWith("/sign-up")) {
         const newSession = ctx.context.newSession;
         if (newSession) {
-          // send an email
+          await sendEmail({
+            email: newSession.user.email,
+            subject: "Welcome to Agentset.ai",
+            react: WelcomeEmail({
+              name: newSession.user.name || null,
+              email: newSession.user.email,
+              domain: HOME_DOMAIN,
+            }),
+            variant: "marketing",
+          });
         }
       }
     }),
