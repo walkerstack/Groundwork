@@ -2,12 +2,7 @@ import { cache } from "react";
 import { headers } from "next/headers";
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
-import {
-  admin,
-  createAuthMiddleware,
-  magicLink,
-  organization,
-} from "better-auth/plugins";
+import { admin, magicLink, organization } from "better-auth/plugins";
 
 import { db } from "@agentset/db";
 import { InviteUserEmail, LoginEmail, WelcomeEmail } from "@agentset/emails";
@@ -58,24 +53,23 @@ export const auth = betterAuth({
       },
     }),
   ],
-  hooks: {
-    after: createAuthMiddleware(async (ctx) => {
-      if (ctx.path.startsWith("/sign-up")) {
-        const newSession = ctx.context.newSession;
-        if (newSession) {
+  databaseHooks: {
+    user: {
+      create: {
+        after: async (user) => {
           await sendEmail({
-            email: newSession.user.email,
+            email: user.email,
             subject: "Welcome to Agentset.ai",
             react: WelcomeEmail({
-              name: newSession.user.name || null,
-              email: newSession.user.email,
+              name: user.name || null,
+              email: user.email,
               domain: HOME_DOMAIN,
             }),
             variant: "marketing",
           });
-        }
-      }
-    }),
+        },
+      },
+    },
   },
   database: prismaAdapter(db, {
     provider: "postgresql",
