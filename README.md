@@ -18,7 +18,7 @@
 <p align="center">
   <a href="https://github.com/agentset-ai/agentset/blob/main/LICENSE.md">
     <img src="https://img.shields.io/github/license/agentset-ai/agentset?label=license&logo=github&color=000&logoColor=fff" alt="License" />
-  </a> ·
+  </a> 
   <a href="https://github.com/agentset-ai/agentset">
     <img src="https://img.shields.io/github/stars/agentset-ai/agentset" alt="Stars" />
   </a>
@@ -45,43 +45,9 @@ Agentset is the open-source RAG platform for developers.
 - [Resend](https://resend.com/) – emails
 - [Vercel](https://vercel.com/) – deployments
 
-## Self-Hosting
+## Self-Hosting and Development
 
-_A complete self-hosting guide is coming soon. For now, please follow the steps below to get the platform up and running._
-
-## Development
-
-1. Install dependencies:
-
-```bash
-pnpm install
-```
-
-2. Copy `.env.example` to `.env` and set the environment variables:
-
-```bash
-cp .env.example .env
-```
-
-3. Migrate the database:
-
-```bash
-pnpm db:deploy
-```
-
-4.Start Upstash workflows local server:
-
-```bash
-pnpm dev:upstash
-```
-
-After it starts, copy the `QSTASH_TOKEN`, `QSTASH_CURRENT_SIGNING_KEY`, `QSTASH_NEXT_SIGNING_KEY` that appear in the terminal and paste them in the `.env` file.
-
-5. Run the development server:
-
-```bash
-pnpm dev:web
-```
+You can find a complete self-hosting guide [here](https://docs.agentset.ai/self-hosting).
 
 ## License
 
