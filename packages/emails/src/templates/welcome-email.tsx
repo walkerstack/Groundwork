@@ -39,6 +39,10 @@ export function WelcomeEmail({
       </Text>
 
       <Text className="ml-1 text-sm leading-4 text-black">
+        ◆ Chat with your documents in the playground
+      </Text>
+
+      <Text className="ml-1 text-sm leading-4 text-black">
         ◆ Check out our{" "}
         <Link
           href="https://docs.agentset.ai/"

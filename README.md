@@ -12,7 +12,7 @@
     <br />
     <a href="#introduction"><strong>Introduction</strong></a> ·
     <a href="#tech-stack"><strong>Tech Stack</strong></a> ·
-    <a href="#self-hosting"><strong>Self-hosting</strong></a>
+    <a href="#self-hosting-and-development"><strong>Self-hosting</strong></a>
 </p>
 
 <p align="center">

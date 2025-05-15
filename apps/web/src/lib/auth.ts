@@ -59,7 +59,7 @@ export const auth = betterAuth({
         after: async (user) => {
           await sendEmail({
             email: user.email,
-            subject: "Welcome to Agentset.ai",
+            subject: "Welcome to Agentset",
             react: WelcomeEmail({
               name: user.name || null,
               email: user.email,
