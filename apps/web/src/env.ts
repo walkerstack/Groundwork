@@ -26,6 +26,9 @@ export const env = createEnv({
     DEFAULT_PINECONE_API_KEY: z.string(),
     DEFAULT_PINECONE_HOST: z.string().url(),
 
+    SECONDARY_PINECONE_API_KEY: z.string().optional(),
+    SECONDARY_PINECONE_HOST: z.string().url().optional(),
+
     DEFAULT_AZURE_BASE_URL: z.string().url(),
     DEFAULT_AZURE_API_KEY: z.string(),
     DEFAULT_AZURE_TEXT_3_LARGE_EMBEDDING_DEPLOYMENT: z.string(),
@@ -82,6 +85,9 @@ export const env = createEnv({
 
     DEFAULT_PINECONE_API_KEY: process.env.DEFAULT_PINECONE_API_KEY,
     DEFAULT_PINECONE_HOST: process.env.DEFAULT_PINECONE_HOST,
+
+    SECONDARY_PINECONE_API_KEY: process.env.SECONDARY_PINECONE_API_KEY,
+    SECONDARY_PINECONE_HOST: process.env.SECONDARY_PINECONE_HOST,
 
     DEFAULT_AZURE_BASE_URL: process.env.DEFAULT_AZURE_BASE_URL,
     DEFAULT_AZURE_API_KEY: process.env.DEFAULT_AZURE_API_KEY,

@@ -5,7 +5,7 @@ import type { Namespace } from "@agentset/db";
 export const DIGNA_NAMESPACE_ID = "cm7zzvk4w0001ri45hfl7lkyo";
 
 export const getNamespaceVectorStore = async (
-  namespace: Pick<Namespace, "vectorStoreConfig" | "id">,
+  namespace: Pick<Namespace, "vectorStoreConfig" | "id" | "createdAt">,
   tenant?: string,
 ) => {
   const config = namespace.vectorStoreConfig;
@@ -17,9 +17,18 @@ export const getNamespaceVectorStore = async (
   // TODO: handle different embedding models
   if (!config) {
     const { Pinecone } = await import("./pinecone");
+    const shouldUseSecondary =
+      namespace.createdAt.getTime() > 1747418241190 &&
+      !!env.SECONDARY_PINECONE_API_KEY &&
+      !!env.SECONDARY_PINECONE_HOST;
+
     return new Pinecone({
-      apiKey: env.DEFAULT_PINECONE_API_KEY,
-      indexHost: env.DEFAULT_PINECONE_HOST,
+      apiKey: shouldUseSecondary
+        ? env.SECONDARY_PINECONE_API_KEY!
+        : env.DEFAULT_PINECONE_API_KEY,
+      indexHost: shouldUseSecondary
+        ? env.SECONDARY_PINECONE_HOST!
+        : env.DEFAULT_PINECONE_HOST,
       namespace: tenantId,
     });
   }

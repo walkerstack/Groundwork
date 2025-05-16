@@ -37,6 +37,7 @@ export const validateVectorStoreConfig = async (
   const v = await getNamespaceVectorStore({
     id: "",
     vectorStoreConfig,
+    createdAt: new Date(),
   });
 
   try {
