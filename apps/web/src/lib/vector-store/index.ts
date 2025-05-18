@@ -18,7 +18,11 @@ export const getNamespaceVectorStore = async (
   if (!config) {
     const { Pinecone } = await import("./pinecone");
     const shouldUseSecondary =
-      namespace.createdAt.getTime() > 1747418241190 &&
+      namespace.createdAt &&
+      (typeof namespace.createdAt === "string"
+        ? new Date(namespace.createdAt)
+        : namespace.createdAt
+      ).getTime() > 1747418241190 &&
       !!env.SECONDARY_PINECONE_API_KEY &&
       !!env.SECONDARY_PINECONE_HOST;
 
