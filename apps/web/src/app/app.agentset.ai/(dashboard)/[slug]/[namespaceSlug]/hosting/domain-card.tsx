@@ -14,11 +14,10 @@ import { useNamespace } from "@/contexts/namespace-context";
 import { SHORT_DOMAIN } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { useTRPC } from "@/trpc/react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   AlertCircleIcon,
   CheckCircle2Icon,
-  LoaderCircleIcon,
   RefreshCwIcon,
   TrashIcon,
   XCircleIcon,
@@ -250,10 +249,16 @@ const DomainControls = ({ domain }: { domain: string }) => {
   const { refetch, loading } = useDomainStatus();
   const { activeNamespace } = useNamespace();
   const trpc = useTRPC();
+  const queryClient = useQueryClient();
   const { mutate: removeDomain, isPending: isRemovingDomain } = useMutation(
     trpc.domain.remove.mutationOptions({
       onSuccess: () => {
         toast.success("Domain removed successfully");
+        void queryClient.invalidateQueries(
+          trpc.hosting.get.queryOptions({
+            namespaceId: activeNamespace.id,
+          }),
+        );
       },
     }),
   );

@@ -96,7 +96,9 @@ export const callVercelApi = async <T>(
     method,
     headers: {
       Authorization: `Bearer ${env.VERCEL_API_TOKEN}`,
-      "Content-Type": "application/json",
+      ...(method !== "DELETE" && {
+        "Content-Type": "application/json",
+      }),
     },
     ...(!!body && {
       body: JSON.stringify(body),

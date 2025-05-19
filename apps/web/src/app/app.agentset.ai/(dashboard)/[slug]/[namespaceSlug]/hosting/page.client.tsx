@@ -1,9 +1,11 @@
 "use client";
 
 import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useNamespace } from "@/contexts/namespace-context";
 import { useTRPC } from "@/trpc/react";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 import { CustomDomainConfigurator } from "./domain-card";
 import { EmptyState } from "./empty-state";
@@ -17,8 +19,26 @@ export default function HostingPage() {
     trpc.hosting.get.queryOptions({ namespaceId: activeNamespace.id }),
   );
 
+  const { mutateAsync: updateHosting, isPending: isUpdating } = useMutation(
+    trpc.hosting.update.mutationOptions({
+      onSuccess: () => {
+        toast.success("Hosting updated");
+      },
+      onError: (error) => {
+        toast.error(error.message);
+      },
+    }),
+  );
+
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex max-w-xl flex-col gap-4">
+        <Skeleton className="h-[100px] w-full" />
+        <Skeleton className="h-[100px] w-full" />
+        <Skeleton className="h-[100px] w-full" />
+        <Skeleton className="h-[100px] w-full" />
+      </div>
+    );
   }
 
   if (!data) {
@@ -28,8 +48,13 @@ export default function HostingPage() {
   return (
     <div className="max-w-xl">
       <HostingForm
-        isPending={false}
-        onSubmit={() => {}}
+        isPending={isUpdating}
+        onSubmit={async (data) => {
+          await updateHosting({
+            namespaceId: activeNamespace.id,
+            ...data,
+          });
+        }}
         defaultValues={{
           protected: data.protected,
           systemPrompt: data.systemPrompt || "",

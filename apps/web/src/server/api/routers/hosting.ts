@@ -81,4 +81,35 @@ export const hostingRouter = createTRPCRouter({
         },
       });
     }),
+  update: protectedProcedure
+    .input(
+      commonInput.extend({
+        protected: z.boolean().optional(),
+        systemPrompt: z.string().optional(),
+        examples: z.array(z.string()).max(4).optional(),
+        welcomeMessage: z.string().optional(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const hosting = await getHosting(ctx, input);
+
+      if (!hosting) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Hosting not found",
+        });
+      }
+
+      return ctx.db.hosting.update({
+        where: {
+          id: hosting.id,
+        },
+        data: {
+          protected: input.protected,
+          systemPrompt: input.systemPrompt,
+          exampleQuestions: input.examples,
+          welcomeMessage: input.welcomeMessage,
+        },
+      });
+    }),
 });

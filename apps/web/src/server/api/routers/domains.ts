@@ -221,7 +221,8 @@ export const domainsRouter = createTRPCRouter({
       }
 
       const vercelResponse = await removeDomainFromVercel(domain.slug);
-      if (vercelResponse.error) {
+      // ignore not_found error
+      if (vercelResponse.error && vercelResponse.error.code !== "not_found") {
         throw new TRPCError({
           code: "UNPROCESSABLE_CONTENT",
           message: vercelResponse.error.message,
