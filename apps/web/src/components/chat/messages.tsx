@@ -16,6 +16,7 @@ interface MessagesProps {
   reload: UseChatHelpers["reload"];
   isReadonly: boolean;
   isArtifactVisible: boolean;
+  overviewMessage?: string;
 }
 
 function PureMessages({
@@ -25,6 +26,7 @@ function PureMessages({
   setMessages,
   reload,
   isReadonly,
+  overviewMessage,
 }: MessagesProps) {
   const {
     containerRef: messagesContainerRef,
@@ -42,7 +44,7 @@ function PureMessages({
       ref={messagesContainerRef}
       className="relative flex min-w-0 flex-1 flex-col gap-6 overflow-y-scroll pt-4"
     >
-      {messages.length === 0 && <Overview />}
+      {messages.length === 0 && <Overview message={overviewMessage} />}
 
       {messages.map((message, index) => (
         <PreviewMessage

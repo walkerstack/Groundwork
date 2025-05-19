@@ -1,5 +1,5 @@
 import type Stripe from "stripe";
-import { HOME_DOMAIN } from "@/lib/constants";
+import { APP_DOMAIN } from "@/lib/constants";
 import { sendEmail } from "@/lib/resend";
 
 import { db } from "@agentset/db";
@@ -80,7 +80,7 @@ export async function invoicePaymentFailed(event: Stripe.Event) {
           amountDue,
           user,
           organization,
-          domain: HOME_DOMAIN,
+          domain: APP_DOMAIN,
         }),
         variant: "notifications",
       }),

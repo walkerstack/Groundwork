@@ -16,6 +16,8 @@ import { ArrowDownIcon, ArrowUpIcon } from "lucide-react";
 import { toast } from "sonner";
 import { useLocalStorage, useWindowSize } from "usehooks-ts";
 
+import { SuggestedActions } from "./suggested-actions";
+
 const ChatInputModes = dynamic(() => import("./chat-input-modes"), {
   ssr: false,
   loading: () => (
@@ -29,19 +31,27 @@ const ChatInputModes = dynamic(() => import("./chat-input-modes"), {
 function PureMultimodalInput({
   input,
   setInput,
+  append,
+  messages,
   status,
   stop,
   setMessages,
   handleSubmit,
   className,
+  type,
+  exampleMessages,
 }: {
   input: UseChatHelpers["input"];
   setInput: UseChatHelpers["setInput"];
   status: UseChatHelpers["status"];
   stop: () => void;
+  append: UseChatHelpers["append"];
+  messages: Array<Message>;
   setMessages: Dispatch<SetStateAction<Array<Message>>>;
   handleSubmit: UseChatHelpers["handleSubmit"];
   className?: string;
+  type: "playground" | "hosted";
+  exampleMessages?: string[];
 }) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { width } = useWindowSize();
@@ -138,6 +148,12 @@ function PureMultimodalInput({
         )}
       </AnimatePresence>
 
+      {messages.length === 0 &&
+        exampleMessages &&
+        exampleMessages.length > 0 && (
+          <SuggestedActions append={append} exampleMessages={exampleMessages} />
+        )}
+
       <Textarea
         data-testid="multimodal-input"
         ref={textareaRef}
@@ -167,7 +183,7 @@ function PureMultimodalInput({
         }}
       />
 
-      <ChatInputModes />
+      {type === "playground" && <ChatInputModes />}
 
       <div className="absolute right-0 bottom-0 flex w-fit flex-row justify-end p-2">
         {status === "submitted" ? (
@@ -185,6 +201,10 @@ export const MultimodalInput = memo(
   (prevProps, nextProps) => {
     if (prevProps.input !== nextProps.input) return false;
     if (prevProps.status !== nextProps.status) return false;
+
+    // cleared the chat
+    if (nextProps.messages.length === 0 && prevProps.messages.length > 0)
+      return false;
 
     return true;
   },

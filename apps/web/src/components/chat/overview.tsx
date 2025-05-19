@@ -1,7 +1,11 @@
 import { Logo } from "@/components/ui/logo";
 import { motion } from "framer-motion";
 
-export const Overview = () => {
+export const Overview = ({
+  message = "Welcome to the playground! You can try chatting with your data here.",
+}: {
+  message?: string;
+}) => {
   return (
     <motion.div
       key="overview"
@@ -12,15 +16,9 @@ export const Overview = () => {
       transition={{ delay: 0.5 }}
     >
       <div className="flex max-w-xl flex-col items-center gap-8 rounded-xl p-6 text-center leading-relaxed">
-        {/* <p className="flex flex-row justify-center gap-4 items-center">
-          <VercelIcon size={32} />
-          <span>+</span>
-          <MessageIcon size={32} />
-        </p> */}
         <Logo className="size-15" />
-        <p>
-          Welcome to the playground! You can try chatting with your data here.
-        </p>
+
+        <p>{message}</p>
       </div>
     </motion.div>
   );

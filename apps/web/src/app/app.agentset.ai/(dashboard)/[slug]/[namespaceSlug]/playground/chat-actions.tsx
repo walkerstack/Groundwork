@@ -1,11 +1,11 @@
 "use client";
 
+import { useNamespaceChat } from "@/components/chat/use-chat";
 import { Button } from "@/components/ui/button";
 import { PlusIcon } from "lucide-react";
 
 import ApiDialog from "./api-dialog";
 import ChatSettings from "./chat-settings";
-import { useNamespaceChat } from "./chat/use-chat";
 
 export default function ChatActions() {
   const { setMessages } = useNamespaceChat();

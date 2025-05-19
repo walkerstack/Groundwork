@@ -3,7 +3,7 @@ import { env } from "@/env";
 import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
-import { HOME_DOMAIN } from "./constants";
+import { APP_DOMAIN } from "./constants";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -11,7 +11,7 @@ export function cn(...inputs: ClassValue[]) {
 export function getBaseUrl() {
   if (typeof window !== "undefined") return window.location.origin;
 
-  if (env.NODE_ENV === "production") return HOME_DOMAIN;
+  if (env.NODE_ENV === "production") return APP_DOMAIN;
   if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
 
   return `http://localhost:${process.env.PORT ?? 3000}`;

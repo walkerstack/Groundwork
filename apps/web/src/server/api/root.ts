@@ -3,6 +3,8 @@ import { createCallerFactory, createTRPCRouter } from "@/server/api/trpc";
 import { apiKeysRouter } from "./routers/api-keys";
 import { billingRouter } from "./routers/billing";
 import { documentsRouter } from "./routers/documents";
+import { domainsRouter } from "./routers/domains";
+import { hostingRouter } from "./routers/hosting";
 import { ingestJobRouter } from "./routers/ingest-jobs";
 import { namespaceRouter } from "./routers/namespaces";
 import { organizationsRouter } from "./routers/organizations";
@@ -16,6 +18,8 @@ export const appRouter = createTRPCRouter({
   upload: uploadsRouter,
   billing: billingRouter,
   organization: organizationsRouter,
+  hosting: hostingRouter,
+  domain: domainsRouter,
 });
 
 // export type definition of API

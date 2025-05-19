@@ -1,6 +1,6 @@
 import type Stripe from "stripe";
 import { limiter } from "@/lib/bottleneck";
-import { HOME_DOMAIN } from "@/lib/constants";
+import { APP_DOMAIN } from "@/lib/constants";
 import { log } from "@/lib/log";
 import { getPlanFromPriceId, planToOrganizationFields } from "@/lib/plans";
 import { sendEmail } from "@/lib/resend";
@@ -83,13 +83,13 @@ export async function checkoutSessionCompleted(event: Stripe.Event) {
       limiter.schedule(() =>
         sendEmail({
           email: user.email,
-          replyTo: "abdellatif@agentset.ai",
+          replyTo: "contact@agentset.ai",
           subject: `Thank you for upgrading to Agentset ${plan.name}!`,
           react: UpgradeEmail({
             name: user.name || null,
             email: user.email,
             plan,
-            domain: HOME_DOMAIN,
+            domain: APP_DOMAIN,
           }),
           variant: "marketing",
         }),

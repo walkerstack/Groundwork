@@ -6,7 +6,13 @@ export const env = createEnv({
     NODE_ENV: z
       .enum(["development", "test", "production"])
       .default("development"),
-    NEXT_PUBLIC_HOME_DOMAIN: z.string().url(),
+    NEXT_PUBLIC_APP_NAME: z.string().optional().default("Agentset"),
+    NEXT_PUBLIC_APP_SHORT_DOMAIN: z.string().optional().default("agentset.ai"),
+
+    NEXT_PUBLIC_VERCEL_ENV: z
+      .enum(["development", "preview", "production"])
+      .optional()
+      .default("development"),
   },
   server: {
     DATABASE_URL: z.string().url(),
@@ -62,12 +68,19 @@ export const env = createEnv({
     DISCORD_HOOK_CRON: z.string().url().optional(),
     DISCORD_HOOK_SUBSCRIBERS: z.string().url().optional(),
     DISCORD_HOOK_ERRORS: z.string().url().optional(),
+
+    VERCEL_PROJECT_ID: z.string(),
+    VERCEL_TEAM_ID: z.string(),
+    VERCEL_API_TOKEN: z.string(),
   },
   client: {
     NEXT_PUBLIC_STRIPE_PUBLIC_KEY: z.string(),
   },
   runtimeEnv: {
-    NEXT_PUBLIC_HOME_DOMAIN: process.env.NEXT_PUBLIC_HOME_DOMAIN,
+    NEXT_PUBLIC_APP_NAME: process.env.NEXT_PUBLIC_APP_NAME,
+    NEXT_PUBLIC_APP_SHORT_DOMAIN: process.env.NEXT_PUBLIC_APP_SHORT_DOMAIN,
+    NEXT_PUBLIC_VERCEL_ENV: process.env.NEXT_PUBLIC_VERCEL_ENV,
+
     DATABASE_URL: process.env.DATABASE_URL,
     SUPABASE_URL: process.env.SUPABASE_URL,
     SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY,
@@ -126,6 +139,10 @@ export const env = createEnv({
     DISCORD_HOOK_CRON: process.env.DISCORD_HOOK_CRON,
     DISCORD_HOOK_SUBSCRIBERS: process.env.DISCORD_HOOK_SUBSCRIBERS,
     DISCORD_HOOK_ERRORS: process.env.DISCORD_HOOK_ERRORS,
+
+    VERCEL_PROJECT_ID: process.env.VERCEL_PROJECT_ID,
+    VERCEL_TEAM_ID: process.env.VERCEL_TEAM_ID,
+    VERCEL_API_TOKEN: process.env.VERCEL_API_TOKEN,
   },
   skipValidation: !!process.env.SKIP_ENV_VALIDATION,
   emptyStringAsUndefined: true,

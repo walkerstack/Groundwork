@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useChatSettings } from "@/components/chat/chat-settings.store";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -16,8 +17,6 @@ import { useNamespace } from "@/contexts/namespace-context";
 import { DEFAULT_SYSTEM_PROMPT } from "@/lib/prompts";
 import { Settings2Icon } from "lucide-react";
 import { toast } from "sonner";
-
-import { useChatSettings } from "./chat/chat-settings.store";
 
 const defaultPrompt = DEFAULT_SYSTEM_PROMPT.compile().trim();
 

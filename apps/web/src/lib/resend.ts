@@ -2,7 +2,7 @@ import type { CreateEmailOptions } from "resend";
 import { env } from "@/env";
 import { Resend } from "resend";
 
-import { HOME_DOMAIN } from "./constants";
+import { APP_DOMAIN } from "./constants";
 
 export const resend = new Resend(env.RESEND_API_KEY);
 
@@ -15,7 +15,7 @@ interface ResendEmailOptions extends Omit<CreateEmailOptions, "to" | "from"> {
 const VARIANT_TO_FROM_MAP = {
   primary: "Agentset.ai <system@agentset.ai>",
   notifications: "Agentset.ai <notifications@agentset.ai>", // TODO: change domain to mail.
-  marketing: "Abdellatif from Agentset.ai <abdellatif@agentset.ai>", // TODO: change domain to ship.
+  marketing: "Abdellatif from Agentset.ai <contact@agentset.ai>", // TODO: change domain to ship.
 };
 
 export const sendEmail = async (opts: ResendEmailOptions) => {
@@ -42,7 +42,7 @@ export const sendEmail = async (opts: ResendEmailOptions) => {
     scheduledAt,
     ...(variant === "marketing" && {
       headers: {
-        "List-Unsubscribe": `${HOME_DOMAIN}/account/settings`,
+        "List-Unsubscribe": `${APP_DOMAIN}/account/settings`,
       },
     }),
   });

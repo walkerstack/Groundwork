@@ -28,7 +28,7 @@ import { DocumentStatus, IngestJobStatus } from "@agentset/db";
 
 import type { JobsTableMeta } from "./columns";
 import type { DocumentCol } from "./documents-columns";
-import { CodeBlock } from "../playground/chat/code-block";
+import { CodeBlock } from "../../../../../../components/chat/code-block";
 import { columns } from "./columns";
 import { documentColumns } from "./documents-columns";
 

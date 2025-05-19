@@ -8,7 +8,7 @@ import { db } from "@agentset/db";
 import { InviteUserEmail, LoginEmail, WelcomeEmail } from "@agentset/emails";
 
 import { env } from "../env";
-import { HOME_DOMAIN } from "./constants";
+import { APP_DOMAIN } from "./constants";
 import { sendEmail } from "./resend";
 import { getBaseUrl } from "./utils";
 
@@ -38,7 +38,7 @@ export const auth = betterAuth({
             organizationName: organization.name,
             organizationUserEmail: inviter.user.email,
             organizationUser: inviter.user.name || null,
-            domain: HOME_DOMAIN,
+            domain: APP_DOMAIN,
           }),
         });
       },
@@ -48,7 +48,7 @@ export const auth = betterAuth({
         await sendEmail({
           email,
           subject: "Your Agentset login link",
-          react: LoginEmail({ loginLink: url, email, domain: HOME_DOMAIN }),
+          react: LoginEmail({ loginLink: url, email, domain: APP_DOMAIN }),
         });
       },
     }),
@@ -63,7 +63,7 @@ export const auth = betterAuth({
             react: WelcomeEmail({
               name: user.name || null,
               email: user.email,
-              domain: HOME_DOMAIN,
+              domain: APP_DOMAIN,
             }),
             variant: "marketing",
           });

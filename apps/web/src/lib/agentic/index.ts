@@ -14,7 +14,10 @@ import { queryVectorStore } from "../vector-store/parse";
 import { evaluateQueries, formatSources, generateQueries } from "./utils";
 
 const agenticPipeline = (
-  namespace: Namespace,
+  namespace: Pick<
+    Namespace,
+    "id" | "vectorStoreConfig" | "embeddingConfig" | "createdAt"
+  >,
   {
     model,
     // queryOptions,
@@ -26,6 +29,7 @@ const agenticPipeline = (
     afterQueries,
     maxEvals = 3,
     tokenBudget = 4096,
+    includeLogs = true,
   }: {
     model: LanguageModelV1;
     queryOptions?: Omit<QueryVectorStoreOptions, "query">;
@@ -37,6 +41,7 @@ const agenticPipeline = (
     afterQueries?: (totalQueries: number) => void;
     maxEvals?: number;
     tokenBudget?: number;
+    includeLogs?: boolean;
   },
 ) => {
   const messages: CoreMessage[] = [
@@ -145,7 +150,9 @@ const agenticPipeline = (
       dataStream.writeMessageAnnotation({
         type: "agentset_sources",
         value: { results: dedupedData } as unknown as JSONValue,
-        logs: Object.values(queryToResult) as unknown as JSONValue,
+        ...(includeLogs && {
+          logs: Object.values(queryToResult) as unknown as JSONValue,
+        }),
       });
       messageStream.mergeIntoDataStream(dataStream);
     },
@@ -159,7 +166,10 @@ const agenticPipeline = (
 };
 
 export const generateAgenticResponse = async (
-  namespace: Namespace,
+  namespace: Pick<
+    Namespace,
+    "id" | "vectorStoreConfig" | "embeddingConfig" | "createdAt"
+  >,
   {
     model,
     systemPrompt,

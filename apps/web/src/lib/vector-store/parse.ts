@@ -51,7 +51,10 @@ export type QueryVectorStoreOptions = {
 };
 
 export const queryVectorStore = async (
-  namespace: Namespace,
+  namespace: Pick<
+    Namespace,
+    "id" | "vectorStoreConfig" | "embeddingConfig" | "createdAt"
+  >,
   options: QueryVectorStoreOptions,
 ) => {
   // TODO: if the embedding model is managed, track the usage

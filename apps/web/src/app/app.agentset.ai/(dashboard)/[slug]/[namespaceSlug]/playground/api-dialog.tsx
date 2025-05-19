@@ -13,7 +13,7 @@ import { useOrganization } from "@/contexts/organization-context";
 import { prefixId } from "@/lib/api/ids";
 import { ArrowUpRightIcon, Code2Icon } from "lucide-react";
 
-import { CodeBlock } from "./chat/code-block";
+import { CodeBlock } from "../../../../../../components/chat/code-block";
 
 const curlExample = /* bash */ `
 curl --request POST \\

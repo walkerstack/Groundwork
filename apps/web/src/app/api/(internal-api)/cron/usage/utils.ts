@@ -1,4 +1,4 @@
-import { HOME_DOMAIN } from "@/lib/constants";
+import { APP_DOMAIN } from "@/lib/constants";
 import { getAdjustedBillingCycleStart } from "@/lib/datetime";
 import { log } from "@/lib/log";
 import { capitalize } from "@/lib/string-utils";
@@ -114,7 +114,7 @@ export const updateUsage = async () => {
   }
 
   return await qstashClient.publishJSON({
-    url: `${HOME_DOMAIN}/api/cron/usage`,
+    url: `${APP_DOMAIN}/api/cron/usage`,
     method: "POST",
     body: {},
   });

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { HOME_DOMAIN } from "./constants";
+import { APP_DOMAIN } from "./constants";
 
 export function constructMetadata({
   title,
@@ -51,7 +51,7 @@ export function constructMetadata({
       }),
     },
     // icons,
-    metadataBase: new URL(HOME_DOMAIN),
+    metadataBase: new URL(APP_DOMAIN),
     ...((url || canonicalUrl) && {
       alternates: {
         canonical: url || canonicalUrl,

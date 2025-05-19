@@ -1,6 +1,10 @@
 import type { NextRequest } from "next/server";
-import { NextResponse } from "next/server";
-import { getSessionCookie } from "better-auth/cookies";
+
+import { API_HOSTNAMES, APP_HOSTNAMES } from "./lib/constants";
+import ApiMiddleware from "./lib/middleware/api";
+import AppMiddleware from "./lib/middleware/app";
+import CustomDomainMiddleware from "./lib/middleware/custom-domain";
+import { parse } from "./lib/middleware/utils";
 
 export const config = {
   matcher: [
@@ -16,32 +20,18 @@ export const config = {
 };
 
 export function middleware(request: NextRequest) {
-  const cookies = getSessionCookie(request);
-  const pathname = request.nextUrl.pathname;
-  const domain = request.nextUrl.hostname;
+  const { domain } = parse(request);
 
-  // rewrite to /api
-  if (domain === "api.agentset.ai") {
-    const searchParams = request.nextUrl.searchParams.toString();
-    const searchParamsString =
-      searchParams.length > 0 ? `?${searchParams}` : "";
-    const fullPath = `${pathname}${searchParamsString}`;
-
-    return NextResponse.rewrite(new URL(`/api${fullPath}`, request.url));
+  // for App
+  if (APP_HOSTNAMES.has(domain)) {
+    return AppMiddleware(request);
   }
 
-  // if the user is logged in, and is trying to access the login page, redirect to dashboard
-  if (cookies && pathname.startsWith("/login")) {
-    return NextResponse.redirect(new URL("/", request.url));
+  // for API
+  if (API_HOSTNAMES.has(domain)) {
+    return ApiMiddleware(request);
   }
 
-  // if the user is not logged in, and is trying to access a dashboard page, redirect to login
-  if (
-    !cookies &&
-    !(pathname.startsWith("/login") || pathname.startsWith("/invitation"))
-  ) {
-    return NextResponse.redirect(new URL("/login", request.url));
-  }
-
-  return NextResponse.next();
+  // for Custom Domain
+  return CustomDomainMiddleware(request);
 }

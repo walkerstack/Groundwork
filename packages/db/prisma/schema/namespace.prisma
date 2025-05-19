@@ -18,15 +18,48 @@ model Namespace {
   connections Connection[]
   ingestJobs  IngestJob[]
 
-  totalIngestJobs Int @default(0) // Total number of ingest jobs in the namespace
-  totalDocuments  Int @default(0) // Total number of documents in the namespace
-  totalPages      Int @default(0)
-
+  totalIngestJobs      Int @default(0) // Total number of ingest jobs in the namespace
+  totalDocuments       Int @default(0) // Total number of documents in the namespace
+  totalPages           Int @default(0)
   totalPlaygroundUsage Int @default(0) // Total number of playground requests in the namespace
+
+  hosting Hosting?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@unique([organizationId, slug]) // A namespace must have a unique slug within an organization
   @@map("namespace")
+}
+
+model Hosting {
+  id          String    @id @default(cuid())
+  namespaceId String    @unique
+  namespace   Namespace @relation(fields: [namespaceId], references: [id], onDelete: Cascade)
+
+  domain Domain?
+
+  systemPrompt     String?  @db.Text
+  exampleQuestions String[] @default([]) @db.Text
+  welcomeMessage   String?
+  protected        Boolean  @default(true) // Whether the namespace is protected from public access
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Domain {
+  id       String  @id @default(cuid())
+  slug     String  @unique
+  verified Boolean @default(false)
+
+  lastChecked DateTime @default(now())
+
+  hosting   Hosting @relation(fields: [hostingId], references: [id], onDelete: Cascade)
+  hostingId String  @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index(lastChecked(sort: Asc))
 }

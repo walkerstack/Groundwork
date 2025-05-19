@@ -5,6 +5,7 @@ import {
   CircleHelpIcon,
   CreditCardIcon,
   FilesIcon,
+  GlobeIcon,
   HelpCircleIcon,
   HomeIcon,
   LockIcon,
@@ -61,6 +62,11 @@ export const namespaceItems: SidebarItemType[] = [
     title: "Playground",
     url: createNamespaceUrl("/playground"),
     icon: MessagesSquareIcon,
+  },
+  {
+    title: "Hosting",
+    url: createNamespaceUrl("/hosting"),
+    icon: GlobeIcon,
   },
 ];
 
