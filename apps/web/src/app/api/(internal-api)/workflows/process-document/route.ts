@@ -79,7 +79,7 @@ const partitionDocument = async (
     "wait-for-partition-processing",
     partitionBody.notify_id,
     {
-      timeout: "2h", // 2 hour timeout
+      timeout: "1d", // 1 day timeout
     },
   );
 
