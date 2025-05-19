@@ -167,6 +167,17 @@ export const { POST } = serve<TriggerIngestionJobBody>(
       },
     );
 
+    await context.run("update-status-processing", async () => {
+      await db.ingestJob.update({
+        where: { id: ingestionJob.id },
+        data: {
+          status: IngestJobStatus.PROCESSING,
+          processingAt: new Date(),
+        },
+        select: { id: true },
+      });
+    });
+
     // update documents with workflowRunIds (in parallel)
     const batches = chunkArray(documentIdToWorkflowRunId, BATCH_SIZE);
     await Promise.all(
@@ -183,17 +194,6 @@ export const { POST } = serve<TriggerIngestionJobBody>(
         }),
       ),
     );
-
-    await context.run("update-status-processing", async () => {
-      await db.ingestJob.update({
-        where: { id: ingestionJob.id },
-        data: {
-          status: IngestJobStatus.PROCESSING,
-          processingAt: new Date(),
-        },
-        select: { id: true },
-      });
-    });
   },
   {
     failureFunction: async ({ context, failResponse }) => {
@@ -213,6 +213,6 @@ export const { POST } = serve<TriggerIngestionJobBody>(
     },
     qstashClient: qstashClient,
     receiver: qstashReceiver,
-    flowControl: { key: "ingest-job", parallelism: 3, ratePerSecond: 3 },
+    flowControl: { key: "ingest-job", parallelism: 200, ratePerSecond: 100 },
   },
 );

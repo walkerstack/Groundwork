@@ -66,6 +66,10 @@ export const { POST } = serve<DeleteNamespaceBody>(
   {
     qstashClient: qstashClient,
     receiver: qstashReceiver,
-    flowControl: { key: "delete-namespace", parallelism: 3, ratePerSecond: 3 },
+    flowControl: {
+      key: "delete-namespace",
+      parallelism: 200,
+      ratePerSecond: 100,
+    },
   },
 );

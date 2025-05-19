@@ -198,6 +198,10 @@ export const { POST } = serve<DeleteIngestJobBody>(
   {
     qstashClient: qstashClient,
     receiver: qstashReceiver,
-    flowControl: { key: "delete-ingest-job", parallelism: 3, ratePerSecond: 3 },
+    flowControl: {
+      key: "delete-ingest-job",
+      parallelism: 200,
+      ratePerSecond: 100,
+    },
   },
 );
