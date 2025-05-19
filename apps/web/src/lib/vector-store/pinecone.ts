@@ -122,12 +122,12 @@ export class Pinecone {
   }
 
   async getDimensions() {
-    const response = await this.makeRequest<{ dimensions: number }>(
+    const response = await this.makeRequest<{ dimension: number }>(
       "GET",
       "/describe_index_stats",
       undefined,
       { includeBody: false },
     );
-    return response.dimensions;
+    return response.dimension;
   }
 }
