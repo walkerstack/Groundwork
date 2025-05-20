@@ -9,7 +9,7 @@ export const Overview = ({
   return (
     <motion.div
       key="overview"
-      className="mx-auto max-w-3xl md:mt-20"
+      className="mx-auto mt-10 max-w-3xl md:mt-20"
       initial={{ opacity: 0, scale: 0.98 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.98 }}
