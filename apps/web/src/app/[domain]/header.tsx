@@ -13,7 +13,10 @@ export default function Header({ title }: { title: string }) {
 
   return (
     <div className="mx-auto flex h-16 w-full max-w-3xl items-center justify-between px-4">
-      <h2 className="text-lg font-semibold">{title}</h2>
+      <h2 className="cursor-pointer text-lg font-semibold" onClick={resetChat}>
+        {title}
+      </h2>
+
       <Button variant="outline" onClick={resetChat}>
         <PlusIcon className="size-4" />
         New Chat
