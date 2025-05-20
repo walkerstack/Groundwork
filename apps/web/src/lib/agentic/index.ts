@@ -138,9 +138,6 @@ const agenticPipeline = (
         },
       ];
 
-      console.log(
-        `using temp: ${temperature} and system prompt: ${systemPrompt}`,
-      );
       const messageStream = streamText({
         model,
         system: systemPrompt,
