@@ -9,6 +9,7 @@ import dynamic from "next/dynamic";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
+import { useIsHosting } from "@/contexts/hosting-context";
 import { useScrollToBottom } from "@/hooks/use-scroll-to-bottom";
 import { cn } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
@@ -55,6 +56,7 @@ function PureMultimodalInput({
 }) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { width } = useWindowSize();
+  const isHosting = useIsHosting();
 
   useEffect(() => {
     if (textareaRef.current) {
@@ -72,7 +74,7 @@ function PureMultimodalInput({
   const resetHeight = () => {
     if (textareaRef.current) {
       textareaRef.current.style.height = "auto";
-      textareaRef.current.style.height = "112px";
+      textareaRef.current.style.height = isHosting ? "98px" : "112px";
     }
   };
 
@@ -161,7 +163,11 @@ function PureMultimodalInput({
         value={input}
         onChange={handleInput}
         className={cn(
-          "bg-muted max-h-[calc(35dvh)] min-h-28 resize-none overflow-hidden rounded-lg pt-3 pb-14 text-base",
+          "bg-muted resize-none overflow-hidden text-base",
+          isHosting
+            ? "max-h-[75dvh] min-h-[24px] rounded-2xl pt-3 pb-10"
+            : "max-h-[calc(35dvh)] min-h-28 rounded-lg pt-3 pb-14",
+
           className,
         )}
         rows={2}

@@ -17,10 +17,7 @@ interface CitationModalProps {
   triggerProps: React.ComponentProps<"button">;
 }
 
-const HostingCitation = ({
-  source,
-  sourceIndex,
-}: Pick<CitationModalProps, "source" | "sourceIndex">) => {
+const HostingCitation = ({ source }: Pick<CitationModalProps, "source">) => {
   const hosting = useHosting();
   const citationName = useMemo(() => {
     if (!hosting.citationMetadataPath || !source.metadata) return null;
@@ -33,10 +30,23 @@ const HostingCitation = ({
       value = (value as Record<string, unknown>)[key];
     }
 
-    return typeof value === "string" ? value : null;
+    if (typeof value === "string") {
+      return value;
+    }
+
+    if (typeof value === "number") {
+      return value.toString();
+    }
+
+    if (typeof value === "boolean") {
+      return value ? "True" : "False";
+    }
+
+    return null;
   }, [hosting, source.metadata]);
 
-  return <>{citationName || `Source [${sourceIndex}]`}</>;
+  if (!citationName) return null;
+  return <>{citationName}</>;
 };
 
 export function CitationModal({
@@ -55,24 +65,34 @@ export function CitationModal({
     }
   }, [source]);
 
+  const hostingCitation = isHosting ? (
+    <HostingCitation source={source} />
+  ) : null;
+
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <button
-          className={cn(
-            triggerProps.className,
-            "cursor-pointer text-blue-500 hover:underline",
-          )}
-          {...triggerProps}
-        >
-          <span className="mx-1.5">
-            {isHosting ? (
-              <HostingCitation source={source} sourceIndex={sourceIndex} />
-            ) : (
-              triggerProps.children
+        {hostingCitation ? (
+          <button
+            className={cn(
+              triggerProps.className,
+              "bg-muted-foreground text-muted-foreground hover:bg-muted-foreground/80 mx-0.5 cursor-pointer rounded-full px-1 py-0.5",
             )}
-          </span>
-        </button>
+            {...triggerProps}
+          >
+            {hostingCitation}
+          </button>
+        ) : (
+          <button
+            className={cn(
+              triggerProps.className,
+              "cursor-pointer text-blue-500 hover:underline",
+            )}
+            {...triggerProps}
+          >
+            <span className="mx-1.5">{triggerProps.children}</span>
+          </button>
+        )}
       </DialogTrigger>
 
       <DialogContent
@@ -83,11 +103,7 @@ export function CitationModal({
       >
         <DialogHeader>
           <DialogTitle>
-            {isHosting ? (
-              <HostingCitation source={source} sourceIndex={sourceIndex} />
-            ) : (
-              `Source [${sourceIndex}]`
-            )}
+            {hostingCitation || `Source [${sourceIndex}]`}
           </DialogTitle>
         </DialogHeader>
 
