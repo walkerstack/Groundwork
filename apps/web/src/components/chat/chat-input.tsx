@@ -74,7 +74,7 @@ function PureMultimodalInput({
   const resetHeight = () => {
     if (textareaRef.current) {
       textareaRef.current.style.height = "auto";
-      textareaRef.current.style.height = isHosting ? "98px" : "112px";
+      textareaRef.current.style.height = isHosting ? "96px" : "112px";
     }
   };
 
@@ -165,8 +165,8 @@ function PureMultimodalInput({
         className={cn(
           "bg-muted resize-none overflow-hidden text-base",
           isHosting
-            ? "max-h-[75dvh] min-h-[24px] rounded-2xl pt-3 pb-10"
-            : "max-h-[calc(35dvh)] min-h-28 rounded-lg pt-3 pb-14",
+            ? "max-h-[75dvh] min-h-24 rounded-2xl pt-3 pb-10"
+            : "max-h-[35dvh] min-h-28 rounded-lg pt-3 pb-14",
 
           className,
         )}
