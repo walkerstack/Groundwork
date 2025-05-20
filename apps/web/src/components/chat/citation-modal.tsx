@@ -77,7 +77,7 @@ export function CitationModal({
             {...triggerProps}
             className={cn(
               triggerProps.className,
-              "bg-muted text-muted-foreground hover:bg-primary hover:text-primary-foreground mx-0.5 cursor-pointer rounded-full px-2 py-0.5 text-sm hover:no-underline",
+              "bg-muted text-muted-foreground hover:bg-primary hover:text-primary-foreground mx-0.5 cursor-pointer rounded-full px-2 py-0.5 text-sm font-medium hover:no-underline",
             )}
           >
             {hostingCitation}

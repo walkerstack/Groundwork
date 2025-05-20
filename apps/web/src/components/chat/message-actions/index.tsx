@@ -6,6 +6,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useIsHosting } from "@/contexts/hosting-context";
 import { CopyIcon } from "lucide-react";
 import { toast } from "sonner";
 import { useCopyToClipboard } from "usehooks-ts";
@@ -22,6 +23,7 @@ export function PureMessageActions({
   isLoading: boolean;
 }) {
   const [_, copyToClipboard] = useCopyToClipboard();
+  const isHosting = useIsHosting();
 
   if (isLoading) return null;
   if (message.role === "user") return null;
@@ -55,7 +57,7 @@ export function PureMessageActions({
         <TooltipContent>Copy</TooltipContent>
       </Tooltip>
 
-      <MessageLogs message={message} />
+      {!isHosting && <MessageLogs message={message} />}
     </div>
   );
 }
