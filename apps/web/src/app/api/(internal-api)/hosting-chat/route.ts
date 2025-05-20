@@ -1,4 +1,3 @@
-import { unstable_cache } from "next/cache";
 import agenticPipeline from "@/lib/agentic";
 import { AgentsetApiError } from "@/lib/api/errors";
 import { withPublicApiHandler } from "@/lib/api/handler/public";
@@ -32,33 +31,23 @@ const incrementUsage = (namespaceId: string, queries: number) => {
 };
 
 const getHosting = async (namespaceId: string) => {
-  return unstable_cache(
-    async () => {
-      const hosting = await db.hosting.findFirst({
-        where: {
-          namespaceId,
-        },
+  return db.hosting.findFirst({
+    where: {
+      namespaceId,
+    },
+    select: {
+      id: true,
+      systemPrompt: true,
+      namespace: {
         select: {
           id: true,
-          systemPrompt: true,
-          namespace: {
-            select: {
-              id: true,
-              createdAt: true,
-              vectorStoreConfig: true,
-              embeddingConfig: true,
-            },
-          },
+          createdAt: true,
+          vectorStoreConfig: true,
+          embeddingConfig: true,
         },
-      });
-
-      return hosting;
+      },
     },
-    [`hosting:${namespaceId}`],
-    {
-      tags: [`hosting:${namespaceId}`],
-    },
-  )();
+  });
 };
 
 // export const runtime = "edge";

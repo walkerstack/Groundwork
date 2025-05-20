@@ -1,5 +1,4 @@
 import type { ProtectedProcedureContext } from "@/server/api/trpc";
-import { revalidateTag } from "next/cache";
 import { DEFAULT_SYSTEM_PROMPT } from "@/lib/prompts";
 import z from "@/lib/zod";
 import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
@@ -28,10 +27,6 @@ const getHosting = async (
   });
 
   return hosting ?? null;
-};
-
-const invalidateHosting = (namespaceId: string) => {
-  revalidateTag(`hosting:${namespaceId}`);
 };
 
 // TODO: only allow for pro users
@@ -108,7 +103,7 @@ export const hostingRouter = createTRPCRouter({
         });
       }
 
-      const result = await ctx.db.hosting.update({
+      return ctx.db.hosting.update({
         where: {
           id: hosting.id,
         },
@@ -120,8 +115,5 @@ export const hostingRouter = createTRPCRouter({
           citationMetadataPath: input.citationMetadataPath,
         },
       });
-      invalidateHosting(hosting.namespaceId);
-
-      return result;
     }),
 });
