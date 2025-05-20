@@ -18,6 +18,17 @@ export default async function CustomDomainPage({
         slug: domain,
       },
     },
+    include: {
+      namespace: {
+        select: {
+          organization: {
+            select: {
+              name: true,
+            },
+          },
+        },
+      },
+    },
   });
 
   if (!hosting) notFound();
@@ -26,7 +37,7 @@ export default async function CustomDomainPage({
   return (
     <HostingProvider hosting={hosting}>
       <div>
-        <Header />
+        <Header title={hosting.namespace.organization.name} />
         <Chat type="hosted" />
       </div>
     </HostingProvider>
