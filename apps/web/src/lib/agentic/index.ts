@@ -90,6 +90,7 @@ const agenticPipeline = (
                 topK: 50,
                 rerankLimit: 15,
                 rerank: true,
+                includeMetadata: true,
               });
               totalQueries++;
               return queryResult;
@@ -138,10 +139,10 @@ const agenticPipeline = (
       ];
 
       const messageStream = streamText({
-        model: model,
+        model,
         system: systemPrompt,
         messages: newMessages,
-        temperature: temperature,
+        temperature,
         onError: (error) => {
           console.error(error);
         },

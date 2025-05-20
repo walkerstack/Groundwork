@@ -1,10 +1,8 @@
 import type { QueryVectorStoreResult } from "@/lib/vector-store/parse";
-import { cn } from "@/lib/utils";
 
 import { CitationModal } from "./citation-modal";
 
 export const CitationButton = ({
-  children,
   annotations,
   node: _,
   ...props
@@ -15,32 +13,18 @@ export const CitationButton = ({
   node?: any;
   className?: string;
 }) => {
-  if (!children) return null;
+  if (!props.children) return null;
 
   const idx = props["data-citation"] ? props["data-citation"] - 1 : undefined;
   const sources = annotations?.find((a) => a.type === "agentset_sources")
     ?.value as QueryVectorStoreResult | undefined;
 
   if (idx === undefined || !sources || !sources.results[idx])
-    return <span {...props}>{children}</span>;
+    return <span {...props}>{props.children}</span>;
 
   const source = sources.results[idx];
 
   return (
-    <CitationModal
-      source={source}
-      sourceIndex={idx + 1}
-      trigger={
-        <button
-          className={cn(
-            props.className,
-            "cursor-pointer text-blue-500 hover:underline",
-          )}
-          {...props}
-        >
-          <span className="mx-[1.5px]">{children}</span>
-        </button>
-      }
-    />
+    <CitationModal source={source} sourceIndex={idx + 1} triggerProps={props} />
   );
 };

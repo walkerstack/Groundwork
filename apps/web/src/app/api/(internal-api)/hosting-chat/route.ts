@@ -108,9 +108,10 @@ export const POST = withPublicApiHandler(
       model: languageModel,
       // TODO: get from hosting
       queryOptions: {
-        topK: 30,
+        topK: 50,
         rerankLimit: 15,
         rerank: true,
+        includeMetadata: true,
       },
       systemPrompt: hosting.systemPrompt ?? DEFAULT_SYSTEM_PROMPT.compile(),
       temperature: 0,

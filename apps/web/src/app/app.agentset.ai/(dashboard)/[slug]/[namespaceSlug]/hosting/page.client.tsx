@@ -60,6 +60,7 @@ export default function HostingPage() {
           systemPrompt: data.systemPrompt || "",
           examples: data.exampleQuestions,
           welcomeMessage: data.welcomeMessage || "",
+          citationMetadataPath: data.citationMetadataPath || "",
         }}
         action="Save"
       />

@@ -42,6 +42,7 @@ export const schema = z.object({
   systemPrompt: z.string().min(1, "System prompt cannot be empty"),
   examples: z.array(z.string().min(1, "Example cannot be empty")).max(4),
   welcomeMessage: z.string(),
+  citationMetadataPath: z.string().optional(),
 });
 
 // Virtual ID type for sortable items
@@ -67,6 +68,7 @@ export default function HostingForm({
       systemPrompt: DEFAULT_SYSTEM_PROMPT.compile(),
       examples: [],
       welcomeMessage: "",
+      citationMetadataPath: "",
       ...defaultValues,
     },
   });
@@ -200,6 +202,29 @@ export default function HostingForm({
                   />
                 </FormControl>
 
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="citationMetadataPath"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Citation Metadata Path</FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    placeholder="e.g. title or foo.bar"
+                    className="max-w-sm"
+                  />
+                </FormControl>
+                <FormDescription>
+                  Optional path to use for citation names. For example, if your
+                  metadata has a "title" field, enter "title". For nested
+                  fields, use dot notation like "foo.bar".
+                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}

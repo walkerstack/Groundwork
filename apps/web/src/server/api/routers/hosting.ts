@@ -41,6 +41,7 @@ export const hostingRouter = createTRPCRouter({
         systemPrompt: z.string().optional(),
         examples: z.array(z.string()).max(4).optional(),
         welcomeMessage: z.string().optional(),
+        citationMetadataPath: z.string().optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -78,6 +79,7 @@ export const hostingRouter = createTRPCRouter({
           systemPrompt: input.systemPrompt ?? DEFAULT_SYSTEM_PROMPT.compile(),
           exampleQuestions: input.examples,
           welcomeMessage: input.welcomeMessage,
+          citationMetadataPath: input.citationMetadataPath,
         },
       });
     }),
@@ -88,6 +90,7 @@ export const hostingRouter = createTRPCRouter({
         systemPrompt: z.string().optional(),
         examples: z.array(z.string()).max(4).optional(),
         welcomeMessage: z.string().optional(),
+        citationMetadataPath: z.string().optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -109,6 +112,7 @@ export const hostingRouter = createTRPCRouter({
           systemPrompt: input.systemPrompt,
           exampleQuestions: input.examples,
           welcomeMessage: input.welcomeMessage,
+          citationMetadataPath: input.citationMetadataPath,
         },
       });
     }),

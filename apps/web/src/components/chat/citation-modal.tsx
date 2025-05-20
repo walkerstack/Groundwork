@@ -6,20 +6,46 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { useHosting, useIsHosting } from "@/contexts/hosting-context";
+import { cn } from "@/lib/utils";
 
 import { CodeBlock } from "./code-block";
 
 interface CitationModalProps {
-  trigger: React.ReactNode;
   source: { text: string; metadata?: Record<string, unknown> };
   sourceIndex: number;
+  triggerProps: React.ComponentProps<"button">;
 }
 
-export function CitationModal({
-  trigger,
+const HostingCitation = ({
   source,
   sourceIndex,
+}: Pick<CitationModalProps, "source" | "sourceIndex">) => {
+  const hosting = useHosting();
+  const citationName = useMemo(() => {
+    if (!hosting.citationMetadataPath || !source.metadata) return null;
+
+    const path = hosting.citationMetadataPath.split(".");
+    let value: unknown = source.metadata;
+
+    for (const key of path) {
+      if (value === null || typeof value !== "object") return null;
+      value = (value as Record<string, unknown>)[key];
+    }
+
+    return typeof value === "string" ? value : null;
+  }, [hosting, source.metadata]);
+
+  return <>{citationName || `Source [${sourceIndex}]`}</>;
+};
+
+export function CitationModal({
+  source,
+  sourceIndex,
+  triggerProps,
 }: CitationModalProps) {
+  const isHosting = useIsHosting();
+
   const stringifiedMetadata = useMemo(() => {
     if (!source.metadata) return null;
     try {
@@ -31,7 +57,23 @@ export function CitationModal({
 
   return (
     <Dialog>
-      <DialogTrigger asChild>{trigger}</DialogTrigger>
+      <DialogTrigger asChild>
+        <button
+          className={cn(
+            triggerProps.className,
+            "cursor-pointer text-blue-500 hover:underline",
+          )}
+          {...triggerProps}
+        >
+          <span className="mx-1.5">
+            {isHosting ? (
+              <HostingCitation source={source} sourceIndex={sourceIndex} />
+            ) : (
+              triggerProps.children
+            )}
+          </span>
+        </button>
+      </DialogTrigger>
 
       <DialogContent
         className="sm:max-w-2xl"
@@ -40,7 +82,13 @@ export function CitationModal({
         }}
       >
         <DialogHeader>
-          <DialogTitle>Source [{sourceIndex}]</DialogTitle>
+          <DialogTitle>
+            {isHosting ? (
+              <HostingCitation source={source} sourceIndex={sourceIndex} />
+            ) : (
+              `Source [${sourceIndex}]`
+            )}
+          </DialogTitle>
         </DialogHeader>
 
         <div className="mt-4 max-h-[60vh] overflow-y-auto">

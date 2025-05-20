@@ -25,3 +25,8 @@ export function useHosting() {
   if (!hosting) throw new Error("Hosting not found");
   return hosting;
 }
+
+export function useIsHosting() {
+  const hosting = use(HostingContext);
+  return !!hosting;
+}
