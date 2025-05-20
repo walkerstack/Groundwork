@@ -5,6 +5,13 @@ import type { ColumnDef } from "@tanstack/react-table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -96,12 +103,29 @@ export const columns: ColumnDef<JobCol>[] = [
     accessorKey: "config",
     header: "Config",
     cell: ({ row }) => {
+      const config = row.original.config;
+      if (!config) return <p>-</p>;
+
+      const configStr = JSON.stringify(config, null, 2);
+      const truncatedConfig =
+        configStr.length > 50 ? configStr.slice(0, 50) + "..." : configStr;
+
       return (
-        <pre>
-          {row.original.config
-            ? JSON.stringify(row.original.config, null, 2)
-            : "-"}
-        </pre>
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant="ghost" className="h-auto p-0 hover:bg-transparent">
+              <pre className="text-left">{truncatedConfig}</pre>
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-3xl">
+            <DialogHeader>
+              <DialogTitle>Job Config</DialogTitle>
+            </DialogHeader>
+            <pre className="bg-muted max-h-[60vh] overflow-auto rounded-md p-4">
+              {configStr}
+            </pre>
+          </DialogContent>
+        </Dialog>
       );
     },
   },
