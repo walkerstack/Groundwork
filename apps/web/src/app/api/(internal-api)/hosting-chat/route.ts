@@ -56,7 +56,8 @@ const getHosting = async (namespaceId: string) => {
     },
     ["hosting", namespaceId],
     {
-      revalidate: 60 * 60 * 1, // 1 hour
+      tags: [`hosting:${namespaceId}`],
+      revalidate: 60 * 60 * 24, // 1 day
     },
   )();
 };

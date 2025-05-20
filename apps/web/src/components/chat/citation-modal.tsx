@@ -74,11 +74,11 @@ export function CitationModal({
       <DialogTrigger asChild>
         {hostingCitation ? (
           <button
+            {...triggerProps}
             className={cn(
               triggerProps.className,
-              "bg-muted-foreground text-muted-foreground hover:bg-muted-foreground/80 mx-0.5 cursor-pointer rounded-full px-1 py-0.5",
+              "bg-muted text-muted-foreground hover:bg-primary hover:text-primary-foreground mx-0.5 cursor-pointer rounded-full px-3 py-0.5 text-sm hover:no-underline",
             )}
-            {...triggerProps}
           >
             {hostingCitation}
           </button>
