@@ -13,11 +13,12 @@ export const validDomainRegex = new RegExp(
   /^([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/,
 );
 export const isValidDomain = (domain: string) => {
-  return (
-    validDomainRegex.test(domain) &&
-    // make sure the domain isn't agentset.ai
-    !/^(agentset\.ai|.*\.agentset\.ai)$/i.test(domain)
-  );
+  return validDomainRegex.test(domain);
+  // return (
+  //   validDomainRegex.test(domain) &&
+  //   // make sure the domain isn't agentset.ai
+  //   !/^(agentset\.ai|.*\.agentset\.ai)$/i.test(domain)
+  // );
 };
 
 export const domainExists = async (domain: string) => {
