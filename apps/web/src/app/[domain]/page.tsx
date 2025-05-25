@@ -39,9 +39,7 @@ export async function generateMetadata({
 
   if (!hosting) return {};
 
-  return {
-    title: constructMetadata({ title: hosting.namespace.organization.name }),
-  };
+  return constructMetadata({ title: hosting.namespace.organization.name });
 }
 
 export default async function CustomDomainPage({
