@@ -76,7 +76,7 @@ export default function UploadForm({ onSuccess }: { onSuccess: () => void }) {
       payload: {
         type: "MANAGED_FILES",
         name: data.name,
-        keys: uploadedFiles.map((file) => file.key),
+        files: uploadedFiles,
       },
       config:
         data.chunkSize || data.chunkOverlap || data.metadata

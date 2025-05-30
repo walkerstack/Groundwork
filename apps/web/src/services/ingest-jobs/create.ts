@@ -49,8 +49,20 @@ export const createIngestJob = async ({
       key: payload.key,
     };
   } else if (payload.type === "MANAGED_FILES") {
-    const deduplicatedKeys = [...new Set(payload.keys)];
-    const results = await Promise.all(deduplicatedKeys.map(checkFileExists));
+    const deduplicatedFiles: {
+      key: string;
+      name?: string | null | undefined;
+    }[] = [];
+    for (const file of payload.files) {
+      if (deduplicatedFiles.find((f) => f.key === file.key)) {
+        continue;
+      }
+      deduplicatedFiles.push(file);
+    }
+
+    const results = await Promise.all(
+      deduplicatedFiles.map((file) => checkFileExists(file.key)),
+    );
 
     const missingKeys = results.filter((result) => !result);
     if (missingKeys.length > 0) {
@@ -60,7 +72,7 @@ export const createIngestJob = async ({
     finalPayload = {
       type: "MANAGED_FILES",
       ...(payload.name && { name: payload.name }),
-      keys: deduplicatedKeys,
+      files: deduplicatedFiles,
     };
   }
 

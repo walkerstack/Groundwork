@@ -6,6 +6,12 @@ const nameSchema = z
   .optional()
   .describe("The name of the ingest job.");
 
+const fileNameSchema = z
+  .string()
+  .nullable()
+  .optional()
+  .describe("The name of the file.");
+
 export const textPayloadSchema = z
   .object({
     type: z.literal("TEXT"),
@@ -39,9 +45,12 @@ export const managedFilePayloadSchema = z
 export const managedFilesPayloadSchema = z
   .object({
     type: z.literal("MANAGED_FILES"),
-    keys: z
-      .array(z.string())
-      .describe("The keys of the managed files to ingest."),
+    files: z.array(
+      z.object({
+        key: z.string().describe("The key of the managed file to ingest."),
+        name: fileNameSchema,
+      }),
+    ),
     name: nameSchema,
   })
   .openapi({
