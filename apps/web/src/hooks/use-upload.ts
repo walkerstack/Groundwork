@@ -41,10 +41,10 @@ const uploadWithProgress = (
   });
 };
 
-export function useUploadFile({ namespaceId }: { namespaceId: string }) {
+export function useUploadFiles({ namespaceId }: { namespaceId: string }) {
   const trpc = useTRPC();
-  const { mutateAsync: getPresignedUrl } = useMutation(
-    trpc.upload.getPresignedUrl.mutationOptions(),
+  const { mutateAsync: getPresignedUrls } = useMutation(
+    trpc.upload.getPresignedUrls.mutationOptions(),
   );
 
   const [uploadedFiles, setUploadedFiles] = useState<
@@ -54,26 +54,35 @@ export function useUploadFile({ namespaceId }: { namespaceId: string }) {
   const [progresses, setProgresses] = useState<Record<string, number>>({});
   const [isUploading, setIsUploading] = useState(false);
 
-  async function onUpload(file: File) {
+  async function onUpload(files: File[]) {
     setIsUploading(true);
-    let newEntry: { name: string; key: string } | null = null;
+    const newEntries: { name: string; key: string }[] = [];
 
     try {
-      const presignResponse = await getPresignedUrl({
+      const presignResponses = await getPresignedUrls({
         namespaceId,
-        fileName: file.name,
-        contentType: file.type,
-        fileSize: file.size,
+        files: files.map((file) => ({
+          fileName: file.name,
+          contentType: file.type,
+          fileSize: file.size,
+        })),
       });
 
-      await uploadWithProgress(presignResponse.url, file, {
-        onProgress: (percent) => {
-          setProgresses((prev) => ({ ...prev, [file.name]: percent }));
-        },
-      });
+      await Promise.all(
+        presignResponses.map(async (presignResponse, i) => {
+          const file = files[i]!;
 
-      newEntry = { name: file.name, key: presignResponse.key };
-      setUploadedFiles((prev) => [...prev, newEntry!]);
+          await uploadWithProgress(presignResponse.url, file, {
+            onProgress: (percent) => {
+              setProgresses((prev) => ({ ...prev, [file.name]: percent }));
+            },
+          });
+
+          const newEntry = { name: file.name, key: presignResponse.key };
+          newEntries.push(newEntry);
+          setUploadedFiles((prev) => [...prev, newEntry]);
+        }),
+      );
     } catch {
       toast.error("Failed to upload file!");
     } finally {
@@ -81,7 +90,7 @@ export function useUploadFile({ namespaceId }: { namespaceId: string }) {
       setIsUploading(false);
     }
 
-    return newEntry;
+    return newEntries;
   }
 
   return {

@@ -43,7 +43,7 @@ export const { POST } = serve<TriggerIngestionJobBody>(
       status: DocumentStatus.QUEUED,
       tenantId: ingestionJob.tenantId,
       ingestJobId: ingestionJob.id,
-      // metadata: ingestionJob.config?.metadata,
+      // metadata: ingestionJob.config?.metadata, // NOTE: we currently get document metadata from the job directly
     } satisfies Partial<Prisma.DocumentCreateArgs["data"]>;
 
     let documents: Pick<Document, "id">[] = [];
@@ -108,6 +108,30 @@ export const { POST } = serve<TriggerIngestionJobBody>(
 
         return [];
       });
+    } else if (ingestionJob.payload.type === "MANAGED_FILES") {
+      // we need to batch create the documents
+      const batches = chunkArray(ingestionJob.payload.keys, 20);
+
+      for (let i = 0; i < batches.length; i++) {
+        const keyBatch = batches[i]!;
+        const batchResult = await context.run(
+          `create-documents-${i}`,
+          async () => {
+            const newDocuments = await db.document.createManyAndReturn({
+              select: { id: true },
+              data: keyBatch.map((key) => ({
+                ...commonData,
+                ingestJobId: ingestionJob.id,
+                source: { type: "MANAGED_FILE", key: key },
+              })),
+            });
+
+            return newDocuments.flat();
+          },
+        );
+
+        documents = documents.concat(batchResult);
+      }
     } else if (ingestionJob.payload.type === "URLS") {
       // we need to batch create the documents
       const batches = chunkArray(ingestionJob.payload.urls, 20);

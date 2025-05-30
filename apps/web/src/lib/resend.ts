@@ -1,5 +1,6 @@
 import type { CreateEmailOptions } from "resend";
 import { env } from "@/env";
+import { render } from "@react-email/render";
 import { Resend } from "resend";
 
 import { APP_DOMAIN } from "./constants";
@@ -30,6 +31,17 @@ export const sendEmail = async (opts: ResendEmailOptions) => {
     react,
     scheduledAt,
   } = opts;
+
+  if (env.NODE_ENV === "development" && (text || react)) {
+    const emailText =
+      text || (await render(react as React.ReactElement, { plainText: true }));
+    // log to console
+    console.log(
+      `Sending email to ${email} from ${from || VARIANT_TO_FROM_MAP[variant]}`,
+    );
+    console.log(emailText);
+    return;
+  }
 
   return await resend.emails.send({
     to: email,

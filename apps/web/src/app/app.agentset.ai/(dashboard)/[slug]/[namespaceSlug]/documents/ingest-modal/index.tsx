@@ -93,7 +93,7 @@ export function IngestModal() {
         </DialogTrigger>
       </div>
 
-      <DialogContent className="sm:max-w-2xl">
+      <DialogContent className="sm:max-w-2xl" scrollableOverlay>
         <DialogHeader>
           <DialogTitle>Ingest Content</DialogTitle>
         </DialogHeader>

@@ -90,7 +90,7 @@ export default function TextForm({ onSuccess }: { onSuccess: () => void }) {
                   <Textarea
                     id="text"
                     placeholder="Enter your text here"
-                    className="min-h-[200px]"
+                    className="max-h-[400px] min-h-[200px]"
                     {...field}
                   />
                 </FormControl>

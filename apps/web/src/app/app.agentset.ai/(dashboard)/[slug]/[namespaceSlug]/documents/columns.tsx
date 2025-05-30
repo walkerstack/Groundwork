@@ -91,6 +91,17 @@ export const columns: ColumnDef<JobCol>[] = [
     size: 32,
   },
   {
+    id: "name",
+    accessorKey: "payload",
+    header: "Name",
+    cell: ({ row }) => {
+      const name =
+        "name" in row.original.payload ? row.original.payload.name : "-";
+      return <p>{name}</p>;
+    },
+  },
+  {
+    id: "type",
     accessorKey: "payload",
     header: "Type",
     cell: ({ row }) => {

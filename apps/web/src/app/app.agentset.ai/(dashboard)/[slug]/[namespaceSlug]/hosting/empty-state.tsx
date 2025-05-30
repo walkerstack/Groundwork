@@ -82,12 +82,7 @@ export function EmptyState() {
               <Button size="lg">Enable</Button>
             </DialogTrigger>
 
-            <DialogContent
-              className="relative! top-0 left-0 translate-none!"
-              overlayProps={{
-                className: "grid place-items-center overflow-y-auto py-20",
-              }}
-            >
+            <DialogContent scrollableOverlay>
               <DialogHeader>
                 <DialogTitle>Enable Hosting</DialogTitle>
               </DialogHeader>

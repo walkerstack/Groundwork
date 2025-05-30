@@ -36,10 +36,23 @@ export const managedFilePayloadSchema = z
     title: "Managed File Payload",
   });
 
+export const managedFilesPayloadSchema = z
+  .object({
+    type: z.literal("MANAGED_FILES"),
+    keys: z
+      .array(z.string())
+      .describe("The keys of the managed files to ingest."),
+    name: nameSchema,
+  })
+  .openapi({
+    title: "Managed Files Payload",
+  });
+
 export const urlsPayloadSchema = z
   .object({
     type: z.literal("URLS"),
     urls: z.array(z.string().url()).describe("The URLs to ingest."),
+    name: nameSchema,
   })
   .openapi({
     title: "URLs Payload",
@@ -50,6 +63,7 @@ export const ingestJobPayloadSchema = z
     textPayloadSchema,
     filePayloadSchema,
     managedFilePayloadSchema,
+    managedFilesPayloadSchema,
     urlsPayloadSchema,
   ])
   .describe("The ingest job payload.");

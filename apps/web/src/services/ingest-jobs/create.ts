@@ -34,6 +34,7 @@ export const createIngestJob = async ({
     const deduplicatedUrls = [...new Set(payload.urls)];
     finalPayload = {
       type: "URLS",
+      ...(payload.name && { name: payload.name }),
       urls: deduplicatedUrls,
     };
   } else if (payload.type === "MANAGED_FILE") {
@@ -46,6 +47,20 @@ export const createIngestJob = async ({
       type: "MANAGED_FILE",
       ...(payload.name && { name: payload.name }),
       key: payload.key,
+    };
+  } else if (payload.type === "MANAGED_FILES") {
+    const deduplicatedKeys = [...new Set(payload.keys)];
+    const results = await Promise.all(deduplicatedKeys.map(checkFileExists));
+
+    const missingKeys = results.filter((result) => !result);
+    if (missingKeys.length > 0) {
+      throw new Error("FILE_NOT_FOUND");
+    }
+
+    finalPayload = {
+      type: "MANAGED_FILES",
+      ...(payload.name && { name: payload.name }),
+      keys: deduplicatedKeys,
     };
   }
 

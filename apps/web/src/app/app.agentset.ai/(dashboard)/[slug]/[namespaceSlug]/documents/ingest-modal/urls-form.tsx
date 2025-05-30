@@ -3,6 +3,7 @@ import { DialogFooter } from "@/components/ui/dialog";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -23,6 +24,7 @@ import IngestConfig from "./config";
 
 const schema = z
   .object({
+    name: z.string().optional(),
     urls: z
       .array(z.string().url("Please enter a valid URL"))
       .min(1, "Add at least one URL"),
@@ -52,6 +54,7 @@ export default function UrlsForm({ onSuccess }: { onSuccess: () => void }) {
       payload: {
         type: "URLS",
         urls: data.urls,
+        name: data.name,
       },
       config:
         data.chunkSize || data.chunkOverlap || data.metadata
@@ -83,6 +86,22 @@ export default function UrlsForm({ onSuccess }: { onSuccess: () => void }) {
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleUrlsSubmit)}>
         <div className="flex flex-col gap-6 py-4">
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Name (optional)</FormLabel>
+                <FormControl>
+                  <Input placeholder="2025 Reports" {...field} />
+                </FormControl>
+
+                <FormDescription>A name for this batch</FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
           <div className="flex flex-col gap-1">
             {form.watch("urls").map((_, index) => (
               <div key={index} className="flex items-end gap-2">
