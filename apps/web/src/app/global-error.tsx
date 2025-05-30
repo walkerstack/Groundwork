@@ -22,11 +22,11 @@ export default function GlobalError({
     <html>
       <body
         className={cn(
-          "bg-background text-foreground flex min-h-screen font-sans antialiased",
+          "bg-background text-foreground flex min-h-screen w-full font-sans antialiased",
           inter.variable,
         )}
       >
-        <main className="grid min-h-screen place-items-center px-6 py-24 sm:py-32 lg:px-8">
+        <main className="grid min-h-screen w-full place-items-center px-6 py-24 sm:py-32 lg:px-8">
           <div className="text-center">
             <p className="text-destructive text-base font-semibold">ERROR</p>
             <h1 className="mt-4 text-5xl font-semibold tracking-tight text-balance sm:text-7xl">

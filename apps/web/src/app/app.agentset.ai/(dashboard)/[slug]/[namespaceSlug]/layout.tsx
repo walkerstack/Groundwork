@@ -1,27 +1,34 @@
-import { notFound } from "next/navigation";
-import { NamespaceProvider } from "@/contexts/namespace-context";
-import { trpcApi } from "@/trpc/server";
+"use client";
 
-export default async function NamespaceLayout({
-  params,
+import { notFound, useParams } from "next/navigation";
+import { NamespaceProvider } from "@/contexts/namespace-context";
+import { useTRPC } from "@/trpc/react";
+import { useQuery } from "@tanstack/react-query";
+
+export default function NamespaceLayout({
   children,
 }: {
-  params: Promise<{ slug: string; namespaceSlug: string }>;
   children: React.ReactNode;
 }) {
-  const { slug, namespaceSlug } = await params;
-  const namespace = await trpcApi.namespace.getNamespaceBySlug({
-    slug: namespaceSlug,
-    orgSlug: slug,
-  });
+  const trpc = useTRPC();
+  const params = useParams();
 
-  if (!namespace) {
+  const { isLoading, data } = useQuery(
+    trpc.namespace.getNamespaceBySlug.queryOptions({
+      orgSlug: params.slug as string,
+      slug: params.namespaceSlug as string,
+    }),
+  );
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (!data) {
     notFound();
   }
 
   return (
-    <NamespaceProvider activeNamespace={namespace}>
-      {children}
-    </NamespaceProvider>
+    <NamespaceProvider activeNamespace={data}>{children}</NamespaceProvider>
   );
 }

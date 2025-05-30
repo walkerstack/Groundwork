@@ -40,7 +40,8 @@ export function NavItems({
 } & React.ComponentPropsWithoutRef<typeof SidebarGroup>) {
   const router = useRouter();
   const { slug, namespaceSlug } = useParams();
-  const { isAdmin } = useOrganization();
+  // const { isAdmin } = useOrganization();
+  const isAdmin = true;
 
   const pathname = usePathname();
 

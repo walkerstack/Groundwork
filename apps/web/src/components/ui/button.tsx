@@ -2,7 +2,8 @@ import type { VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 import { Slot } from "@radix-ui/react-slot";
 import { cva } from "class-variance-authority";
-import { Loader2Icon } from "lucide-react";
+
+import { Spinner } from "./spinner";
 
 const buttonVariants = cva(
   "focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive inline-flex shrink-0 cursor-pointer items-center justify-center gap-2 rounded-md text-sm font-medium whitespace-nowrap transition-[color,box-shadow] outline-none focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
@@ -56,11 +57,7 @@ function Button({
       disabled={props.disabled || isLoading}
       {...props}
     >
-      {isLoading ? (
-        <Loader2Icon size={15} className="animate-spin" />
-      ) : (
-        children
-      )}
+      {isLoading ? <Spinner className="animate-spin" /> : children}
     </Comp>
   );
 }

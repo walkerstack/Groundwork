@@ -32,9 +32,7 @@ export type SidebarItemType = {
 export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar variant="inset" {...props}>
-      <SidebarHeader>
-        <OrganizationSwitcher />
-      </SidebarHeader>
+      <SidebarHeader>{/* <OrganizationSwitcher /> */}</SidebarHeader>
 
       <SidebarContent>
         <NavOrgSettings />
@@ -47,9 +45,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
 
       <SidebarSeparator className="mr-0 -ml-2 w-[calc(100%+1rem)]!" />
 
-      <SidebarFooter className="pb-5">
-        <Usage />
-      </SidebarFooter>
+      <SidebarFooter className="pb-5">{/* <Usage /> */}</SidebarFooter>
     </Sidebar>
   );
 }
