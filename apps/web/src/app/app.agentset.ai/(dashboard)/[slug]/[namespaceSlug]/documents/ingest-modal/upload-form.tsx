@@ -71,24 +71,22 @@ export default function UploadForm({ onSuccess }: { onSuccess: () => void }) {
     const uploadedFiles = await onUpload(data.files);
     if (uploadedFiles.length === 0) return;
 
-    toast.success("Files uploaded successfully");
-
-    // await mutateAsync({
-    //   namespaceId: activeNamespace.id,
-    //   payload: {
-    //     type: "MANAGED_FILES",
-    //     name: data.name,
-    //     keys: uploadedFiles.map((file) => file.key),
-    //   },
-    //   config:
-    //     data.chunkSize || data.chunkOverlap || data.metadata
-    //       ? {
-    //           chunkSize: data.chunkSize,
-    //           chunkOverlap: data.chunkOverlap,
-    //           metadata: data.metadata,
-    //         }
-    //       : undefined,
-    // });
+    await mutateAsync({
+      namespaceId: activeNamespace.id,
+      payload: {
+        type: "MANAGED_FILES",
+        name: data.name,
+        keys: uploadedFiles.map((file) => file.key),
+      },
+      config:
+        data.chunkSize || data.chunkOverlap || data.metadata
+          ? {
+              chunkSize: data.chunkSize,
+              chunkOverlap: data.chunkOverlap,
+              metadata: data.metadata,
+            }
+          : undefined,
+    });
   };
 
   const isPending = isFilePending || isUploading;
