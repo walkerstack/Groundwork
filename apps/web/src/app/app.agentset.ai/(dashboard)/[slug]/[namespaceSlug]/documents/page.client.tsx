@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { CodeBlock } from "@/components/chat/code-block";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   Dialog,
   DialogContent,
@@ -11,6 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { prefixId } from "@/lib/api/ids";
+import { InfoIcon } from "lucide-react";
 
 import type { JobsTableMeta } from "./columns";
 import { columns } from "./columns";
@@ -110,6 +112,14 @@ export default function JobsPage() {
         </TabsContent>
 
         <TabsContent value="documents">
+          <Alert className="mb-5">
+            <InfoIcon className="text-muted-foreground size-4" />
+            <AlertDescription>
+              Documents may take a moment to appear while processing. Check the
+              jobs tab for status.
+            </AlertDescription>
+          </Alert>
+
           <PaginatedTable
             columns={documentColumns}
             data={documentsData}
