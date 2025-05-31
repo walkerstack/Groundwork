@@ -17,7 +17,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { capitalize } from "@/lib/string-utils";
-import { formatMs } from "@/lib/utils";
+import { formatDuration } from "@/lib/utils";
 import { ChevronDownIcon, ChevronRightIcon } from "lucide-react";
 
 import type { IngestJob } from "@agentset/db";
@@ -74,18 +74,23 @@ export const columns: ColumnDef<JobCol>[] = [
       const onExpand = meta?.onExpand;
       const isExpanded = expandedJobId === row.original.id;
       return (
-        <Button
-          variant="ghost"
-          size="icon"
-          aria-label={isExpanded ? "Collapse" : "Expand"}
-          onClick={() => onExpand?.(isExpanded ? null : row.original.id)}
-        >
-          {isExpanded ? (
-            <ChevronDownIcon className="h-4 w-4" />
-          ) : (
-            <ChevronRightIcon className="h-4 w-4" />
-          )}
-        </Button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label={isExpanded ? "Collapse" : "Expand"}
+              onClick={() => onExpand?.(isExpanded ? null : row.original.id)}
+            >
+              {isExpanded ? (
+                <ChevronDownIcon className="size-4" />
+              ) : (
+                <ChevronRightIcon className="size-4" />
+              )}
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>View Documents</TooltipContent>
+        </Tooltip>
       );
     },
     size: 32,
@@ -157,7 +162,7 @@ export const columns: ColumnDef<JobCol>[] = [
           variant={statusToBadgeVariant(row.original.status)}
           className="capitalize"
         >
-          {row.original.status.toLowerCase()}
+          {capitalize(row.original.status.split("_").join(" "))}
         </Badge>
       );
 
@@ -186,7 +191,7 @@ export const columns: ColumnDef<JobCol>[] = [
       return (
         <p>
           {finishDate && row.original.queuedAt
-            ? formatMs(finishDate.getTime() - row.original.queuedAt.getTime())
+            ? formatDuration(row.original.queuedAt, finishDate)
             : "-"}
         </p>
       );

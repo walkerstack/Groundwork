@@ -19,7 +19,6 @@ import { useTRPC } from "@/trpc/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
-import { toast } from "sonner";
 import { z } from "zod";
 
 import { configSchema } from "@agentset/validation";
@@ -140,7 +139,7 @@ export default function UploadForm({ onSuccess }: { onSuccess: () => void }) {
 
         <DialogFooter>
           <Button type="submit" isLoading={isPending}>
-            Ingest File
+            Ingest Files
           </Button>
         </DialogFooter>
       </form>

@@ -7,7 +7,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { capitalize } from "@/lib/string-utils";
-import { formatBytes, formatMs, formatNumber } from "@/lib/utils";
+import { formatBytes, formatDuration, formatNumber } from "@/lib/utils";
 import { BookTextIcon, Code2Icon, FileTextIcon, ImageIcon } from "lucide-react";
 
 import type { Document } from "@agentset/db";
@@ -165,7 +165,7 @@ export const documentColumns: ColumnDef<DocumentCol>[] = [
           variant={statusToBadgeVariant(row.original.status)}
           className="capitalize"
         >
-          {row.original.status.toLowerCase()}
+          {capitalize(row.original.status.split("_").join(" "))}
         </Badge>
       );
       if (!row.original.error) return badge;
@@ -186,7 +186,7 @@ export const documentColumns: ColumnDef<DocumentCol>[] = [
       return (
         <p>
           {finishDate && row.original.queuedAt
-            ? formatMs(finishDate.getTime() - row.original.queuedAt.getTime())
+            ? formatDuration(row.original.queuedAt, finishDate)
             : "-"}
         </p>
       );

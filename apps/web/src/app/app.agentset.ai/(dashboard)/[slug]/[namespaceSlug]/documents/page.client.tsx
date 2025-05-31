@@ -1,8 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { DataTable } from "@/components/data-table";
-import { Button } from "@/components/ui/button";
+import { useState } from "react";
+import { CodeBlock } from "@/components/chat/code-block";
 import {
   Dialog,
   DialogContent,
@@ -10,234 +9,172 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { useNamespace } from "@/contexts/namespace-context";
-import { useCursorPagination } from "@/hooks/use-cursor-pagination";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { prefixId } from "@/lib/api/ids";
-import { capitalize } from "@/lib/string-utils";
-import { useTRPC } from "@/trpc/react";
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { RefreshCcwIcon } from "lucide-react";
-
-import { DocumentStatus, IngestJobStatus } from "@agentset/db";
 
 import type { JobsTableMeta } from "./columns";
-import type { DocumentCol } from "./documents-columns";
-import { CodeBlock } from "../../../../../../components/chat/code-block";
 import { columns } from "./columns";
 import { documentColumns } from "./documents-columns";
-
-const Documents = ({ expandedJobId }: { expandedJobId: string }) => {
-  const { activeNamespace } = useNamespace();
-  const trpc = useTRPC();
-  const [statuses, setStatuses] = useState<DocumentStatus[]>([]);
-  const { cursor, cursorDirection, handleNext, handlePrevious, hasPrevious } =
-    useCursorPagination();
-
-  const { isLoading, data, refetch, isFetching } = useQuery(
-    trpc.document.all.queryOptions(
-      {
-        namespaceId: activeNamespace.id,
-        ingestJobId: expandedJobId,
-        statuses,
-        cursor,
-        cursorDirection,
-      },
-      {
-        placeholderData: keepPreviousData,
-      },
-    ),
-  );
-
-  const statusLabels = useMemo(() => {
-    return Object.values(DocumentStatus).map((status) => ({
-      label: capitalize(status.split("_").join(" ")),
-      value: status,
-    }));
-  }, []);
-
-  return (
-    <div className="mt-5 overflow-x-auto">
-      <div className="mb-5 flex justify-between">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline">Status</Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start">
-            {statusLabels.map(({ label, value }) => (
-              <DropdownMenuCheckboxItem
-                key={value}
-                checked={statuses.includes(value)}
-                onCheckedChange={() =>
-                  setStatuses(
-                    statuses.includes(value)
-                      ? statuses.filter((s) => s !== value)
-                      : [...statuses, value],
-                  )
-                }
-                className="capitalize"
-              >
-                {label}
-              </DropdownMenuCheckboxItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
-
-        <Button
-          onClick={() => refetch()}
-          disabled={isFetching}
-          className="flex items-center gap-2"
-        >
-          <RefreshCcwIcon className="h-4 w-4" />
-          Refresh
-        </Button>
-      </div>
-
-      <div className="min-h-[450px] w-full">
-        <DataTable
-          columns={documentColumns}
-          data={data?.records as DocumentCol[]}
-          isLoading={isLoading}
-        />
-      </div>
-
-      <div className="mt-10 flex gap-4">
-        <Button
-          variant="outline"
-          onClick={handlePrevious}
-          disabled={!hasPrevious}
-        >
-          Previous Page
-        </Button>
-
-        <Button
-          variant="outline"
-          onClick={() => handleNext({ nextCursor: data?.nextCursor })}
-          disabled={!data?.nextCursor}
-        >
-          Next Page
-        </Button>
-      </div>
-    </div>
-  );
-};
+import { PaginatedTable } from "./paginated-table";
+import { PaginatedTableHeader } from "./paginated-table-header";
+import { useDocuments } from "./use-documents";
+import { useJobs } from "./use-jobs";
 
 export default function JobsPage() {
-  const { activeNamespace } = useNamespace();
-  const trpc = useTRPC();
-  const [statuses, setStatuses] = useState<IngestJobStatus[]>([]);
-  const { cursor, cursorDirection, handleNext, handlePrevious, hasPrevious } =
-    useCursorPagination();
-  const [expandedJobId, setExpandedJobId] = useState<string | null>(null);
+  const [tab, setTab] = useState<"jobs" | "documents">("jobs");
 
-  const { isLoading, data, refetch, isFetching } = useQuery(
-    trpc.ingestJob.all.queryOptions(
-      {
-        namespaceId: activeNamespace.id,
-        statuses,
-        cursor,
-        cursorDirection,
-      },
-      { refetchInterval: 15_000, placeholderData: keepPreviousData }, // Refetch every 15 seconds
-    ),
-  );
+  const {
+    isLoading: isJobsLoading,
+    data: jobsData,
+    refetch: refetchJobs,
+    isFetching: isJobsFetching,
+    handleNext: handleNextJob,
+    handlePrevious: handlePreviousJob,
+    hasPrevious: hasPreviousJob,
+    statuses: jobStatuses,
+    setStatuses: setJobStatuses,
+    statusLabels: jobStatusLabels,
+    expandedJobId,
+    setExpandedJobId,
+  } = useJobs();
 
-  const statusLabels = useMemo(() => {
-    return Object.values(IngestJobStatus).map((status) => ({
-      label: capitalize(status.split("_").join(" ")),
-      value: status,
-    }));
-  }, []);
+  const {
+    isLoading: isDocumentsLoading,
+    data: documentsData,
+    refetch: refetchDocuments,
+    isFetching: isDocumentsFetching,
+    statuses: documentStatuses,
+    setStatuses: setDocumentStatuses,
+    statusLabels: documentStatusLabels,
+    handleNext: handleNextDocument,
+    handlePrevious: handlePreviousDocument,
+    hasPrevious: hasPreviousDocument,
+  } = useDocuments(undefined, tab === "documents");
 
   return (
     <>
-      <div className="mb-5 flex justify-between">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline">Status</Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {statusLabels.map(({ label, value }) => (
-              <DropdownMenuCheckboxItem
-                key={value}
-                checked={statuses.includes(value)}
-                onCheckedChange={() =>
-                  setStatuses(
-                    statuses.includes(value)
-                      ? statuses.filter((s) => s !== value)
-                      : [...statuses, value],
-                  )
-                }
-                className="capitalize"
-              >
-                {label}
-              </DropdownMenuCheckboxItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
+      <Tabs
+        value={tab}
+        onValueChange={(value) => setTab(value as "jobs" | "documents")}
+      >
+        <div className="mb-5 flex w-full justify-between gap-4">
+          <TabsList>
+            <TabsTrigger value="jobs">Jobs</TabsTrigger>
+            <TabsTrigger value="documents">Documents</TabsTrigger>
+          </TabsList>
 
-        <Button
-          onClick={() => refetch()}
-          disabled={isFetching}
-          className="flex items-center gap-2"
-        >
-          <RefreshCcwIcon className="h-4 w-4" />
-          Refresh
-        </Button>
-      </div>
+          <TabsContent value="jobs" className="flex flex-none">
+            <PaginatedTableHeader
+              statuses={jobStatuses}
+              setStatuses={setJobStatuses}
+              statusLabels={jobStatusLabels}
+              onRefresh={refetchJobs}
+              isRefreshing={isJobsFetching}
+            />
+          </TabsContent>
 
-      <DataTable
-        columns={columns}
-        data={data?.records}
-        isLoading={isLoading}
-        meta={
-          { expandedJobId, onExpand: setExpandedJobId } satisfies JobsTableMeta
-        }
-      />
+          <TabsContent value="documents" className="flex flex-none">
+            <PaginatedTableHeader
+              statuses={documentStatuses}
+              setStatuses={setDocumentStatuses}
+              statusLabels={documentStatusLabels}
+              onRefresh={refetchDocuments}
+              isRefreshing={isDocumentsFetching}
+            />
+          </TabsContent>
+        </div>
 
-      {/* Show documents for the expanded job */}
-      {expandedJobId && (
-        <Dialog open onOpenChange={() => setExpandedJobId(null)}>
-          <DialogContent className="sm:max-w-5xl">
-            <DialogHeader>
-              <DialogTitle>Documents</DialogTitle>
-              <DialogDescription>
-                Documents for the ingest job{" "}
-                {expandedJobId && (
-                  <CodeBlock inline>
-                    {prefixId(expandedJobId, "job_")}
-                  </CodeBlock>
-                )}
-              </DialogDescription>
-            </DialogHeader>
+        <TabsContent value="jobs">
+          {/* Show documents for the expanded job */}
+          {expandedJobId && (
+            <DocumentsDialog
+              jobId={expandedJobId}
+              onClose={() => setExpandedJobId(null)}
+            />
+          )}
 
-            <Documents expandedJobId={expandedJobId} />
-          </DialogContent>
-        </Dialog>
-      )}
+          <PaginatedTable
+            columns={columns}
+            data={jobsData}
+            isLoading={isJobsLoading}
+            meta={
+              {
+                expandedJobId,
+                onExpand: setExpandedJobId,
+              } satisfies JobsTableMeta
+            }
+            onNext={handleNextJob}
+            onPrevious={handlePreviousJob}
+            hasPrevious={hasPreviousJob}
+          />
+        </TabsContent>
 
-      <div className="mt-10 flex gap-4">
-        <Button
-          variant="outline"
-          onClick={handlePrevious}
-          disabled={!hasPrevious}
-        >
-          Previous Page
-        </Button>
-
-        <Button
-          variant="outline"
-          onClick={() => handleNext({ nextCursor: data?.nextCursor })}
-          disabled={!data?.nextCursor}
-        >
-          Next Page
-        </Button>
-      </div>
+        <TabsContent value="documents">
+          <PaginatedTable
+            columns={documentColumns}
+            data={documentsData}
+            isLoading={isDocumentsLoading}
+            onNext={handleNextDocument}
+            onPrevious={handlePreviousDocument}
+            hasPrevious={hasPreviousDocument}
+          />
+        </TabsContent>
+      </Tabs>
     </>
+  );
+}
+
+function DocumentsDialog({
+  jobId,
+  onClose,
+}: {
+  jobId: string;
+  onClose: () => void;
+}) {
+  const {
+    isLoading,
+    data,
+    refetch,
+    isFetching,
+    statuses,
+    setStatuses,
+    statusLabels,
+    handleNext,
+    handlePrevious,
+    hasPrevious,
+  } = useDocuments(jobId);
+
+  return (
+    <Dialog open onOpenChange={() => onClose()}>
+      <DialogContent className="sm:max-w-5xl">
+        <DialogHeader>
+          <DialogTitle>Documents</DialogTitle>
+          <DialogDescription>
+            Documents for the ingest job{" "}
+            <CodeBlock inline>{prefixId(jobId, "job_")}</CodeBlock>
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="my-5 flex justify-end">
+          <PaginatedTableHeader
+            statuses={statuses}
+            setStatuses={setStatuses}
+            statusLabels={statusLabels}
+            onRefresh={refetch}
+            isRefreshing={isFetching}
+          />
+        </div>
+
+        <PaginatedTable
+          isDialog
+          columns={documentColumns}
+          data={data}
+          isLoading={isLoading}
+          onNext={handleNext}
+          onPrevious={handlePrevious}
+          hasPrevious={hasPrevious}
+        />
+      </DialogContent>
+    </Dialog>
   );
 }

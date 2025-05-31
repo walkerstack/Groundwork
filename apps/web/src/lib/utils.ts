@@ -80,9 +80,11 @@ export function formatNumber(
 }
 
 export function formatMs(ms: number) {
-  const seconds = Math.floor(ms / 1000);
-  const minutes = Math.floor(seconds / 60);
-  const hours = Math.floor(minutes / 60);
+  const totalSeconds = Math.floor(ms / 1000);
+  const seconds = totalSeconds % 60;
+  const totalMinutes = Math.floor(totalSeconds / 60);
+  const minutes = totalMinutes % 60;
+  const hours = Math.floor(totalMinutes / 60);
 
   if (hours > 0) {
     return `${hours}h ${minutes}m ${seconds}s`;
@@ -94,4 +96,9 @@ export function formatMs(ms: number) {
     return `${seconds}s`;
   }
   return `${ms}ms`;
+}
+
+export function formatDuration(start: Date, end: Date) {
+  const duration = end.getTime() - start.getTime();
+  return formatMs(duration);
 }
