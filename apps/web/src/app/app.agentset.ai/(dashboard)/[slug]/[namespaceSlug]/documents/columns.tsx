@@ -101,8 +101,13 @@ export const columns: ColumnDef<JobCol>[] = [
     header: "Name",
     cell: ({ row }) => {
       const name =
-        "name" in row.original.payload ? row.original.payload.name : "-";
-      return <p>{name}</p>;
+        ("name" in row.original.payload ? row.original.payload.name : null) ??
+        "-";
+      return (
+        <p title={name}>
+          {name.length > 30 ? name.slice(0, 30) + "..." : name}
+        </p>
+      );
     },
   },
   {

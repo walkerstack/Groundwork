@@ -87,7 +87,13 @@ export const documentColumns: ColumnDef<DocumentCol>[] = [
     accessorKey: "name",
     header: "Name",
     cell: ({ row }) => {
-      return <p>{row.original.name ?? "-"}</p>;
+      const name = row.original.name ?? "-";
+
+      return (
+        <p title={name}>
+          {name.length > 30 ? name.slice(0, 30) + "..." : name}
+        </p>
+      );
     },
   },
   {
