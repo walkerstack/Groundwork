@@ -105,7 +105,7 @@ export const columns: ColumnDef<JobCol>[] = [
         "-";
       return (
         <p title={name}>
-          {name.length > 30 ? name.slice(0, 30) + "..." : name}
+          {name.length > 20 ? name.slice(0, 20) + "..." : name}
         </p>
       );
     },
