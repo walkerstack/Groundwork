@@ -1,11 +1,10 @@
 import Link from "next/link";
-import Chat from "@/components/chat";
 import DashboardPageWrapper from "@/components/dashboard-page-wrapper";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-import ChatActions from "./chat-actions";
+import SearchPageClient from "./page.client";
 
-export default async function PlaygroundPage({
+export default async function SearchPage({
   params,
 }: {
   params: Promise<{ slug: string; namespaceSlug: string }>;
@@ -14,14 +13,14 @@ export default async function PlaygroundPage({
 
   return (
     <DashboardPageWrapper
-      title="Playground"
-      className="p-0"
+      title="Search"
       titleActions={
-        <Tabs value="chat">
+        <Tabs value="search">
           <TabsList>
             <TabsTrigger value="chat" asChild>
               <Link href={`/${slug}/${namespaceSlug}/playground`}>Chat</Link>
             </TabsTrigger>
+
             <TabsTrigger value="search" asChild>
               <Link href={`/${slug}/${namespaceSlug}/playground/search`}>
                 Search
@@ -30,9 +29,8 @@ export default async function PlaygroundPage({
           </TabsList>
         </Tabs>
       }
-      actions={<ChatActions />}
     >
-      <Chat />
+      <SearchPageClient />
     </DashboardPageWrapper>
   );
 }

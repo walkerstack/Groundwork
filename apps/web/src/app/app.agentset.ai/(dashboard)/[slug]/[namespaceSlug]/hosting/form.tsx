@@ -40,7 +40,12 @@ type FormData = z.infer<typeof schema>;
 export const schema = z.object({
   protected: z.boolean(),
   systemPrompt: z.string().min(1, "System prompt cannot be empty"),
-  examples: z.array(z.string().min(1, "Example cannot be empty")).max(4),
+  examplesQuestions: z
+    .array(z.string().min(1, "Example cannot be empty"))
+    .max(4),
+  exampleSearchQueries: z
+    .array(z.string().min(1, "Example cannot be empty"))
+    .max(4),
   welcomeMessage: z.string(),
   citationMetadataPath: z.string().optional(),
 });
@@ -66,7 +71,8 @@ export default function HostingForm({
     defaultValues: {
       protected: false,
       systemPrompt: DEFAULT_SYSTEM_PROMPT.compile(),
-      examples: [],
+      examplesQuestions: [],
+      exampleSearchQueries: [],
       welcomeMessage: "",
       citationMetadataPath: "",
       ...defaultValues,
@@ -76,18 +82,40 @@ export default function HostingForm({
   // Generate virtual IDs for each example
   const [virtualIds, setVirtualIds] = React.useState<VirtualId[]>(() =>
     form
-      .getValues("examples")
+      .getValues("examplesQuestions")
       .map((_, index) => `example-${index}-${Date.now()}`),
+  );
+
+  const [virtualIdsSearch, setVirtualIdsSearch] = React.useState<VirtualId[]>(
+    () =>
+      form
+        .getValues("exampleSearchQueries")
+        .map((_, index) => `example-${index}-${Date.now()}`),
   );
 
   const { fields, append, remove, move } = useFieldArray<
     FormValues,
     // @ts-expect-error - idk
     "example",
-    "examples"
+    "examplesQuestions"
   >({
     control: form.control,
-    name: "examples",
+    name: "examplesQuestions",
+  });
+
+  const {
+    fields: fieldsSearch,
+    append: appendSearch,
+    remove: removeSearch,
+    move: moveSearch,
+  } = useFieldArray<
+    FormValues,
+    // @ts-expect-error - idk
+    "example",
+    "exampleSearchQueries"
+  >({
+    control: form.control,
+    name: "exampleSearchQueries",
   });
 
   const sensors = useSensors(
@@ -99,10 +127,10 @@ export default function HostingForm({
 
   const handleAddExample = () => {
     // Check if the last example is empty
-    const examples = form.getValues("examples");
-    const lastExample = examples.at(-1);
+    const examplesQuestions = form.getValues("examplesQuestions");
+    const lastExample = examplesQuestions.at(-1);
     if (lastExample === "") {
-      form.setError(`examples.${examples.length - 1}`, {
+      form.setError(`examplesQuestions.${examplesQuestions.length - 1}`, {
         type: "manual",
         message: "Please fill in the current example before adding a new one",
       });
@@ -114,10 +142,35 @@ export default function HostingForm({
     setVirtualIds((prev) => [...prev, `example-${prev.length}-${Date.now()}`]);
   };
 
+  const handleAddExampleSearch = () => {
+    // Check if the last example is empty
+    const exampleSearchQueries = form.getValues("exampleSearchQueries");
+    const lastExample = exampleSearchQueries.at(-1);
+    if (lastExample === "") {
+      form.setError(`exampleSearchQueries.${exampleSearchQueries.length - 1}`, {
+        type: "manual",
+        message: "Please fill in the current example before adding a new one",
+      });
+    }
+
+    // Add new virtual ID when adding an example
+    appendSearch("");
+    setVirtualIdsSearch((prev) => [
+      ...prev,
+      `example-${prev.length}-${Date.now()}`,
+    ]);
+  };
+
   const handleRemoveExample = (index: number) => {
     // Remove virtual ID when removing an example
     setVirtualIds((prev) => prev.filter((_, i) => i !== index));
     remove(index);
+  };
+
+  const handleRemoveExampleSearch = (index: number) => {
+    // Remove virtual ID when removing an example
+    setVirtualIdsSearch((prev) => prev.filter((_, i) => i !== index));
+    removeSearch(index);
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
@@ -131,6 +184,30 @@ export default function HostingForm({
         move(oldIndex, newIndex);
         // Update virtual IDs order
         setVirtualIds((prev) => {
+          const newIds = [...prev];
+          const [movedId] = newIds.splice(oldIndex, 1);
+          newIds.splice(newIndex, 0, movedId!);
+          return newIds;
+        });
+      }
+    }
+  };
+
+  const handleDragEndSearch = (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      const oldIndex = fieldsSearch.findIndex(
+        (_, i) => virtualIdsSearch[i] === active.id,
+      );
+      const newIndex = fieldsSearch.findIndex(
+        (_, i) => virtualIdsSearch[i] === over.id,
+      );
+
+      if (oldIndex !== -1 && newIndex !== -1) {
+        moveSearch(oldIndex, newIndex);
+        // Update virtual IDs order
+        setVirtualIdsSearch((prev) => {
           const newIds = [...prev];
           const [movedId] = newIds.splice(oldIndex, 1);
           newIds.splice(newIndex, 0, movedId!);
@@ -232,7 +309,7 @@ export default function HostingForm({
 
           <div className="flex flex-col gap-2">
             <div className="flex items-center justify-between">
-              <FormLabel>Examples</FormLabel>
+              <FormLabel>Examples (Chat)</FormLabel>
               <Button
                 type="button"
                 variant="outline"
@@ -261,7 +338,7 @@ export default function HostingForm({
                   return (
                     <FormField
                       key={virtualId}
-                      name={`examples.${index}`}
+                      name={`examplesQuestions.${index}`}
                       control={form.control}
                       render={({ field }) => (
                         <FormItem>
@@ -269,6 +346,56 @@ export default function HostingForm({
                             id={virtualId}
                             inputProps={field}
                             onRemove={() => handleRemoveExample(index)}
+                          />
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  );
+                })}
+              </SortableContext>
+            </DndContext>
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center justify-between">
+              <FormLabel>Examples (Search)</FormLabel>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleAddExampleSearch}
+                disabled={fieldsSearch.length >= 4}
+              >
+                <PlusIcon className="mr-2 h-4 w-4" />
+                Add Example
+              </Button>
+            </div>
+
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEndSearch}
+            >
+              <SortableContext
+                items={virtualIdsSearch}
+                strategy={verticalListSortingStrategy}
+              >
+                {fieldsSearch.map((_, index) => {
+                  const virtualId = virtualIdsSearch[index];
+                  if (!virtualId) return null;
+
+                  return (
+                    <FormField
+                      key={virtualId}
+                      name={`exampleSearchQueries.${index}`}
+                      control={form.control}
+                      render={({ field }) => (
+                        <FormItem>
+                          <SortableItem
+                            id={virtualId}
+                            inputProps={field}
+                            onRemove={() => handleRemoveExampleSearch(index)}
                           />
                           <FormMessage />
                         </FormItem>

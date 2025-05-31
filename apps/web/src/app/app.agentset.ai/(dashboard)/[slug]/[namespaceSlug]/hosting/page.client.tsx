@@ -58,7 +58,8 @@ export default function HostingPage() {
         defaultValues={{
           protected: data.protected,
           systemPrompt: data.systemPrompt || "",
-          examples: data.exampleQuestions,
+          examplesQuestions: data.exampleQuestions,
+          exampleSearchQueries: data.exampleSearchQueries,
           welcomeMessage: data.welcomeMessage || "",
           citationMetadataPath: data.citationMetadataPath || "",
         }}

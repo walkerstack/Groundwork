@@ -55,7 +55,8 @@ export function EmptyState() {
       protected: data.protected,
       systemPrompt: data.systemPrompt,
       welcomeMessage: data.welcomeMessage,
-      examples: data.examples,
+      examplesQuestions: data.examplesQuestions,
+      exampleSearchQueries: data.exampleSearchQueries,
     });
   };
 

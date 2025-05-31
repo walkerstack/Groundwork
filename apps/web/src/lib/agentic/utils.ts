@@ -6,7 +6,7 @@ import type { QueryVectorStoreResult } from "../vector-store/parse";
 import { EVALUATE_QUERIES_PROMPT, GENERATE_QUERIES_PROMPT } from "./prompts";
 
 export const formatChatHistory = (messages: CoreMessage[]) => {
-  return messages.map((m) => `${m.role}: ${m.content}`).join("\n");
+  return messages.map((m) => `${m.role}: ${m.content as string}`).join("\n\n");
 };
 
 export const formatSources = (sources: QueryVectorStoreResult["results"]) => {

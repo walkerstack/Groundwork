@@ -6,11 +6,13 @@ import { SidebarTrigger } from "./ui/sidebar";
 export default function DashboardPageWrapper({
   children,
   title,
+  titleActions,
   className,
   actions,
 }: {
   children: React.ReactNode;
   title: string;
+  titleActions?: React.ReactNode;
   className?: string;
   actions?: React.ReactNode;
 }) {
@@ -20,6 +22,7 @@ export default function DashboardPageWrapper({
         <div className="flex items-center gap-2">
           <SidebarTrigger className="md:hidden" />
           <h1 className="text-base font-medium">{title}</h1>
+          {titleActions}
         </div>
 
         <div className="flex items-center gap-2">

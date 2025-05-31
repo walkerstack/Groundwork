@@ -8,6 +8,7 @@ import { hostingRouter } from "./routers/hosting";
 import { ingestJobRouter } from "./routers/ingest-jobs";
 import { namespaceRouter } from "./routers/namespaces";
 import { organizationsRouter } from "./routers/organizations";
+import { searchRouter } from "./routers/search";
 import { uploadsRouter } from "./routers/uploads";
 
 export const appRouter = createTRPCRouter({
@@ -20,6 +21,7 @@ export const appRouter = createTRPCRouter({
   organization: organizationsRouter,
   hosting: hostingRouter,
   domain: domainsRouter,
+  search: searchRouter,
 });
 
 // export type definition of API
