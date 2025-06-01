@@ -34,16 +34,30 @@ export const getPartitionDocumentBody = async (
     notify_id: `partition-${uuidv4()}`,
   };
 
-  if (document.source.type === "TEXT") {
-    body.text = document.source.text;
-    body.filename = document.name || `${document.id}.txt`;
-  } else if (document.source.type === "FILE") {
-    body.url = document.source.fileUrl;
-    body.filename = document.name || document.id;
-  } else if (document.source.type === "MANAGED_FILE") {
-    const url = await presignGetUrl(document.source.key);
-    body.url = url.url;
-    body.filename = document.name || document.id;
+  const type = document.source.type;
+  switch (type) {
+    case "TEXT": {
+      body.text = document.source.text;
+      // TODO: fix this later when we have a better way to handle extensions
+      body.filename = `${document.id}.txt`;
+      break;
+    }
+    case "FILE": {
+      body.url = document.source.fileUrl;
+      body.filename = document.name || document.id;
+      break;
+    }
+    case "MANAGED_FILE": {
+      const url = await presignGetUrl(document.source.key);
+      body.url = url.url;
+      body.filename = document.name || document.id;
+      break;
+    }
+
+    default: {
+      const exhaustiveCheck: never = type;
+      throw new Error(`Unsupported document source type: ${exhaustiveCheck}`);
+    }
   }
 
   body.extra_metadata = {
