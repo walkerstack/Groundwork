@@ -53,7 +53,8 @@ export const { POST } = serve<ReIngestJobBody>(
         db.document.updateMany({
           where: { ingestJobId: ingestJob.id },
           data: {
-            status: DocumentStatus.QUEUED,
+            status: DocumentStatus.QUEUED_FOR_RESYNC,
+            queuedAt: new Date(),
             preProcessingAt: null,
             processingAt: null,
             completedAt: null,

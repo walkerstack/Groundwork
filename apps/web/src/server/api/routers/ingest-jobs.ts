@@ -154,7 +154,11 @@ export const ingestJobRouter = createTRPCRouter({
 
       await ctx.db.ingestJob.update({
         where: { id: ingestJob.id },
-        data: { workflowRunsIds: { push: workflowRunId } },
+        data: {
+          status: IngestJobStatus.QUEUED_FOR_RESYNC,
+          queuedAt: new Date(),
+          workflowRunsIds: { push: workflowRunId },
+        },
         select: { id: true },
       });
 
