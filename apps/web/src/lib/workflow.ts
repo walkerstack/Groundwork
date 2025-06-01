@@ -31,6 +31,7 @@ export const triggerIngestionJob = async (body: TriggerIngestionJobBody) => {
 
 export type TriggerDocumentJobBody = {
   documentId: string;
+  cleanup?: boolean;
 };
 export const triggerDocumentJob = async (body: TriggerDocumentJobBody) => {
   return workflowClient.trigger({
@@ -71,6 +72,16 @@ export type DeleteNamespaceBody = {
 export const triggerDeleteNamespace = async (body: DeleteNamespaceBody) => {
   return workflowClient.trigger({
     url: `${getBaseUrl()}/api/workflows/delete-namespace`,
+    body,
+  });
+};
+
+export type ReIngestJobBody = {
+  jobId: string;
+};
+export const triggerReIngestJob = async (body: ReIngestJobBody) => {
+  return workflowClient.trigger({
+    url: `${getBaseUrl()}/api/workflows/re-ingest`,
     body,
   });
 };

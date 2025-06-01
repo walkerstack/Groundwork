@@ -15,6 +15,8 @@ import { embedMany } from "ai";
 
 import { db, DocumentStatus, IngestJobStatus } from "@agentset/db";
 
+const BATCH_SIZE = 30;
+
 const updateDocumentStatusFailed = async (
   documentId: string,
   error?: string,
@@ -101,6 +103,7 @@ export const { POST } = serve<TriggerDocumentJobBody>(
   async (context) => {
     const {
       ingestJob: { namespace, ...ingestJob },
+      shouldCleanup,
       ...document
     } = await context.run("get-config", async () => {
       const { documentId } = context.requestPayload;
@@ -113,7 +116,7 @@ export const { POST } = serve<TriggerDocumentJobBody>(
         throw new Error("Ingestion job not found");
       }
 
-      return doc;
+      return { ...doc, shouldCleanup: context.requestPayload.cleanup };
     });
 
     await context.run("update-status-pre-processing", async () => {
@@ -178,6 +181,41 @@ export const { POST } = serve<TriggerDocumentJobBody>(
       getNamespaceEmbeddingModel(namespace, "document"),
       getNamespaceVectorStore(namespace, document.tenantId ?? undefined),
     ]);
+
+    // Clean up existing chunks if requested
+    if (shouldCleanup) {
+      const chunkIdsToDelete = await context.run(
+        "cleanup-get-chunk-ids",
+        async () => {
+          let paginationToken: string | undefined;
+          const chunkIds: string[] = [];
+
+          do {
+            const chunks = await vectorStore.list({
+              prefix: `${document.id}#`,
+              paginationToken,
+            });
+
+            chunks.vectors?.forEach((chunk) => {
+              if (chunk.id) {
+                chunkIds.push(chunk.id);
+              }
+            });
+
+            paginationToken = chunks.pagination?.next;
+          } while (paginationToken);
+
+          return chunkIds;
+        },
+      );
+
+      await context.run("cleanup-vector-store-chunks", async () => {
+        const batches = chunkArray(chunkIdsToDelete, BATCH_SIZE);
+        for (const batch of batches) {
+          await vectorStore.delete(batch);
+        }
+      });
+    }
 
     let totalTokens = 0;
     for (let batchIdx = 0; batchIdx < body.total_batches; batchIdx++) {
@@ -279,6 +317,7 @@ export const { POST } = serve<TriggerDocumentJobBody>(
   },
   {
     failureFunction: async ({ context, failResponse }) => {
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       if (context.requestPayload && context.requestPayload.documentId) {
         const { documentId } = context.requestPayload;
         await handleDocumentError(documentId, failResponse);

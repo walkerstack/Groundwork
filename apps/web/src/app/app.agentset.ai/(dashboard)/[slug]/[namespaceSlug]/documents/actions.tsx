@@ -10,7 +10,12 @@ import { useNamespace } from "@/contexts/namespace-context";
 import { prefixId } from "@/lib/api/ids";
 import { useTRPC } from "@/trpc/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { CopyIcon, EllipsisVerticalIcon, Trash2Icon } from "lucide-react";
+import {
+  CopyIcon,
+  EllipsisVerticalIcon,
+  RefreshCwIcon,
+  Trash2Icon,
+} from "lucide-react";
 import { toast } from "sonner";
 
 import { IngestJobStatus } from "@agentset/db";
@@ -21,10 +26,26 @@ export function JobActions({ row }: { row: Row<JobCol> }) {
   const queryClient = useQueryClient();
   const { activeNamespace } = useNamespace();
   const trpc = useTRPC();
-  const { mutate: deleteJob, isPending } = useMutation(
+  const { mutate: deleteJob, isPending: isDeletePending } = useMutation(
     trpc.ingestJob.delete.mutationOptions({
       onSuccess: () => {
         toast.success("Job deleted successfully");
+        void queryClient.invalidateQueries(
+          trpc.ingestJob.all.queryFilter({
+            namespaceId: activeNamespace.id,
+          }),
+        );
+      },
+      onError: (error) => {
+        toast.error(error.message);
+      },
+    }),
+  );
+
+  const { mutate: reIngestJob, isPending: isReIngestPending } = useMutation(
+    trpc.ingestJob.reIngest.mutationOptions({
+      onSuccess: () => {
+        toast.success("Job re-ingestion started");
         void queryClient.invalidateQueries(
           trpc.ingestJob.all.queryFilter({
             namespaceId: activeNamespace.id,
@@ -49,10 +70,24 @@ export function JobActions({ row }: { row: Row<JobCol> }) {
     });
   };
 
+  const handleReIngest = () => {
+    reIngestJob({
+      namespaceId: activeNamespace.id,
+      jobId: row.original.id,
+    });
+  };
+
   const isDeleteDisabled =
-    isPending ||
+    isDeletePending ||
+    isReIngestPending ||
     row.original.status === IngestJobStatus.DELETING ||
     row.original.status === IngestJobStatus.QUEUED_FOR_DELETE;
+
+  const isReIngestDisabled =
+    isDeletePending ||
+    isReIngestPending ||
+    row.original.status === IngestJobStatus.PRE_PROCESSING ||
+    row.original.status === IngestJobStatus.PROCESSING;
 
   return (
     <DropdownMenu>
@@ -66,6 +101,14 @@ export function JobActions({ row }: { row: Row<JobCol> }) {
         <DropdownMenuItem onClick={handleCopy}>
           <CopyIcon className="size-4" />
           Copy ID
+        </DropdownMenuItem>
+
+        <DropdownMenuItem
+          disabled={isReIngestDisabled}
+          onClick={handleReIngest}
+        >
+          <RefreshCwIcon className="size-4" />
+          Re-ingest
         </DropdownMenuItem>
 
         <DropdownMenuItem disabled={isDeleteDisabled} onClick={handleDelete}>

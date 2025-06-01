@@ -225,6 +225,7 @@ export const { POST } = serve<TriggerIngestionJobBody>(
   },
   {
     failureFunction: async ({ context, failResponse }) => {
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       if (context.requestPayload && context.requestPayload.jobId) {
         const { jobId } = context.requestPayload;
 

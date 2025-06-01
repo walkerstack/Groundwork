@@ -1,3 +1,4 @@
+import { triggerReIngestJob } from "@/lib/workflow";
 import {
   createIngestJobSchema,
   getIngestionJobsSchema,
@@ -113,5 +114,50 @@ export const ingestJobRouter = createTRPCRouter({
       const updatedIngestJob = await deleteIngestJob(ingestJob.id);
 
       return updatedIngestJob;
+    }),
+  reIngest: protectedProcedure
+    .input(z.object({ jobId: z.string(), namespaceId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const namespace = await getNamespaceByUser(ctx, {
+        id: input.namespaceId,
+      });
+
+      if (!namespace) {
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
+
+      const ingestJob = await ctx.db.ingestJob.findUnique({
+        where: {
+          id: input.jobId,
+          namespaceId: namespace.id,
+        },
+        select: { id: true, status: true },
+      });
+
+      if (!ingestJob) {
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
+
+      if (
+        ingestJob.status === IngestJobStatus.PRE_PROCESSING ||
+        ingestJob.status === IngestJobStatus.PROCESSING
+      ) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Job is already being processed",
+        });
+      }
+
+      const { workflowRunId } = await triggerReIngestJob({
+        jobId: ingestJob.id,
+      });
+
+      await ctx.db.ingestJob.update({
+        where: { id: ingestJob.id },
+        data: { workflowRunsIds: { push: workflowRunId } },
+        select: { id: true },
+      });
+
+      return ingestJob;
     }),
 });
