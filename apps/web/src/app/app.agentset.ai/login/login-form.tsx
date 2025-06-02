@@ -20,8 +20,11 @@ export function LoginForm({
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState(false);
 
+  const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
   const redirect =
-    redirectParam && redirectParam.startsWith("/") ? redirectParam : "/";
+    redirectParam && redirectParam.startsWith("/")
+      ? `${baseUrl}${redirectParam}`
+      : `${baseUrl}/`;
 
   const { mutateAsync: sendMagicLink, isPending: isSendingMagicLink } =
     useMutation({

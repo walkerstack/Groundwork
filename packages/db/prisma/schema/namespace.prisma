@@ -44,7 +44,10 @@ model Hosting {
   exampleSearchQueries String[] @default([]) @db.Text
   citationMetadataPath String? // Path to use for citation metadata (e.g. "title" or "foo.bar")
   welcomeMessage       String?
-  protected            Boolean  @default(true) // Whether the namespace is protected from public access
+
+  protected           Boolean  @default(true) // Whether the namespace is protected from public access
+  allowedEmails       String[] @default([]) // relevant when protected is true
+  allowedEmailDomains String[] @default([]) // relevant when protected is true
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

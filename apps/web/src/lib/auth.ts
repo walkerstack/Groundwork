@@ -24,6 +24,24 @@ export const auth = betterAuth({
       clientSecret: env.GOOGLE_CLIENT_SECRET,
     },
   },
+  async trustedOrigins(request) {
+    let domain = request.headers.get("host");
+    // check if domain is in the list of allowed domains
+    if (domain) {
+      domain = domain.replace(/^www./, "").toLowerCase();
+      const domainRecord = await db.domain.findUnique({
+        where: {
+          slug: domain,
+        },
+      });
+
+      if (domainRecord) {
+        return [domain];
+      }
+    }
+
+    return [env.BETTER_AUTH_URL];
+  },
   plugins: [
     admin(),
     organization({
