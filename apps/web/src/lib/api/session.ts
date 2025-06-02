@@ -5,6 +5,7 @@ import { db } from "@agentset/db";
 
 import type { Session } from "../auth-types";
 import { AgentsetApiError } from "../api/errors";
+import { getMiddlewareSession } from "../middleware/get-session";
 
 type AuthenticateSessionResult<T extends string | undefined> = T extends string
   ? {
@@ -17,22 +18,7 @@ export const authenticateRequestSession = async <T extends string | undefined>(
   request: NextRequest,
   namespaceId?: T,
 ): Promise<AuthenticateSessionResult<T>> => {
-  let session: Session | null = null;
-  try {
-    const resp = await fetch(`${request.nextUrl.origin}/api/auth/get-session`, {
-      headers: {
-        cookie: request.headers.get("cookie") || "", // Forward the cookies from the request
-      },
-    });
-
-    if (!resp.ok) {
-      throw new Error("Failed to fetch session");
-    }
-
-    session = (await resp.json()) as Session;
-  } catch {
-    /* empty */
-  }
+  const session = await getMiddlewareSession(request);
 
   if (!session) {
     throw new AgentsetApiError({

@@ -12,6 +12,10 @@ export const getMiddlewareSession = async (req: NextRequest) => {
     },
   });
 
+  if (!response.ok) {
+    return null;
+  }
+
   try {
     const data = (await response.json()) as Session | null;
     return data;

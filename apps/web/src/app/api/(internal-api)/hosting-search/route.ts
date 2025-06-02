@@ -1,6 +1,7 @@
 import { agenticSearch } from "@/lib/agentic/search";
 import { AgentsetApiError } from "@/lib/api/errors";
 import { withPublicApiHandler } from "@/lib/api/handler/public";
+import { hostingAuth } from "@/lib/api/hosting-auth";
 import { makeApiSuccessResponse } from "@/lib/api/response";
 import { incrementSearchUsage } from "@/lib/api/usage";
 import { parseRequestBody } from "@/lib/api/utils";
@@ -34,7 +35,9 @@ export const POST = withPublicApiHandler(
       },
       select: {
         id: true,
-
+        protected: true,
+        allowedEmails: true,
+        allowedEmailDomains: true,
         namespace: {
           select: {
             id: true,
@@ -53,7 +56,7 @@ export const POST = withPublicApiHandler(
       });
     }
 
-    // TODO: check if protected
+    await hostingAuth(req, hosting);
 
     // TODO: pass namespace config
     const languageModel = await getNamespaceLanguageModel();

@@ -1,6 +1,7 @@
 import agenticPipeline from "@/lib/agentic";
 import { AgentsetApiError } from "@/lib/api/errors";
 import { withPublicApiHandler } from "@/lib/api/handler/public";
+import { hostingAuth } from "@/lib/api/hosting-auth";
 import { parseRequestBody } from "@/lib/api/utils";
 import { getNamespaceLanguageModel } from "@/lib/llm";
 import { DEFAULT_SYSTEM_PROMPT } from "@/lib/prompts";
@@ -38,6 +39,9 @@ const getHosting = async (namespaceId: string) => {
     select: {
       id: true,
       systemPrompt: true,
+      protected: true,
+      allowedEmails: true,
+      allowedEmailDomains: true,
       namespace: {
         select: {
           id: true,
@@ -88,7 +92,7 @@ export const POST = withPublicApiHandler(
       });
     }
 
-    // TODO: check if protected
+    await hostingAuth(req, hosting);
 
     // TODO: pass namespace config
     const languageModel = await getNamespaceLanguageModel();
