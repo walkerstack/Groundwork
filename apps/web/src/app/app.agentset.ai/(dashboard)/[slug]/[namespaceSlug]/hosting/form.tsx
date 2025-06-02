@@ -39,6 +39,8 @@ type FormData = z.infer<typeof schema>;
 
 export const schema = z.object({
   protected: z.boolean(),
+  allowedEmails: z.array(z.string().email()).optional(),
+  allowedEmailDomains: z.array(z.string()).optional(),
   systemPrompt: z.string().min(1, "System prompt cannot be empty"),
   examplesQuestions: z
     .array(z.string().min(1, "Example cannot be empty"))
@@ -70,6 +72,8 @@ export default function HostingForm({
     resolver: zodResolver(schema),
     defaultValues: {
       protected: false,
+      allowedEmails: [],
+      allowedEmailDomains: [],
       systemPrompt: DEFAULT_SYSTEM_PROMPT.compile(),
       examplesQuestions: [],
       exampleSearchQueries: [],
@@ -245,6 +249,67 @@ export default function HostingForm({
               </FormItem>
             )}
           />
+
+          {form.watch("protected") && (
+            <>
+              <FormField
+                control={form.control}
+                name="allowedEmails"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Allowed Emails</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Enter allowed emails, one per line"
+                        value={field.value?.join("\n") || ""}
+                        onChange={(e) =>
+                          field.onChange(
+                            e.target.value
+                              .split("\n")
+                              .map((v) => v.trim())
+                              .filter(Boolean),
+                          )
+                        }
+                        className="h-24 max-h-40"
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Only these emails will be allowed access (if set).
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="allowedEmailDomains"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Allowed Email Domains</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Enter allowed domains, one per line (e.g. example.com)"
+                        value={field.value?.join("\n") || ""}
+                        onChange={(e) =>
+                          field.onChange(
+                            e.target.value
+                              .split("\n")
+                              .map((v) => v.trim())
+                              .filter(Boolean),
+                          )
+                        }
+                        className="h-24 max-h-40"
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Only these email domains will be allowed access (if set).
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </>
+          )}
 
           <FormField
             control={form.control}

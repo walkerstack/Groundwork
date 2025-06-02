@@ -57,6 +57,8 @@ export default function HostingPage() {
         }}
         defaultValues={{
           protected: data.protected,
+          allowedEmails: data.allowedEmails,
+          allowedEmailDomains: data.allowedEmailDomains,
           systemPrompt: data.systemPrompt || "",
           examplesQuestions: data.exampleQuestions,
           exampleSearchQueries: data.exampleSearchQueries,

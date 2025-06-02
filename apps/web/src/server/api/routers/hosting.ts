@@ -38,6 +38,8 @@ export const hostingRouter = createTRPCRouter({
     .input(
       commonInput.extend({
         protected: z.boolean(),
+        allowedEmails: z.array(z.string().email()).optional(),
+        allowedEmailDomains: z.array(z.string()).optional(),
         systemPrompt: z.string().optional(),
         examplesQuestions: z.array(z.string()).max(4).optional(),
         exampleSearchQueries: z.array(z.string()).max(4).optional(),
@@ -77,6 +79,8 @@ export const hostingRouter = createTRPCRouter({
         data: {
           namespaceId: namespace.id,
           protected: input.protected,
+          allowedEmails: input.allowedEmails ?? [],
+          allowedEmailDomains: input.allowedEmailDomains ?? [],
           systemPrompt: input.systemPrompt ?? DEFAULT_SYSTEM_PROMPT.compile(),
           exampleQuestions: input.examplesQuestions,
           exampleSearchQueries: input.exampleSearchQueries,
@@ -89,6 +93,8 @@ export const hostingRouter = createTRPCRouter({
     .input(
       commonInput.extend({
         protected: z.boolean().optional(),
+        allowedEmails: z.array(z.string().email()).optional(),
+        allowedEmailDomains: z.array(z.string()).optional(),
         systemPrompt: z.string().optional(),
         examplesQuestions: z.array(z.string()).max(4).optional(),
         exampleSearchQueries: z.array(z.string()).max(4).optional(),
@@ -112,6 +118,8 @@ export const hostingRouter = createTRPCRouter({
         },
         data: {
           protected: input.protected,
+          allowedEmails: input.allowedEmails ?? [],
+          allowedEmailDomains: input.allowedEmailDomains ?? [],
           systemPrompt: input.systemPrompt,
           exampleQuestions: input.examplesQuestions,
           exampleSearchQueries: input.exampleSearchQueries,
