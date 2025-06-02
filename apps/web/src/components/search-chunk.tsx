@@ -36,11 +36,33 @@ const SearchChunk = ({
   chunk,
   index,
   originalIndex,
+  truncate = false,
+  query,
 }: {
   chunk: QueryVectorStoreResult["results"][number];
   index?: number;
   originalIndex?: number;
+  truncate?: boolean;
+  query?: string;
 }) => {
+  const [expanded, setExpanded] = useState(false);
+  const text = chunk.text;
+  const shouldTruncate = truncate && !expanded && text.length > 500;
+  const displayText = shouldTruncate ? text.slice(0, 500) + "..." : text;
+
+  // Highlight query matches
+  let highlightedText = displayText;
+  if (query && query.length > 0) {
+    try {
+      const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const regex = new RegExp(`(${escaped})`, "gi");
+      highlightedText = displayText.replace(
+        regex,
+        '<mark class="bg-yellow-200">$1</mark>',
+      );
+    } catch {}
+  }
+
   return (
     <div className="bg-secondary rounded-md p-4">
       <div className="flex justify-between">
@@ -66,9 +88,19 @@ const SearchChunk = ({
       <p
         className="mt-2 text-sm"
         dangerouslySetInnerHTML={{
-          __html: chunk.text.replace(/(\n)/g, "<br />"),
+          __html: highlightedText.replace(/(\n)/g, "<br />"),
         }}
       />
+      {shouldTruncate && (
+        <Button
+          size="sm"
+          variant="link"
+          className="mt-2 px-0"
+          onClick={() => setExpanded(true)}
+        >
+          See more
+        </Button>
+      )}
       {chunk.metadata && <CollapsibleMetadata metadata={chunk.metadata} />}
     </div>
   );

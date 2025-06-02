@@ -61,6 +61,7 @@ export const useSearch = () => {
   return {
     inputQuery,
     setInputQuery,
+    query,
     data,
     isLoading,
     isFetching,

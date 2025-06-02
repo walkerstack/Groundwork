@@ -94,7 +94,12 @@ export default function SearchPageClient() {
             <div className="mt-6 flex w-full flex-col gap-6">
               {data.results.length > 0 ? (
                 data.results.map((result) => (
-                  <SearchChunk key={result.id} chunk={result} />
+                  <SearchChunk
+                    key={result.id}
+                    chunk={result}
+                    truncate={true}
+                    query={searchQuery}
+                  />
                 ))
               ) : (
                 <p>No results found</p>

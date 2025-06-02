@@ -16,6 +16,7 @@ export default function SearchPage() {
   const {
     inputQuery,
     setInputQuery,
+    query,
     handleSubmit,
     data,
     isFetching,
@@ -111,7 +112,12 @@ export default function SearchPage() {
             >
               {allData!.length > 0 ? (
                 allData!.map((result) => (
-                  <SearchChunk key={result.id} chunk={result} />
+                  <SearchChunk
+                    key={result.id}
+                    chunk={result}
+                    truncate={true}
+                    query={query}
+                  />
                 ))
               ) : (
                 <p>No results found</p>
