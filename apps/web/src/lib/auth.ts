@@ -12,93 +12,117 @@ import { APP_DOMAIN } from "./constants";
 import { sendEmail } from "./resend";
 import { getBaseUrl } from "./utils";
 
-export const auth = betterAuth({
-  secret: env.BETTER_AUTH_SECRET,
-  socialProviders: {
-    github: {
-      clientId: env.GITHUB_CLIENT_ID,
-      clientSecret: env.GITHUB_CLIENT_SECRET,
-    },
-    google: {
-      clientId: env.GOOGLE_CLIENT_ID,
-      clientSecret: env.GOOGLE_CLIENT_SECRET,
-    },
-  },
-  async trustedOrigins(request) {
-    let domain = request.headers.get("host");
-    // check if domain is in the list of allowed domains
-    if (domain) {
-      domain = domain.replace(/^www./, "").toLowerCase();
-      const domainRecord = await db.domain.findUnique({
-        where: {
-          slug: domain,
-        },
-      });
+export const makeAuth = (baseUrl = env.BETTER_AUTH_URL) => {
+  const isUsingDefaultUrl = baseUrl === env.BETTER_AUTH_URL;
 
-      if (domainRecord) {
-        return [domain];
-      }
-    }
-
-    return [env.BETTER_AUTH_URL];
-  },
-  plugins: [
-    admin(),
-    organization({
-      sendInvitationEmail: async ({ email, organization, id, inviter }) => {
-        const url = `${getBaseUrl()}/invitation/${id}`;
-        await sendEmail({
-          email,
-          subject: "You've been invited to join an organization on Agentset.ai",
-          react: InviteUserEmail({
-            email,
-            url,
-            organizationName: organization.name,
-            organizationUserEmail: inviter.user.email,
-            organizationUser: inviter.user.name || null,
-            domain: APP_DOMAIN,
-          }),
-        });
+  return betterAuth({
+    appName: "Agentset",
+    baseURL: baseUrl,
+    secret: env.BETTER_AUTH_SECRET,
+    socialProviders: {
+      github: {
+        clientId: env.GITHUB_CLIENT_ID,
+        clientSecret: env.GITHUB_CLIENT_SECRET,
       },
-    }),
-    magicLink({
-      sendMagicLink: async ({ email, url }) => {
-        await sendEmail({
-          email,
-          subject: "Your Agentset login link",
-          react: LoginEmail({ loginLink: url, email, domain: APP_DOMAIN }),
-        });
+      google: {
+        clientId: env.GOOGLE_CLIENT_ID,
+        clientSecret: env.GOOGLE_CLIENT_SECRET,
       },
-    }),
-  ],
-  databaseHooks: {
-    user: {
-      create: {
-        after: async (user) => {
+    },
+    trustedOrigins: [baseUrl],
+    plugins: [
+      admin(),
+      organization({
+        sendInvitationEmail: async ({ email, organization, id, inviter }) => {
+          const url = `${getBaseUrl()}/invitation/${id}`;
           await sendEmail({
-            email: user.email,
-            subject: "Welcome to Agentset",
-            react: WelcomeEmail({
-              name: user.name || null,
-              email: user.email,
+            email,
+            subject:
+              "You've been invited to join an organization on Agentset.ai",
+            react: InviteUserEmail({
+              email,
+              url,
+              organizationName: organization.name,
+              organizationUserEmail: inviter.user.email,
+              organizationUser: inviter.user.name || null,
               domain: APP_DOMAIN,
             }),
-            variant: "marketing",
           });
+        },
+      }),
+      magicLink({
+        sendMagicLink: async ({ email, url }) => {
+          await sendEmail({
+            email,
+            subject: "Your Agentset login link",
+            react: LoginEmail({ loginLink: url, email, domain: APP_DOMAIN }),
+          });
+        },
+      }),
+    ],
+    account: {
+      accountLinking: {
+        enabled: true,
+        trustedProviders: ["google", "github"],
+        allowDifferentEmails: false,
+      },
+    },
+    user: {
+      additionalFields: {
+        referrerDomain: {
+          type: "string",
+          required: false,
         },
       },
     },
-  },
-  database: prismaAdapter(db, {
-    provider: "postgresql",
-  }),
-  session: {
-    cookieCache: {
-      enabled: true,
-      maxAge: 5 * 60, // Cache duration in seconds
+    databaseHooks: {
+      user: {
+        create: {
+          before: !isUsingDefaultUrl
+            ? // eslint-disable-next-line @typescript-eslint/require-await
+              async (user) => {
+                const domain = new URL(baseUrl).host;
+
+                return {
+                  data: {
+                    ...user,
+                    referrerDomain: domain,
+                  },
+                };
+              }
+            : undefined,
+          // only send welcome email if using default url
+          after: isUsingDefaultUrl
+            ? async (user) => {
+                await sendEmail({
+                  email: user.email,
+                  subject: "Welcome to Agentset",
+                  react: WelcomeEmail({
+                    name: user.name || null,
+                    email: user.email,
+                    domain: APP_DOMAIN,
+                  }),
+                  variant: "marketing",
+                });
+              }
+            : undefined,
+        },
+      },
     },
-  },
-});
+
+    database: prismaAdapter(db, {
+      provider: "postgresql",
+    }),
+    session: {
+      cookieCache: {
+        enabled: true,
+        maxAge: 5 * 60, // Cache duration in seconds
+      },
+    },
+  });
+};
+
+export const auth = makeAuth();
 
 export const getSession = cache(async () => {
   const allHeaders = await headers();

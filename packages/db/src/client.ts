@@ -3,25 +3,10 @@ import { PrismaNeon } from "@prisma/adapter-neon";
 import { PrismaClient } from "@prisma/client";
 
 const createPrismaClient = () => {
-  // if (process.env.NEXT_RUNTIME === "edge") {
-  //   console.log("TRUE");
-
-  //   const connectionString = process.env.DATABASE_URL ?? "";
-  //   const adapter = new PrismaPg({ connectionString });
-  //   return new PrismaClient({
-  //     adapter,
-  //     log:
-  //       process.env.NODE_ENV === "development"
-  //         ? ["query", "error", "warn"]
-  //         : ["error"],
-  //   });
-  // }
-
   // Supabase pooled connection string (must use Supavisor)
   const connectionString = process.env.DATABASE_URL ?? "";
 
-  const url = new URL(connectionString);
-  if (url.hostname === "localhost") {
+  if (connectionString.includes("@localhost")) {
     // Disable SSL for local connections
     neonConfig.useSecureWebSocket = false;
     // WebSocket proxy is hosted on `4000` locally, so add port. Does not work in production.
@@ -42,13 +27,6 @@ const createPrismaClient = () => {
         ? ["query", "error", "warn"]
         : ["error"],
   });
-
-  // return new PrismaClient({
-  //   log:
-  //     process.env.NODE_ENV === "development"
-  //       ? ["query", "error", "warn"]
-  //       : ["error"],
-  // });
 };
 
 const globalForPrisma = globalThis as unknown as {

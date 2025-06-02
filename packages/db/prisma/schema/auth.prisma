@@ -15,6 +15,10 @@ model User {
   banReason     String? // The reason for the user's ban.
   banExpires    DateTime?
 
+  // NOTE: this is used to track the domain that the user came from
+  // for e.g. if they signup from a hosted page, we don't want to send them a welcome email
+  referrerDomain String?
+
   @@unique([email])
   @@map("user")
 }

@@ -53,7 +53,6 @@ export default async function CustomDomainLayout({
 
   if (!hosting) notFound();
 
-  // TODO: Implement protected hosting
   return (
     <HostingProvider hosting={hosting}>
       <div>

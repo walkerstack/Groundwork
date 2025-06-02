@@ -1,8 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import GithubIcon from "@/components/icons/github";
-import GoogleIcon from "@/components/icons/google";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -33,18 +31,6 @@ export function LoginForm({
       onSuccess: () => {
         setSent(true);
       },
-    });
-
-  const { mutateAsync: googleLogin, isPending: isLoggingInWithGoogle } =
-    useMutation({
-      mutationFn: () =>
-        authClient.signIn.social({ provider: "google", callbackURL: redirect }),
-    });
-
-  const { mutateAsync: githubLogin, isPending: isLoggingInWithGithub } =
-    useMutation({
-      mutationFn: () =>
-        authClient.signIn.social({ provider: "github", callbackURL: redirect }),
     });
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -105,36 +91,6 @@ export function LoginForm({
               </Button>
             </div>
           </form>
-
-          <div className="after:border-border relative my-4 text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
-            <span className="bg-background text-muted-foreground relative z-10 px-2">
-              Or
-            </span>
-          </div>
-
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Button
-              variant="outline"
-              className="w-full"
-              onClick={() => googleLogin()}
-              isLoading={isLoggingInWithGoogle}
-              type="button"
-            >
-              <GoogleIcon className="size-4" />
-              Google
-            </Button>
-
-            <Button
-              variant="outline"
-              className="w-full"
-              onClick={() => githubLogin()}
-              isLoading={isLoggingInWithGithub}
-              type="button"
-            >
-              <GithubIcon className="size-4" />
-              Github
-            </Button>
-          </div>
         </div>
       )}
     </div>
