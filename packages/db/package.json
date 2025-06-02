@@ -22,6 +22,8 @@
     "with-env": "dotenv -e ../../.env --"
   },
   "dependencies": {
+    "@neondatabase/serverless": "^1.0.0",
+    "@prisma/adapter-neon": "^6.7.0",
     "@prisma/adapter-pg": "^6.7.0",
     "@prisma/client": "^6.7.0"
   },
