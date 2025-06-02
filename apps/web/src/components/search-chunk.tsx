@@ -1,5 +1,5 @@
 import type { QueryVectorStoreResult } from "@/lib/vector-store/parse";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import { CodeBlock } from "./chat/code-block";
 import { Button } from "./ui/button";
@@ -51,17 +51,28 @@ const SearchChunk = ({
   const displayText = shouldTruncate ? text.slice(0, 500) + "..." : text;
 
   // Highlight query matches
-  let highlightedText = displayText;
-  if (query && query.length > 0) {
-    try {
-      const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-      const regex = new RegExp(`(${escaped})`, "gi");
-      highlightedText = displayText.replace(
-        regex,
-        '<mark class="bg-yellow-200">$1</mark>',
-      );
-    } catch {}
-  }
+  const highlightedText = useMemo(() => {
+    let final = displayText;
+    if (query && query.trim().length > 0) {
+      try {
+        // Split query into words, filter out empty, escape regex
+        const words = query
+          .split(/\s+/)
+          .filter(Boolean)
+          .map((w) => w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+        if (words.length > 0) {
+          // Join with | for substring match (not word boundary)
+          const regex = new RegExp(`(${words.join("|")})`, "gi");
+          final = displayText.replace(
+            regex,
+            '<mark class="bg-yellow-200">$1</mark>',
+          );
+        }
+      } catch {}
+    }
+
+    return final;
+  }, [displayText, query]);
 
   return (
     <div className="bg-secondary rounded-md p-4">

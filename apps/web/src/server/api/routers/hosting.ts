@@ -38,8 +38,12 @@ export const hostingRouter = createTRPCRouter({
     .input(
       commonInput.extend({
         protected: z.boolean(),
-        allowedEmails: z.array(z.string().email()).optional(),
-        allowedEmailDomains: z.array(z.string()).optional(),
+        allowedEmails: z
+          .array(z.string().email().trim().toLowerCase())
+          .optional(),
+        allowedEmailDomains: z
+          .array(z.string().trim().toLowerCase())
+          .optional(),
         systemPrompt: z.string().optional(),
         examplesQuestions: z.array(z.string()).max(4).optional(),
         exampleSearchQueries: z.array(z.string()).max(4).optional(),
@@ -93,8 +97,12 @@ export const hostingRouter = createTRPCRouter({
     .input(
       commonInput.extend({
         protected: z.boolean().optional(),
-        allowedEmails: z.array(z.string().email()).optional(),
-        allowedEmailDomains: z.array(z.string()).optional(),
+        allowedEmails: z
+          .array(z.string().email().trim().toLowerCase())
+          .optional(),
+        allowedEmailDomains: z
+          .array(z.string().trim().toLowerCase())
+          .optional(),
         systemPrompt: z.string().optional(),
         examplesQuestions: z.array(z.string()).max(4).optional(),
         exampleSearchQueries: z.array(z.string()).max(4).optional(),
