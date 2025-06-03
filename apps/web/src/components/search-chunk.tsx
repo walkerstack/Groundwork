@@ -51,28 +51,29 @@ const SearchChunk = ({
   const displayText = shouldTruncate ? text.slice(0, 500) + "..." : text;
 
   // Highlight query matches
-  const highlightedText = useMemo(() => {
-    let final = displayText;
-    if (query && query.trim().length > 0) {
-      try {
-        // Split query into words, filter out empty, escape regex
-        const words = query
-          .split(/\s+/)
-          .filter(Boolean)
-          .map((w) => w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
-        if (words.length > 0) {
-          // Join with | for substring match (not word boundary)
-          const regex = new RegExp(`(${words.join("|")})`, "gi");
-          final = displayText.replace(
-            regex,
-            '<mark class="bg-yellow-200">$1</mark>',
-          );
-        }
-      } catch {}
-    }
+  // TODO: bring back highlighting
+  // const highlightedText = useMemo(() => {
+  //   let final = displayText;
+  //   if (query && query.trim().length > 0) {
+  //     try {
+  //       // Split query into words, filter out empty, escape regex
+  //       const words = query
+  //         .split(/\s+/)
+  //         .filter(Boolean)
+  //         .map((w) => w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+  //       if (words.length > 0) {
+  //         // Join with | for substring match (not word boundary)
+  //         const regex = new RegExp(`(${words.join("|")})`, "gi");
+  //         final = displayText.replace(
+  //           regex,
+  //           '<mark class="bg-yellow-200">$1</mark>',
+  //         );
+  //       }
+  //     } catch {}
+  //   }
 
-    return final;
-  }, [displayText, query]);
+  //   return final;
+  // }, [displayText, query]);
 
   return (
     <div className="bg-secondary rounded-md p-4">
@@ -96,22 +97,24 @@ const SearchChunk = ({
           </div>
         ) : null}
       </div>
-      <p
-        className="mt-2 text-sm"
-        dangerouslySetInnerHTML={{
-          __html: highlightedText.replace(/(\n)/g, "<br />"),
-        }}
-      />
-      {shouldTruncate && (
-        <Button
-          size="sm"
-          variant="link"
-          className="mt-2 px-0"
-          onClick={() => setExpanded(true)}
-        >
-          See more
-        </Button>
-      )}
+      <div className="mt-2 text-sm">
+        <span
+          dangerouslySetInnerHTML={{
+            __html: displayText.replace(/(\n)/g, "<br />"),
+          }}
+        />
+        {shouldTruncate && (
+          <Button
+            size="sm"
+            variant="link"
+            className="ml-1 px-0"
+            onClick={() => setExpanded(true)}
+          >
+            See more
+          </Button>
+        )}
+      </div>
+
       {chunk.metadata && <CollapsibleMetadata metadata={chunk.metadata} />}
     </div>
   );
