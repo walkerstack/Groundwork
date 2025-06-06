@@ -6,6 +6,7 @@ import { env } from "@/env";
 import { makeChunk } from "@/lib/chunk";
 import { getNamespaceEmbeddingModel } from "@/lib/embedding";
 import { chunkArray } from "@/lib/functions";
+import { KeywordStore } from "@/lib/keyword-store";
 import { getPartitionDocumentBody } from "@/lib/partition";
 import { redis } from "@/lib/redis";
 import { getNamespaceVectorStore } from "@/lib/vector-store";
@@ -181,11 +182,15 @@ export const { POST } = serve<TriggerDocumentJobBody>(
       getNamespaceEmbeddingModel(namespace, "document"),
       getNamespaceVectorStore(namespace, document.tenantId ?? undefined),
     ]);
+    const keywordStore = new KeywordStore(
+      namespace.id,
+      document.tenantId ?? undefined,
+    );
 
     // Clean up existing chunks if requested
     if (shouldCleanup) {
       const chunkIdsToDelete = await context.run(
-        "cleanup-get-chunk-ids",
+        "cleanup-get-vector-store-chunk-ids",
         async () => {
           let paginationToken: string | undefined;
           const chunkIds: string[] = [];
@@ -210,11 +215,48 @@ export const { POST } = serve<TriggerDocumentJobBody>(
       );
 
       await context.run("cleanup-vector-store-chunks", async () => {
+        if (chunkIdsToDelete.length === 0) return;
+
         const batches = chunkArray(chunkIdsToDelete, BATCH_SIZE);
         for (const batch of batches) {
           await vectorStore.delete(batch);
         }
       });
+
+      if (namespace.keywordEnabled) {
+        // cleanup keyword store
+        const keywordChunkIdsToDelete = await context.run(
+          "cleanup-get-keyword-store-chunk-ids",
+          async () => {
+            let page: number = 1;
+            let hasNextPage: boolean = true;
+            const chunkIds: string[] = [];
+
+            do {
+              const chunks = await keywordStore.listIds({
+                documentId: document.id,
+                page,
+              });
+
+              chunkIds.push(...chunks.ids);
+
+              hasNextPage = chunks.hasNextPage;
+              page = chunks.currentPage + 1;
+            } while (hasNextPage);
+
+            return chunkIds;
+          },
+        );
+
+        await context.run("cleanup-keyword-store-chunks", async () => {
+          if (keywordChunkIdsToDelete.length === 0) return;
+
+          const batches = chunkArray(keywordChunkIdsToDelete, BATCH_SIZE);
+          for (const batch of batches) {
+            await keywordStore.deleteByIds(batch);
+          }
+        });
+      }
     }
 
     let totalTokens = 0;
@@ -242,6 +284,18 @@ export const { POST } = serve<TriggerDocumentJobBody>(
         );
 
         await vectorStore.upsert(nodes);
+
+        if (namespace.keywordEnabled) {
+          // store in keyword store
+          await keywordStore.upsert(
+            nodes.map((node, idx) => ({
+              id: node.id,
+              text: chunkBatch[idx]!.text,
+              documentId: document.id,
+              metadata: node.metadata,
+            })),
+          );
+        }
 
         return results.usage.tokens;
       });

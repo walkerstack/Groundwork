@@ -31,6 +31,7 @@
     "@aws-sdk/client-s3": "^3.772.0",
     "@aws-sdk/s3-presigned-post": "^3.772.0",
     "@aws-sdk/s3-request-presigner": "^3.772.0",
+    "@azure/search-documents": "^12.1.0",
     "@bprogress/next": "^3.2.4",
     "@calcom/embed-react": "^1.5.2",
     "@dnd-kit/sortable": "^10.0.0",

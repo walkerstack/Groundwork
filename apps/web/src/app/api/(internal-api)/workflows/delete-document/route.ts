@@ -1,5 +1,6 @@
 import type { DeleteDocumentBody } from "@/lib/workflow";
 import { chunkArray } from "@/lib/functions";
+import { KeywordStore } from "@/lib/keyword-store";
 import { deleteObject } from "@/lib/s3";
 import { getNamespaceVectorStore } from "@/lib/vector-store";
 import { cancelWorkflow, qstashClient, qstashReceiver } from "@/lib/workflow";
@@ -98,6 +99,45 @@ export const { POST } = serve<DeleteDocumentBody>(
         await vectorStore.delete(batch);
       }
     });
+
+    if (namespace.keywordEnabled) {
+      const keywordStore = new KeywordStore(
+        namespace.id,
+        document.tenantId ?? undefined,
+      );
+
+      const keywordChunkIdsToDelete = await context.run(
+        "cleanup-get-keyword-store-chunk-ids",
+        async () => {
+          let page: number = 1;
+          let hasNextPage: boolean = true;
+          const chunkIds: string[] = [];
+
+          do {
+            const chunks = await keywordStore.listIds({
+              documentId: document.id,
+              page,
+            });
+
+            chunkIds.push(...chunks.ids);
+
+            hasNextPage = chunks.hasNextPage;
+            page = chunks.currentPage + 1;
+          } while (hasNextPage);
+
+          return chunkIds;
+        },
+      );
+
+      await context.run("cleanup-keyword-store-chunks", async () => {
+        if (keywordChunkIdsToDelete.length === 0) return;
+
+        const batches = chunkArray(keywordChunkIdsToDelete, BATCH_SIZE);
+        for (const batch of batches) {
+          await keywordStore.deleteByIds(batch);
+        }
+      });
+    }
 
     await context.run("delete-document", async () => {
       await db.$transaction([

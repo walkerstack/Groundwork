@@ -23,6 +23,8 @@ model Namespace {
   totalPages           Int @default(0)
   totalPlaygroundUsage Int @default(0) // Total number of playground requests in the namespace
 
+  keywordEnabled Boolean @default(false) // whether keyword + hybrid search is enabled
+
   hosting Hosting?
 
   createdAt DateTime @default(now())

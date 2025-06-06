@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -8,8 +9,10 @@ import {
   CardDescription,
   CardHeader,
 } from "@/components/ui/card";
+import CopyButton from "@/components/ui/copy-button";
 import { Separator } from "@/components/ui/separator";
 import { useNamespace } from "@/contexts/namespace-context";
+import { prefixId } from "@/lib/api/ids";
 import { formatNumber } from "@/lib/utils";
 
 const SensitiveInfo = ({ info }: { info: unknown }) => {
@@ -42,10 +45,22 @@ const SensitiveInfo = ({ info }: { info: unknown }) => {
 
 export default function NamespacePage() {
   const { activeNamespace } = useNamespace();
+  const id = prefixId(activeNamespace.id, "ns_");
 
   return (
     <>
-      <div className="grid grid-cols-3 gap-4">
+      <div className="flex items-center gap-5">
+        <h3 className="text-xl font-bold">{activeNamespace.name}</h3>
+        <pre className="bg-muted relative rounded-md px-3 py-2 pr-10 text-sm">
+          {id}
+          <CopyButton
+            className="absolute top-1/2 right-1 -translate-y-1/2"
+            textToCopy={id}
+          />
+        </pre>
+      </div>
+
+      <div className="mt-5 grid grid-cols-3 gap-4">
         <Card className="gap-0">
           <CardHeader>
             <CardDescription>Ingestion Jobs</CardDescription>
@@ -80,7 +95,7 @@ export default function NamespacePage() {
         </Card>
       </div>
 
-      <div className="mt-10">
+      <div className="mt-10 flex flex-col gap-10">
         <div>
           <h2 className="text-lg font-medium">Vector Store</h2>
           <Separator className="my-2" />
@@ -95,7 +110,7 @@ export default function NamespacePage() {
           )}
         </div>
 
-        <div className="mt-10">
+        <div>
           <h2 className="text-lg font-medium">Embedding</h2>
           <Separator className="my-2" />
           {activeNamespace.embeddingConfig ? (
@@ -108,7 +123,15 @@ export default function NamespacePage() {
           )}
         </div>
 
-        <div className="mt-10">
+        {activeNamespace.keywordEnabled && (
+          <div>
+            <h2 className="text-lg font-medium">Keyword And Hybrid Search</h2>
+            <Separator className="my-2" />
+            <Badge variant="success">Enabled</Badge>
+          </div>
+        )}
+
+        {/* <div >
           <h2 className="text-lg font-medium">File Store</h2>
           <Separator className="my-2" />
           {activeNamespace.fileStoreConfig ? (
@@ -119,7 +142,7 @@ export default function NamespacePage() {
               store.
             </p>
           )}
-        </div>
+        </div> */}
       </div>
     </>
   );
