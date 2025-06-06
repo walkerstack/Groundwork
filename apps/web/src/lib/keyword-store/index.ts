@@ -56,6 +56,14 @@ export class KeywordStore {
     return results;
   }
 
+  private encodeId(id: string) {
+    return id.replaceAll("#", "_"); // Keys can only contain letters, digits, underscore (_), dash (-), or equal sign (=)
+  }
+
+  private decodeId(id: string) {
+    return id.replaceAll("_", "#"); // Keys can only contain letters, digits, underscore (_), dash (-), or equal sign (=)
+  }
+
   async search(
     query: string,
     {
@@ -105,7 +113,7 @@ export class KeywordStore {
         });
 
         return {
-          id: document.id,
+          id: this.decodeId(document.id),
           score: result.score,
           highlights: result.highlights?.text ?? [],
           node: metadataDictToNode(metadata),
@@ -140,7 +148,7 @@ export class KeywordStore {
 
     const ids: string[] = [];
     for await (const result of results.results) {
-      ids.push(result.document.id);
+      ids.push(this.decodeId(result.document.id));
     }
 
     return {
@@ -174,7 +182,7 @@ export class KeywordStore {
         });
 
         return {
-          id: chunk.id,
+          id: this.encodeId(chunk.id),
           text: chunk.text,
           namespaceId: this.namespaceId,
           tenantId: this.tenantId ?? null,
@@ -186,6 +194,6 @@ export class KeywordStore {
   }
 
   async deleteByIds(ids: string[]) {
-    await keywordSearchClient.deleteDocuments("id", ids);
+    await keywordSearchClient.deleteDocuments("id", ids.map(this.encodeId));
   }
 }
