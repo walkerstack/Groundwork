@@ -44,6 +44,7 @@ export const POST = withPublicApiHandler(
             createdAt: true,
             vectorStoreConfig: true,
             embeddingConfig: true,
+            keywordEnabled: true,
           },
         },
       },

@@ -48,6 +48,7 @@ const getHosting = async (namespaceId: string) => {
           createdAt: true,
           vectorStoreConfig: true,
           embeddingConfig: true,
+          keywordEnabled: true,
         },
       },
     },

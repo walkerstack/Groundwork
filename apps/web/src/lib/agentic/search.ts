@@ -7,14 +7,21 @@ import type {
   QueryVectorStoreResult,
 } from "../vector-store/parse";
 import type { Queries } from "./utils";
+import { KeywordStore } from "../keyword-store";
 import { queryVectorStore } from "../vector-store/parse";
 import { evaluateQueries, generateQueries } from "./utils";
 
+export type AgenticSearchNamespace = Pick<
+  Namespace,
+  | "id"
+  | "vectorStoreConfig"
+  | "embeddingConfig"
+  | "createdAt"
+  | "keywordEnabled"
+>;
+
 export async function agenticSearch(
-  namespace: Pick<
-    Namespace,
-    "id" | "vectorStoreConfig" | "embeddingConfig" | "createdAt"
-  >,
+  namespace: AgenticSearchNamespace,
   {
     model,
     messages,
@@ -37,6 +44,8 @@ export async function agenticSearch(
   let totalQueries = 0;
   let totalTokens = 0;
 
+  const lastMessage = messages[messages.length - 1]!.content as string;
+
   for (let i = 0; i < maxEvals; i++) {
     console.log(`[EVAL LOOP] ${i + 1} / ${maxEvals}`);
     console.dir(messages, { depth: null });
@@ -44,6 +53,14 @@ export async function agenticSearch(
 
     const { queries: newQueries, totalTokens: queriesTokens } =
       await generateQueries(model, messages, queries);
+
+    if (i === 0) {
+      newQueries.unshift({
+        query: lastMessage,
+        type: "semantic",
+      });
+    }
+
     newQueries.forEach((q) => {
       if (queries.includes(q)) return;
       queries.push(q);
@@ -56,6 +73,25 @@ export async function agenticSearch(
     const data = (
       await Promise.all(
         newQueries.map(async (query) => {
+          if (namespace.keywordEnabled && query.type === "keyword") {
+            const keywordStore = new KeywordStore(
+              namespace.id,
+              queryOptions?.tenantId,
+            );
+
+            const keywordResult = await keywordStore.search(query.query, {
+              limit: 15,
+              includeMetadata: true,
+            });
+
+            totalQueries++;
+            return {
+              query: query.query,
+              unorderedIds: keywordResult.results.map((r) => r.id),
+              results: keywordResult.results,
+            };
+          }
+
           const queryResult = await queryVectorStore(namespace, {
             query: query.query,
             topK: 50,

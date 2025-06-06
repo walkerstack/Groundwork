@@ -17,7 +17,7 @@ type Result = {
   rerankScore?: number;
 };
 
-const formatResults = (
+export const formatResults = (
   results: Result[],
   {
     includeMetadata,

@@ -1,17 +1,10 @@
 import type { CoreMessage, JSONValue, LanguageModelV1 } from "ai";
 import { createDataStreamResponse, generateText, streamText } from "ai";
 
-import type { Namespace as DBNamespace } from "@agentset/db";
-
 import type { QueryVectorStoreOptions } from "../vector-store/parse";
 import { NEW_MESSAGE_PROMPT } from "../prompts";
-import { agenticSearch } from "./search";
+import { agenticSearch, AgenticSearchNamespace } from "./search";
 import { formatSources } from "./utils";
-
-type Namespace = Pick<
-  DBNamespace,
-  "id" | "vectorStoreConfig" | "embeddingConfig" | "createdAt"
->;
 
 type AgenticPipelineOptions = {
   model: LanguageModelV1;
@@ -26,7 +19,7 @@ type AgenticPipelineOptions = {
 };
 
 const agenticPipeline = (
-  namespace: Namespace,
+  namespace: AgenticSearchNamespace,
   {
     model,
     queryOptions,
@@ -126,7 +119,7 @@ const agenticPipeline = (
 };
 
 export const generateAgenticResponse = async (
-  namespace: Namespace,
+  namespace: AgenticSearchNamespace,
   {
     model,
     queryOptions,

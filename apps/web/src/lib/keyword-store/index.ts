@@ -11,6 +11,8 @@ import {
 } from "@azure/search-documents";
 import { metadataDictToNode } from "llamaindex";
 
+import { formatResults } from "../vector-store/parse";
+
 export type KeywordSearchChunk = {
   id: string;
   text: string;
@@ -70,10 +72,14 @@ export class KeywordStore {
       documentId,
       page = 1,
       limit = 10,
+      includeMetadata,
+      includeRelationships,
     }: {
       documentId?: string;
       page?: number;
       limit?: number;
+      includeMetadata?: boolean;
+      includeRelationships?: boolean;
     } = {},
   ) {
     let filter = odata`namespaceId eq '${this.namespaceId}'`;
@@ -103,22 +109,28 @@ export class KeywordStore {
       currentPage: page,
       hasNextPage: page < totalPages,
       hasPreviousPage: page > 1,
-      results: resultsArray.map((result) => {
-        const document = result.document;
-        const metadata = safeParse(result.document.metadata) ?? {};
+      results: formatResults(
+        resultsArray.map((result) => {
+          const document = result.document;
+          const metadata = safeParse(result.document.metadata) ?? {};
 
-        // add top-level fields back to metadata to match vector store format
-        topLevelMetadataKeys.forEach((key) => {
-          metadata[key] = result.document[key];
-        });
+          // add top-level fields back to metadata to match vector store format
+          topLevelMetadataKeys.forEach((key) => {
+            metadata[key] = result.document[key];
+          });
 
-        return {
-          id: this.decodeId(document.id),
-          score: result.score,
-          highlights: result.highlights?.text ?? [],
-          node: metadataDictToNode(metadata),
-        };
-      }),
+          return {
+            id: this.decodeId(document.id),
+            score: result.score,
+            highlights: result.highlights?.text ?? [],
+            node: metadataDictToNode(metadata),
+          };
+        }),
+        {
+          includeMetadata,
+          includeRelationships,
+        },
+      ),
     };
   }
 
