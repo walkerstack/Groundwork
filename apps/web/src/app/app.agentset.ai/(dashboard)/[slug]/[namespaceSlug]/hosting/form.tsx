@@ -1,4 +1,5 @@
 import React from "react";
+import ListInput from "@/components/list-input";
 import SortableList from "@/components/sortable-list";
 import { Button } from "@/components/ui/button";
 import {
@@ -23,8 +24,8 @@ type FormData = z.infer<typeof schema>;
 
 export const schema = z.object({
   protected: z.boolean(),
-  allowedEmails: z.array(z.string().email()).optional(),
-  allowedEmailDomains: z.array(z.string()).optional(),
+  allowedEmails: z.array(z.string().email()),
+  allowedEmailDomains: z.array(z.string()),
   systemPrompt: z.string().min(1, "System prompt cannot be empty"),
   examplesQuestions: z
     .array(z.string().min(1, "Example cannot be empty"))
@@ -101,71 +102,20 @@ export default function HostingForm({
 
               {form.watch("protected") && (
                 <>
-                  <FormField
-                    control={form.control}
+                  <ListInput
+                    form={form}
                     name="allowedEmails"
-                    render={({ field }) => (
-                      <FormItem>
-                        <div className="flex flex-col gap-1">
-                          <FormLabel>Allowed Emails</FormLabel>
-                          <FormDescription>
-                            Only these emails will be allowed access (if set).
-                          </FormDescription>
-                        </div>
-
-                        <FormControl>
-                          <Textarea
-                            placeholder="Enter allowed emails, one per line"
-                            value={field.value?.join("\n") || ""}
-                            onChange={(e) =>
-                              field.onChange(
-                                e.target.value
-                                  .split("\n")
-                                  .map((v) => v.trim())
-                                  .filter(Boolean),
-                              )
-                            }
-                            className="h-24 max-h-40"
-                          />
-                        </FormControl>
-
-                        <FormMessage />
-                      </FormItem>
-                    )}
+                    label="Allowed Emails"
+                    description="Only these emails will be allowed access (if set)."
+                    placeholder="Enter an email address..."
                   />
 
-                  <FormField
-                    control={form.control}
+                  <ListInput
+                    form={form}
                     name="allowedEmailDomains"
-                    render={({ field }) => (
-                      <FormItem>
-                        <div className="flex flex-col gap-1">
-                          <FormLabel>Allowed Email Domains</FormLabel>
-                          <FormDescription>
-                            Only these email domains will be allowed access (if
-                            set).
-                          </FormDescription>
-                        </div>
-
-                        <FormControl>
-                          <Textarea
-                            placeholder="Enter allowed domains, one per line (e.g. example.com)"
-                            value={field.value?.join("\n") || ""}
-                            onChange={(e) =>
-                              field.onChange(
-                                e.target.value
-                                  .split("\n")
-                                  .map((v) => v.trim())
-                                  .filter(Boolean),
-                              )
-                            }
-                            className="h-24 max-h-40"
-                          />
-                        </FormControl>
-
-                        <FormMessage />
-                      </FormItem>
-                    )}
+                    label="Allowed Email Domains"
+                    description="Only these email domains will be allowed access (if set)."
+                    placeholder="Enter a domain (e.g. example.com)..."
                   />
                 </>
               )}
