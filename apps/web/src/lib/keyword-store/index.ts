@@ -10,6 +10,7 @@ import {
   SearchClient,
 } from "@azure/search-documents";
 import { metadataDictToNode } from "@llamaindex/core/vector-store";
+import { TextNode } from "llamaindex";
 
 import { formatResults } from "../vector-store/parse";
 
@@ -113,17 +114,20 @@ export class KeywordStore {
         resultsArray.map((result) => {
           const document = result.document;
           const metadata = safeParse(result.document.metadata) ?? {};
+          const id = this.decodeId(document.id);
 
           // add top-level fields back to metadata to match vector store format
           topLevelMetadataKeys.forEach((key) => {
-            metadata[key] = result.document[key];
+            metadata[key] = document[key];
           });
 
           return {
-            id: this.decodeId(document.id),
+            id,
             score: result.score,
             highlights: result.highlights?.text ?? [],
-            node: metadataDictToNode(metadata),
+            node: metadata._node_content
+              ? metadataDictToNode(metadata)
+              : new TextNode({ id_: id, text: document.text, metadata }),
           };
         }),
         {
