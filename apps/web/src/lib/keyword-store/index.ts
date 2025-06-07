@@ -9,7 +9,7 @@ import {
   odata,
   SearchClient,
 } from "@azure/search-documents";
-import { metadataDictToNode } from "llamaindex";
+import { metadataDictToNode } from "@llamaindex/core/vector-store";
 
 import { formatResults } from "../vector-store/parse";
 
