@@ -39,6 +39,9 @@ model Hosting {
   namespaceId String    @unique
   namespace   Namespace @relation(fields: [namespaceId], references: [id], onDelete: Cascade)
 
+  title  String?
+  slug   String? @unique
+  logo   String?
   domain Domain?
 
   systemPrompt         String?  @db.Text

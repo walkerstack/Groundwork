@@ -1,4 +1,4 @@
-import React from "react";
+import AvatarUploader from "@/components/avatar-uploader";
 import ListInput from "@/components/list-input";
 import SortableList from "@/components/sortable-list";
 import { Button } from "@/components/ui/button";
@@ -15,14 +15,31 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
+import { HOSTING_PREFIX, SHORT_DOMAIN } from "@/lib/constants";
 import { DEFAULT_SYSTEM_PROMPT } from "@/lib/prompts";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-type FormData = z.infer<typeof schema>;
+// Separate type for API submission
+type FormSubmissionData = {
+  title: string;
+  slug: string;
+  logo?: string | null;
+  protected: boolean;
+  allowedEmails: string[];
+  allowedEmailDomains: string[];
+  systemPrompt: string;
+  examplesQuestions: string[];
+  exampleSearchQueries: string[];
+  welcomeMessage: string;
+  citationMetadataPath?: string;
+};
 
 export const schema = z.object({
+  title: z.string().min(1, "Title is required"),
+  slug: z.string().min(1, "Slug is required"),
+  logo: z.string().nullable().optional(),
   protected: z.boolean(),
   allowedEmails: z.array(z.string().email()),
   allowedEmailDomains: z.array(z.string()),
@@ -46,13 +63,15 @@ export default function HostingForm({
   defaultValues,
 }: {
   isPending: boolean;
-  onSubmit: (data: FormData) => void;
+  onSubmit: (data: FormSubmissionData) => void;
   action?: string;
-  defaultValues?: Partial<FormData>;
+  defaultValues?: Partial<FormSubmissionData>;
 }) {
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
+      title: "",
+      slug: "",
       protected: false,
       allowedEmails: [],
       allowedEmailDomains: [],
@@ -65,13 +84,120 @@ export default function HostingForm({
     },
   });
 
+  const handleSubmit = async (data: FormValues) => {
+    onSubmit({
+      title: data.title,
+      slug: data.slug,
+      logo: defaultValues?.logo === data.logo ? undefined : data.logo,
+      protected: data.protected,
+      allowedEmails: data.allowedEmails,
+      allowedEmailDomains: data.allowedEmailDomains,
+      systemPrompt: data.systemPrompt,
+      examplesQuestions: data.examplesQuestions,
+      exampleSearchQueries: data.exampleSearchQueries,
+      welcomeMessage: data.welcomeMessage,
+      citationMetadataPath: data.citationMetadataPath,
+    });
+  };
+
   return (
     <div>
       <Form {...form}>
         <form
           className="flex flex-col gap-20"
-          onSubmit={form.handleSubmit(onSubmit)}
+          onSubmit={form.handleSubmit(handleSubmit)}
         >
+          <div>
+            <div>
+              <h2 className="text-xl font-medium">Basic Information</h2>
+              <p className="text-muted-foreground mt-1 text-sm">
+                Configure the basic information for your hosting
+              </p>
+            </div>
+
+            <Separator className="my-4" />
+
+            <div className="flex flex-col gap-8">
+              <FormField
+                control={form.control}
+                name="title"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Title</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        placeholder="Enter a title for your hosting..."
+                      />
+                    </FormControl>
+
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="slug"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Slug</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="Enter a unique slug..." />
+                    </FormControl>
+                    <FormDescription>
+                      Preview: {SHORT_DOMAIN}
+                      {HOSTING_PREFIX}
+                      {field.value}
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="logo"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Logo</FormLabel>
+
+                    <AvatarUploader
+                      onImageChange={field.onChange}
+                      defaultImageUrl={defaultValues?.logo}
+                    />
+
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* <FormItem>
+                <FormLabel>Logo</FormLabel>
+                <FormControl>
+                  <FileUploader
+                    value={logoFile ? [logoFile] : []}
+                    onValueChange={(files) => {
+                      setLogoFile(files[0] || null);
+                    }}
+                    maxFileCount={1}
+                    maxSize={MAX_UPLOAD_SIZE}
+                    progresses={progresses}
+                    accept={{
+                      "image/*": [],
+                    }}
+                    disabled={isPending || isUploading}
+                  />
+                </FormControl>
+                <FormDescription>
+                  Upload a logo for your hosted page. Recommended size:
+                  200x200px
+                </FormDescription>
+                <FormMessage />
+              </FormItem> */}
+            </div>
+          </div>
+
           <div>
             <div>
               <h2 className="text-xl font-medium">Protection</h2>
@@ -141,9 +267,7 @@ export default function HostingForm({
                     <FormLabel>System Prompt</FormLabel>
                     <FormControl>
                       <Textarea
-                        id="systemPrompt"
-                        value={field.value}
-                        onChange={(e) => field.onChange(e.target.value)}
+                        {...field}
                         className="h-32 max-h-56"
                         placeholder="Enter your system prompt..."
                       />

@@ -3,8 +3,15 @@ import { NextResponse } from "next/server";
 import { parse } from "@/lib/middleware/utils";
 import { getSessionCookie } from "better-auth/cookies";
 
+import { HOSTING_PREFIX } from "../constants";
+import HostingMiddleware from "./hosting";
+
 export default function AppMiddleware(req: NextRequest) {
   const { path, fullPath } = parse(req);
+
+  if (path.startsWith(HOSTING_PREFIX)) {
+    return HostingMiddleware(req, "path");
+  }
 
   const cookies = getSessionCookie(req);
 

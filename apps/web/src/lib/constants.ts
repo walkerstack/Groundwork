@@ -31,3 +31,6 @@ export const API_DOMAIN =
     : env.NEXT_PUBLIC_VERCEL_ENV === "preview"
       ? `https://api-staging.${SHORT_DOMAIN}`
       : `http://api.${localHost}`;
+
+// for hosting
+export const HOSTING_PREFIX = "/v/";

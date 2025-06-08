@@ -1,5 +1,7 @@
 import type { DeleteNamespaceBody } from "@/lib/workflow";
+import { env } from "@/env";
 import { chunkArray } from "@/lib/functions";
+import { deleteAsset } from "@/lib/s3/assets";
 import {
   qstashClient,
   qstashReceiver,
@@ -19,6 +21,12 @@ export const { POST } = serve<DeleteNamespaceBody>(
         where: { id: namespaceId },
         select: {
           id: true,
+          hosting: {
+            select: {
+              id: true,
+              logo: true,
+            },
+          },
         },
       });
 
@@ -28,6 +36,13 @@ export const { POST } = serve<DeleteNamespaceBody>(
 
       return job;
     });
+
+    const logo = namespace.hosting?.logo;
+    if (logo) {
+      await context.run("delete-hosting-logo", async () => {
+        await deleteAsset(logo.replace(`${env.ASSETS_S3_URL}/`, ""));
+      });
+    }
 
     // TODO: update status to deleting
     // await context.run("update-status-deleting", async () => {

@@ -10,7 +10,7 @@ import {
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
-import { MAX_UPLOAD_SIZE } from "./upload";
+import { MAX_UPLOAD_SIZE } from "../upload";
 
 const s3Client = new S3Client({
   region: "auto",
@@ -141,5 +141,3 @@ export function deleteManyObjects(keys: string[]) {
     }),
   );
 }
-
-export default s3Client;

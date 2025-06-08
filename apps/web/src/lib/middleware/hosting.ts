@@ -2,20 +2,42 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { parse } from "@/lib/middleware/utils";
 
+import type { Prisma } from "@agentset/db";
 import { db } from "@agentset/db";
 
+import { HOSTING_PREFIX } from "../constants";
 import { getMiddlewareSession } from "./get-session";
 
-export default async function CustomDomainMiddleware(req: NextRequest) {
-  const { domain, fullPath } = parse(req);
+export default async function HostingMiddleware(
+  req: NextRequest,
+  mode: "domain" | "path" = "domain",
+) {
+  const { domain, path, fullPath: _fullPath } = parse(req);
 
-  const hosting = await db.hosting.findFirst({
-    where: {
+  let filter: Prisma.HostingWhereInput = {};
+  let fullPath = _fullPath;
+  if (mode === "domain") {
+    filter = {
       domain: {
         slug: domain,
       },
-    },
+    };
+  } else {
+    // fullPath will looks like this: /v/my-slug/...
+    // we need to get the slug and the rest of the path
+    const slug = path.replace(HOSTING_PREFIX, "").split("/")[0];
+    fullPath = fullPath.replace(`${HOSTING_PREFIX}${slug}`, "");
+    if (fullPath === "") fullPath = "/";
+
+    filter = {
+      slug,
+    };
+  }
+
+  const hosting = await db.hosting.findFirst({
+    where: filter,
     select: {
+      id: true,
       protected: true,
       allowedEmailDomains: true,
       allowedEmails: true,
@@ -37,7 +59,7 @@ export default async function CustomDomainMiddleware(req: NextRequest) {
       return NextResponse.redirect(new URL("/", req.url));
     }
 
-    return NextResponse.rewrite(new URL(`/${domain}${fullPath}`, req.url));
+    return NextResponse.rewrite(new URL(`/${hosting.id}${fullPath}`, req.url));
   }
 
   if (hosting.protected) {
@@ -77,11 +99,13 @@ export default async function CustomDomainMiddleware(req: NextRequest) {
 
       // if they're not a member, rewrite to not-allowed
       if (!member) {
-        return NextResponse.rewrite(new URL(`/${domain}/not-allowed`, req.url));
+        return NextResponse.rewrite(
+          new URL(`/${hosting.id}/not-allowed`, req.url),
+        );
       }
     }
   }
 
   // rewrite to the custom domain
-  return NextResponse.rewrite(new URL(`/${domain}${fullPath}`, req.url));
+  return NextResponse.rewrite(new URL(`/${hosting.id}${fullPath}`, req.url));
 }

@@ -62,7 +62,7 @@ export default function ListInput<
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="flex items-center gap-5">
+      <div className="flex items-start justify-between gap-5">
         <div className="flex flex-col gap-1">
           {label && <FormLabel>{label}</FormLabel>}
           {description && <FormDescription>{description}</FormDescription>}

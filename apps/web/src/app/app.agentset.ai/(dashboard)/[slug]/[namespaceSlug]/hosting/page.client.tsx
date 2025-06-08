@@ -56,6 +56,9 @@ export default function HostingPage() {
           });
         }}
         defaultValues={{
+          title: data.title || "",
+          slug: data.slug || "",
+          logo: data.logo || null,
           protected: data.protected,
           allowedEmails: data.allowedEmails,
           allowedEmailDomains: data.allowedEmailDomains,

@@ -5,13 +5,24 @@ import { usePathname } from "next/navigation";
 import { useHostingChat } from "@/components/chat/use-hosting-chat";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { HOSTING_PREFIX } from "@/lib/constants";
 import { PlusIcon } from "lucide-react";
 
 export default function Header({ title }: { title: string }) {
   const { setMessages } = useHostingChat();
   const path = usePathname();
 
-  const isSearch = path === "/search";
+  const isSubPath = path.startsWith(HOSTING_PREFIX);
+  const slug = isSubPath
+    ? path.replace(HOSTING_PREFIX, "").split("/")[0]
+    : null;
+
+  const relativePath = slug
+    ? path.replace(`${HOSTING_PREFIX}${slug}`, "")
+    : path;
+  const isSearch = relativePath === "/search";
+
+  const baseUrl = isSubPath ? `${HOSTING_PREFIX}${slug}` : "";
 
   const resetChat = () => {
     setMessages([]);
@@ -30,10 +41,10 @@ export default function Header({ title }: { title: string }) {
       <Tabs value={isSearch ? "search" : "chat"}>
         <TabsList>
           <TabsTrigger value="chat" asChild>
-            <Link href="/">Chat</Link>
+            <Link href={`${baseUrl}/`}>Chat</Link>
           </TabsTrigger>
           <TabsTrigger value="search" asChild>
-            <Link href="/search">Search</Link>
+            <Link href={`${baseUrl}/search`}>Search</Link>
           </TabsTrigger>
         </TabsList>
       </Tabs>

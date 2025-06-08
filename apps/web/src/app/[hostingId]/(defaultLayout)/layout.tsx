@@ -7,12 +7,10 @@ import { db } from "@agentset/db";
 
 import Header from "./header";
 
-const getHosting = cache(async (domain: string) => {
+const getHosting = cache(async (id: string) => {
   return await db.hosting.findFirst({
     where: {
-      domain: {
-        slug: domain,
-      },
+      id,
     },
     include: {
       namespace: {
@@ -31,10 +29,10 @@ const getHosting = cache(async (domain: string) => {
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ domain: string }>;
+  params: Promise<{ hostingId: string }>;
 }) {
-  const { domain } = await params;
-  const hosting = await getHosting(domain);
+  const { hostingId } = await params;
+  const hosting = await getHosting(hostingId);
 
   if (!hosting) return {};
 
@@ -45,11 +43,11 @@ export default async function CustomDomainLayout({
   params,
   children,
 }: {
-  params: Promise<{ domain: string }>;
+  params: Promise<{ hostingId: string }>;
   children: React.ReactNode;
 }) {
-  const { domain } = await params;
-  const hosting = await getHosting(domain);
+  const { hostingId } = await params;
+  const hosting = await getHosting(hostingId);
 
   if (!hosting) notFound();
 

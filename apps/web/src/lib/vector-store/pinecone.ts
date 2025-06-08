@@ -1,4 +1,5 @@
 import type {
+  FetchResponse,
   ListResponse,
   QueryResponse,
   RecordMetadata,
@@ -72,6 +73,21 @@ export class Pinecone {
     } = {},
   ): Promise<ListResponse> {
     return this.makeRequest<ListResponse>("GET", "/vectors/list", params);
+  }
+
+  async fetch(
+    ids: string[],
+  ): Promise<
+    Omit<FetchResponse, "records"> & { vectors: FetchResponse["records"] }
+  > {
+    return this.makeRequest<
+      Omit<FetchResponse, "records"> & { vectors: FetchResponse["records"] }
+    >(
+      "GET",
+      `/vectors/fetch?namespace=${this.namespace}&${ids.map((id) => `ids=${encodeURIComponent(id)}`).join("&")}`,
+      undefined,
+      { includeBody: false },
+    );
   }
 
   async query(params: {
