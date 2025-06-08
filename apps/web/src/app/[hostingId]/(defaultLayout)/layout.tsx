@@ -54,7 +54,7 @@ export default async function CustomDomainLayout({
   return (
     <HostingProvider hosting={hosting}>
       <div>
-        <Header title={hosting.namespace.organization.name} />
+        <Header />
         {children}
       </div>
     </HostingProvider>

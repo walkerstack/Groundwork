@@ -65,7 +65,7 @@ const PlaygroundChat = () => {
 };
 
 const HostingChat = () => {
-  const { exampleQuestions, welcomeMessage } = useHosting();
+  const { exampleQuestions, welcomeMessage, logo } = useHosting();
   const {
     id,
     messages,
@@ -95,6 +95,7 @@ const HostingChat = () => {
         isReadonly={false}
         isArtifactVisible={false}
         overviewMessage={welcomeMessage ?? undefined}
+        logo={logo ?? undefined}
       />
 
       <form className="bg-background mx-auto flex w-full gap-2 px-4 pb-4 md:max-w-3xl md:pb-6">

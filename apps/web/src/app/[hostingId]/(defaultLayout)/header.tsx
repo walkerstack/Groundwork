@@ -5,10 +5,12 @@ import { usePathname } from "next/navigation";
 import { useHostingChat } from "@/components/chat/use-hosting-chat";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useHosting } from "@/contexts/hosting-context";
 import { HOSTING_PREFIX } from "@/lib/constants";
 import { PlusIcon } from "lucide-react";
 
-export default function Header({ title }: { title: string }) {
+export default function Header() {
+  const { title } = useHosting();
   const { setMessages } = useHostingChat();
   const path = usePathname();
 

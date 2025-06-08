@@ -17,6 +17,7 @@ interface MessagesProps {
   isReadonly: boolean;
   isArtifactVisible: boolean;
   overviewMessage?: string;
+  logo?: string;
 }
 
 function PureMessages({
@@ -27,6 +28,7 @@ function PureMessages({
   reload,
   isReadonly,
   overviewMessage,
+  logo,
 }: MessagesProps) {
   const {
     containerRef: messagesContainerRef,
@@ -44,7 +46,9 @@ function PureMessages({
       ref={messagesContainerRef}
       className="relative flex min-w-0 flex-1 flex-col gap-6 overflow-y-scroll pt-4"
     >
-      {messages.length === 0 && <Overview message={overviewMessage} />}
+      {messages.length === 0 && (
+        <Overview message={overviewMessage} logo={logo} />
+      )}
 
       {messages.map((message, index) => (
         <PreviewMessage
