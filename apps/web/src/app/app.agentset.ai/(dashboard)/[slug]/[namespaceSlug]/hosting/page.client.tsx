@@ -59,7 +59,6 @@ export default function HostingPage() {
   return (
     <div className="max-w-xl">
       <HostingForm
-        type="update"
         isPending={isUpdating}
         onSubmit={async (data) => {
           await updateHosting({
@@ -80,7 +79,6 @@ export default function HostingPage() {
           welcomeMessage: data.welcomeMessage || "",
           citationMetadataPath: data.citationMetadataPath || "",
         }}
-        action="Save"
       />
 
       <Separator className="my-10" />

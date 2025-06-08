@@ -43,24 +43,7 @@ export const hostingRouter = createTRPCRouter({
     return getHosting(ctx, input);
   }),
   enable: protectedProcedure
-    .input(
-      commonInput.extend({
-        title: z.string().min(1),
-        slug: slugSchema,
-        protected: z.boolean(),
-        allowedEmails: z
-          .array(z.string().email().trim().toLowerCase())
-          .optional(),
-        allowedEmailDomains: z
-          .array(z.string().trim().toLowerCase())
-          .optional(),
-        systemPrompt: z.string().optional(),
-        examplesQuestions: z.array(z.string()).max(4).optional(),
-        exampleSearchQueries: z.array(z.string()).max(4).optional(),
-        welcomeMessage: z.string().optional(),
-        citationMetadataPath: z.string().optional(),
-      }),
-    )
+    .input(commonInput)
     .mutation(async ({ ctx, input }) => {
       const namespace = await ctx.db.namespace.findUnique({
         where: {
@@ -71,7 +54,16 @@ export const hostingRouter = createTRPCRouter({
         },
         select: {
           id: true,
+          slug: true,
+          name: true,
           hosting: true,
+          organization: {
+            select: {
+              id: true,
+
+              slug: true,
+            },
+          },
         },
       });
 
@@ -89,34 +81,18 @@ export const hostingRouter = createTRPCRouter({
         });
       }
 
-      // Check if slug is already taken
-      const existingHosting = await ctx.db.hosting.findUnique({
-        where: { slug: input.slug },
-        select: {
-          id: true,
-        },
-      });
-
-      if (existingHosting) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Slug is already taken",
-        });
+      let slug = `${namespace.slug}-${nanoid(10)}`;
+      while ((await ctx.db.hosting.count({ where: { slug } })) > 0) {
+        slug = `${namespace.slug}-${nanoid(10)}`;
       }
 
       return ctx.db.hosting.create({
         data: {
+          // set default values
           namespaceId: namespace.id,
-          title: input.title,
-          slug: input.slug,
-          protected: input.protected,
-          allowedEmails: input.allowedEmails ?? [],
-          allowedEmailDomains: input.allowedEmailDomains ?? [],
-          systemPrompt: input.systemPrompt ?? DEFAULT_SYSTEM_PROMPT.compile(),
-          exampleQuestions: input.examplesQuestions,
-          exampleSearchQueries: input.exampleSearchQueries,
-          welcomeMessage: input.welcomeMessage,
-          citationMetadataPath: input.citationMetadataPath,
+          title: namespace.name,
+          slug,
+          systemPrompt: DEFAULT_SYSTEM_PROMPT.compile(),
         },
       });
     }),

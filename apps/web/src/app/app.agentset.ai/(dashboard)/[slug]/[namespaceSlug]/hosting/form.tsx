@@ -61,15 +61,11 @@ type FormValues = z.infer<typeof schema>;
 export default function HostingForm({
   isPending,
   onSubmit,
-  action = "Submit",
   defaultValues,
-  type = "add",
 }: {
   isPending: boolean;
   onSubmit: (data: FormSubmissionData) => void;
-  action?: string;
   defaultValues?: Partial<FormSubmissionData>;
-  type?: "add" | "update";
 }) {
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -103,67 +99,6 @@ export default function HostingForm({
       citationMetadataPath: data.citationMetadataPath,
     });
   };
-
-  if (type === "add") {
-    return (
-      <Form {...form}>
-        <form
-          className="flex flex-col gap-8"
-          onSubmit={form.handleSubmit(handleSubmit)}
-        >
-          <FormField
-            control={form.control}
-            name="title"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Title</FormLabel>
-                <FormControl>
-                  <Input
-                    {...field}
-                    placeholder="Enter a title for your hosting..."
-                  />
-                </FormControl>
-
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="slug"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Slug</FormLabel>
-                <FormControl>
-                  <Input {...field} placeholder="Enter a unique slug..." />
-                </FormControl>
-                <FormDescription>
-                  Preview: {APP_DOMAIN}
-                  {HOSTING_PREFIX}
-                  {field.value}
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="logo"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Logo</FormLabel>
-
-                <AvatarUploader onImageChange={field.onChange} />
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </form>
-      </Form>
-    );
-  }
 
   const url = `${APP_DOMAIN}${HOSTING_PREFIX}${defaultValues?.slug}`;
 
@@ -426,7 +361,7 @@ export default function HostingForm({
 
           <div className="flex justify-end">
             <Button type="submit" isLoading={isPending}>
-              {action}
+              Save
             </Button>
           </div>
         </form>

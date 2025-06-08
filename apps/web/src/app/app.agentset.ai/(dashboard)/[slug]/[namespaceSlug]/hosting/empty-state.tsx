@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -6,29 +5,17 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import { useNamespace } from "@/contexts/namespace-context";
 import { useTRPC } from "@/trpc/react";
 
 import "@dnd-kit/core";
 
-import type { z } from "zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { GlobeIcon, LockIcon, PaintbrushIcon } from "lucide-react";
 import { toast } from "sonner";
 
-import type { schema } from "./form";
-import HostingForm from "./form";
-
 export function EmptyState() {
   const { activeNamespace } = useNamespace();
-  const [isOpen, setIsOpen] = useState(false);
 
   const trpc = useTRPC();
   const queryClient = useQueryClient();
@@ -36,8 +23,6 @@ export function EmptyState() {
     trpc.hosting.enable.mutationOptions({
       onSuccess: (hosting) => {
         toast.success("Hosting enabled successfully");
-        setIsOpen(false);
-
         queryClient.setQueryData(
           trpc.hosting.get.queryKey({ namespaceId: activeNamespace.id }),
           () => {
@@ -51,10 +36,9 @@ export function EmptyState() {
     }),
   );
 
-  const handleSubmit = (data: z.infer<typeof schema>) => {
+  const handleSubmit = () => {
     enableHosting({
       namespaceId: activeNamespace.id,
-      ...data,
     });
   };
 
@@ -70,31 +54,9 @@ export function EmptyState() {
         </div>
 
         <div className="mt-5 flex justify-center">
-          <Dialog
-            open={isOpen}
-            onOpenChange={(newOpen) => {
-              if (!newOpen && isPending) return;
-              setIsOpen(newOpen);
-            }}
-          >
-            <DialogTrigger asChild>
-              <Button size="lg">Enable</Button>
-            </DialogTrigger>
-
-            <DialogContent scrollableOverlay>
-              <DialogHeader>
-                <DialogTitle>Enable Hosting</DialogTitle>
-              </DialogHeader>
-
-              <div className="mt-6">
-                <HostingForm
-                  isPending={isPending}
-                  onSubmit={handleSubmit}
-                  action="Enable"
-                />
-              </div>
-            </DialogContent>
-          </Dialog>
+          <Button size="lg" isLoading={isPending} onClick={handleSubmit}>
+            Enable
+          </Button>
         </div>
 
         <div className="mt-24 grid grid-cols-1 gap-6 sm:grid-cols-3">
