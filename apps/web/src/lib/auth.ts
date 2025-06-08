@@ -12,7 +12,7 @@ import { APP_DOMAIN } from "./constants";
 import { sendEmail } from "./resend";
 import { getBaseUrl } from "./utils";
 
-export const makeAuth = (baseUrl = env.BETTER_AUTH_URL) => {
+export const makeAuth = (baseUrl = env.BETTER_AUTH_URL, isHosting = false) => {
   const isUsingDefaultUrl = baseUrl === env.BETTER_AUTH_URL;
 
   return betterAuth({
@@ -78,6 +78,7 @@ export const makeAuth = (baseUrl = env.BETTER_AUTH_URL) => {
     databaseHooks: {
       user: {
         create: {
+          // TODO: track the hosting id
           before: !isUsingDefaultUrl
             ? // eslint-disable-next-line @typescript-eslint/require-await
               async (user) => {
@@ -92,24 +93,24 @@ export const makeAuth = (baseUrl = env.BETTER_AUTH_URL) => {
               }
             : undefined,
           // only send welcome email if using default url
-          after: isUsingDefaultUrl
-            ? async (user) => {
-                await sendEmail({
-                  email: user.email,
-                  subject: "Welcome to Agentset",
-                  react: WelcomeEmail({
-                    name: user.name || null,
+          after:
+            isUsingDefaultUrl && !isHosting
+              ? async (user) => {
+                  await sendEmail({
                     email: user.email,
-                    domain: APP_DOMAIN,
-                  }),
-                  variant: "marketing",
-                });
-              }
-            : undefined,
+                    subject: "Welcome to Agentset",
+                    react: WelcomeEmail({
+                      name: user.name || null,
+                      email: user.email,
+                      domain: APP_DOMAIN,
+                    }),
+                    variant: "marketing",
+                  });
+                }
+              : undefined,
         },
       },
     },
-
     database: prismaAdapter(db, {
       provider: "postgresql",
     }),

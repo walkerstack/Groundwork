@@ -38,6 +38,7 @@ export default async function HostingMiddleware(
     where: filter,
     select: {
       id: true,
+      slug: true,
       protected: true,
       allowedEmailDomains: true,
       allowedEmails: true,
@@ -51,12 +52,17 @@ export default async function HostingMiddleware(
   }
 
   if (fullPath === "/login") {
+    const homeUrl = new URL(
+      mode === "domain" ? "/" : `${HOSTING_PREFIX}${hosting.slug}`,
+      req.url,
+    );
+
     // if the domain is not protected and the path is /login, redirect to /
-    if (!hosting.protected) return NextResponse.redirect(new URL("/", req.url));
+    if (!hosting.protected) return NextResponse.redirect(homeUrl);
 
     const session = await getMiddlewareSession(req);
     if (session) {
-      return NextResponse.redirect(new URL("/", req.url));
+      return NextResponse.redirect(homeUrl);
     }
 
     return NextResponse.rewrite(new URL(`/${hosting.id}${fullPath}`, req.url));
@@ -67,7 +73,11 @@ export default async function HostingMiddleware(
 
     // if not session, redirect to login
     if (!session) {
-      return NextResponse.redirect(new URL("/login", req.url));
+      const loginUrl = new URL(
+        `/login${mode === "path" ? `?r=${encodeURIComponent(`${HOSTING_PREFIX}${hosting.slug}`)}` : ""}`,
+        req.url,
+      );
+      return NextResponse.redirect(loginUrl);
     }
 
     // if user is not allowed to access this domain, error

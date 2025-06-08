@@ -15,7 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import { HOSTING_PREFIX, SHORT_DOMAIN } from "@/lib/constants";
+import { APP_DOMAIN, HOSTING_PREFIX, SHORT_DOMAIN } from "@/lib/constants";
 import { DEFAULT_SYSTEM_PROMPT } from "@/lib/prompts";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -146,7 +146,7 @@ export default function HostingForm({
                       <Input {...field} placeholder="Enter a unique slug..." />
                     </FormControl>
                     <FormDescription>
-                      Preview: {SHORT_DOMAIN}
+                      Preview: {APP_DOMAIN}
                       {HOSTING_PREFIX}
                       {field.value}
                     </FormDescription>
@@ -171,30 +171,6 @@ export default function HostingForm({
                   </FormItem>
                 )}
               />
-
-              {/* <FormItem>
-                <FormLabel>Logo</FormLabel>
-                <FormControl>
-                  <FileUploader
-                    value={logoFile ? [logoFile] : []}
-                    onValueChange={(files) => {
-                      setLogoFile(files[0] || null);
-                    }}
-                    maxFileCount={1}
-                    maxSize={MAX_UPLOAD_SIZE}
-                    progresses={progresses}
-                    accept={{
-                      "image/*": [],
-                    }}
-                    disabled={isPending || isUploading}
-                  />
-                </FormControl>
-                <FormDescription>
-                  Upload a logo for your hosted page. Recommended size:
-                  200x200px
-                </FormDescription>
-                <FormMessage />
-              </FormItem> */}
             </div>
           </div>
 
