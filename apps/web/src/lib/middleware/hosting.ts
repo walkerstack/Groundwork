@@ -23,7 +23,7 @@ export default async function HostingMiddleware(
       },
     };
   } else {
-    // fullPath will looks like this: /v/my-slug/...
+    // fullPath will looks like this: /a/my-slug/...
     // we need to get the slug and the rest of the path
     const slug = path.replace(HOSTING_PREFIX, "").split("/")[0];
     fullPath = fullPath.replace(`${HOSTING_PREFIX}${slug}`, "");

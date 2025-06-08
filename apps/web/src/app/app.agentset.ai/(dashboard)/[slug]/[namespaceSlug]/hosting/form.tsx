@@ -15,10 +15,12 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import { APP_DOMAIN, HOSTING_PREFIX, SHORT_DOMAIN } from "@/lib/constants";
+import { APP_DOMAIN, HOSTING_PREFIX } from "@/lib/constants";
 import { DEFAULT_SYSTEM_PROMPT } from "@/lib/prompts";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { ArrowUpRightIcon, CopyIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod";
 
 // Separate type for API submission
@@ -61,11 +63,13 @@ export default function HostingForm({
   onSubmit,
   action = "Submit",
   defaultValues,
+  type = "add",
 }: {
   isPending: boolean;
   onSubmit: (data: FormSubmissionData) => void;
   action?: string;
   defaultValues?: Partial<FormSubmissionData>;
+  type?: "add" | "update";
 }) {
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -100,19 +104,118 @@ export default function HostingForm({
     });
   };
 
+  if (type === "add") {
+    return (
+      <Form {...form}>
+        <form
+          className="flex flex-col gap-8"
+          onSubmit={form.handleSubmit(handleSubmit)}
+        >
+          <FormField
+            control={form.control}
+            name="title"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Title</FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    placeholder="Enter a title for your hosting..."
+                  />
+                </FormControl>
+
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="slug"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Slug</FormLabel>
+                <FormControl>
+                  <Input {...field} placeholder="Enter a unique slug..." />
+                </FormControl>
+                <FormDescription>
+                  Preview: {APP_DOMAIN}
+                  {HOSTING_PREFIX}
+                  {field.value}
+                </FormDescription>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="logo"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Logo</FormLabel>
+
+                <AvatarUploader onImageChange={field.onChange} />
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </form>
+      </Form>
+    );
+  }
+
+  const url = `${APP_DOMAIN}${HOSTING_PREFIX}${defaultValues?.slug}`;
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(url);
+    toast.success("Copied to clipboard");
+  };
+
   return (
     <div>
+      <div className="mb-20 flex w-full items-start justify-between gap-2">
+        <div>
+          <h3 className="flex items-center gap-2 text-xl font-medium">
+            <span className="relative flex size-2">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
+              <span className="relative inline-flex h-full w-full rounded-full bg-green-500" />
+            </span>{" "}
+            Your deployment is live!
+          </h3>
+          <a
+            href={url}
+            target="_blank"
+            className="text-muted-foreground mt-2 text-sm underline"
+          >
+            {url.replace("https://", "").replace("http://", "")}
+          </a>
+        </div>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={handleCopy}>
+            <CopyIcon className="size-4" /> Copy
+          </Button>
+          <Button size="sm" asChild>
+            <a href={url} target="_blank">
+              <ArrowUpRightIcon className="size-4" /> Visit
+            </a>
+          </Button>
+        </div>
+      </div>
+
       <Form {...form}>
         <form
           className="flex flex-col gap-20"
           onSubmit={form.handleSubmit(handleSubmit)}
         >
           <div>
-            <div>
-              <h2 className="text-xl font-medium">Basic Information</h2>
-              <p className="text-muted-foreground mt-1 text-sm">
-                Configure the basic information for your hosting
-              </p>
+            <div className="flex items-start justify-between">
+              <div>
+                <h2 className="text-xl font-medium">Hosting Details</h2>
+                <p className="text-muted-foreground mt-1 text-sm">
+                  Configure the basic information for your hosting
+                </p>
+              </div>
             </div>
 
             <Separator className="my-4" />

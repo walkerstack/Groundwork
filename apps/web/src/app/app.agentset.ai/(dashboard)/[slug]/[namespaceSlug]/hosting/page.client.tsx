@@ -4,7 +4,7 @@ import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useNamespace } from "@/contexts/namespace-context";
 import { useTRPC } from "@/trpc/react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import { CustomDomainConfigurator } from "./domain-card";
@@ -15,14 +15,25 @@ export default function HostingPage() {
   const { activeNamespace } = useNamespace();
   const trpc = useTRPC();
 
+  const queryClient = useQueryClient();
   const { data, isLoading } = useQuery(
     trpc.hosting.get.queryOptions({ namespaceId: activeNamespace.id }),
   );
 
   const { mutateAsync: updateHosting, isPending: isUpdating } = useMutation(
     trpc.hosting.update.mutationOptions({
-      onSuccess: () => {
+      onSuccess: (result) => {
         toast.success("Hosting updated");
+        queryClient.setQueryData(
+          trpc.hosting.get.queryKey({ namespaceId: activeNamespace.id }),
+          (old) => {
+            return { ...(old ?? {}), ...result, domain: old?.domain || null };
+          },
+        );
+
+        queryClient.invalidateQueries(
+          trpc.hosting.get.queryOptions({ namespaceId: activeNamespace.id }),
+        );
       },
       onError: (error) => {
         toast.error(error.message);
@@ -48,6 +59,7 @@ export default function HostingPage() {
   return (
     <div className="max-w-xl">
       <HostingForm
+        type="update"
         isPending={isUpdating}
         onSubmit={async (data) => {
           await updateHosting({

@@ -33,4 +33,4 @@ export const API_DOMAIN =
       : `http://api.${localHost}`;
 
 // for hosting
-export const HOSTING_PREFIX = "/v/";
+export const HOSTING_PREFIX = "/a/";

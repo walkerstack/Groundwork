@@ -31,15 +31,6 @@ const getHosting = async (
     },
     include: {
       domain: true,
-      namespace: {
-        select: {
-          organization: {
-            select: {
-              id: true,
-            },
-          },
-        },
-      },
     },
   });
 
@@ -161,7 +152,7 @@ export const hostingRouter = createTRPCRouter({
 
       const newLogo = input.logo
         ? await uploadImage(
-            `organizations/${prefixId(hosting.namespace.organization.id, "org_")}/hosting/logo_${nanoid(7)}`,
+            `namespaces/${prefixId(hosting.namespaceId, "ns_")}/hosting/logo_${nanoid(7)}`,
             input.logo,
           )
         : input.logo === null

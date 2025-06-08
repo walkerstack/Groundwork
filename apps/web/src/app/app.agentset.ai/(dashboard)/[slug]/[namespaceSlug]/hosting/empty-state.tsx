@@ -40,7 +40,9 @@ export function EmptyState() {
 
         queryClient.setQueryData(
           trpc.hosting.get.queryKey({ namespaceId: activeNamespace.id }),
-          { ...hosting, domain: null },
+          () => {
+            return { ...hosting, domain: null };
+          },
         );
       },
       onError: (error) => {
@@ -52,11 +54,7 @@ export function EmptyState() {
   const handleSubmit = (data: z.infer<typeof schema>) => {
     enableHosting({
       namespaceId: activeNamespace.id,
-      protected: data.protected,
-      systemPrompt: data.systemPrompt,
-      welcomeMessage: data.welcomeMessage,
-      examplesQuestions: data.examplesQuestions,
-      exampleSearchQueries: data.exampleSearchQueries,
+      ...data,
     });
   };
 

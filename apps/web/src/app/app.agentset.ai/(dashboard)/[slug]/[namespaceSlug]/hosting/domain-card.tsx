@@ -288,6 +288,9 @@ const DomainControls = ({ domain }: { domain: string }) => {
   );
 };
 
+// TODO: add a copy button
+// TODO: fix tabs
+
 export function CustomDomainConfigurator(props: { defaultDomain?: string }) {
   const [domain, setDomain] = useState<string | null>(
     props.defaultDomain ?? null,
@@ -303,7 +306,6 @@ export function CustomDomainConfigurator(props: { defaultDomain?: string }) {
   const { mutate: addDomain, isPending } = useMutation(
     trpc.domain.add.mutationOptions({
       onSuccess: (data) => {
-        toast.success("Domain added successfully");
         setDomain(data.slug);
       },
       onError: (error) => {
