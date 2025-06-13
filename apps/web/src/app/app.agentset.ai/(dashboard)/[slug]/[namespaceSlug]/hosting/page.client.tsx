@@ -78,6 +78,7 @@ export default function HostingPage() {
           exampleSearchQueries: data.exampleSearchQueries,
           welcomeMessage: data.welcomeMessage || "",
           citationMetadataPath: data.citationMetadataPath || "",
+          searchEnabled: data.searchEnabled,
         }}
       />
 

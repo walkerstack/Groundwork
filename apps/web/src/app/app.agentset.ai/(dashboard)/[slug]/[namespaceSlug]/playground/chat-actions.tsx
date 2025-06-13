@@ -2,6 +2,11 @@
 
 import { useNamespaceChat } from "@/components/chat/use-chat";
 import { Button } from "@/components/ui/button";
+import {
+  aiSdkExample,
+  curlExample,
+  tsSdkExample,
+} from "@/lib/code-examples/playground";
 import { PlusIcon } from "lucide-react";
 
 import ApiDialog from "./api-dialog";
@@ -23,7 +28,14 @@ export default function ChatActions() {
 
       <ChatSettings />
 
-      <ApiDialog />
+      <ApiDialog
+        description="Use the API to query the vector store. You'll need make an API key first."
+        tabs={[
+          { title: "cURL", code: curlExample },
+          { title: "Javascript", code: tsSdkExample },
+          { title: "AI SDK", code: aiSdkExample },
+        ]}
+      />
     </div>
   );
 }

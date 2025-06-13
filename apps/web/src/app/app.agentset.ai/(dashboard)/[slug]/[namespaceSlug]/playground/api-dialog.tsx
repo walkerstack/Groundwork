@@ -1,3 +1,6 @@
+"use client";
+
+import { CodeBlock } from "@/components/chat/code-block";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -13,61 +16,20 @@ import { useOrganization } from "@/contexts/organization-context";
 import { prefixId } from "@/lib/api/ids";
 import { ArrowUpRightIcon, Code2Icon } from "lucide-react";
 
-import { CodeBlock } from "../../../../../../components/chat/code-block";
-
-const curlExample = /* bash */ `
-curl --request POST \\
-  --url https://api.agentset.ai/v1/namespace/{{namespace}}/search \\
-  --header 'Authorization: Bearer <token>' \\
-  --header 'Content-Type: application/json' \\
-  --data '{
-  "query": "<string>",
-  "topK": 15,
-  "includeMetadata": true
-}'
-`;
-
-const tsSdkExample = /* typescript */ `
-import { Agentset } from "agentset";
-
-const agentset = new Agentset({
-  apiKey: "YOUR_API_KEY",
-});
-
-const ns = agentset.namespace("{{namespace}}");
-
-const results = await ns.search({ query: "YOUR QUERY" });
-console.log(results);
-`;
-
-const aiSdkExample = /* typescript */ `
-import { Agentset } from "agentset";
-import { DEFAULT_PROMPT, makeAgentsetTool } from "@agentset/ai-sdk";
-import { generateText } from "ai";
-
-const agentset = new Agentset({
-  apiKey: "YOUR_API_KEY",
-});
-const ns = agentset.namespace("{{namespace}}");
-
-const result = await generateText({
-  model: gpt4o,
-  tools: {
-    knowledgeBase: makeAgentsetTool(ns),
-  },
-  system: DEFAULT_SYSTEM_PROMPT,
-  messages: [
-    {
-      role: 'user',
-      content: '<question>',
-    },
-  ],
-  maxSteps: 3,
-});
-console.log(result);
-`;
-
-export default function ApiDialog() {
+export default function ApiDialog({
+  variant = "outline",
+  label = "API",
+  description = "Use the api",
+  tabs,
+}: {
+  variant?: "ghost" | "outline";
+  label?: string;
+  description?: React.ReactNode;
+  tabs: {
+    title: string;
+    code: string;
+  }[];
+}) {
   const { activeNamespace } = useNamespace();
   const { activeOrganization } = useOrganization();
 
@@ -79,27 +41,27 @@ export default function ApiDialog() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline">
+        <Button variant={variant}>
           <Code2Icon className="size-4" />
-          API
+          {label}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
-          <DialogTitle>API</DialogTitle>
-          <DialogDescription>
-            Use the API to query the vector store. You'll need make an API key
-            first.
-          </DialogDescription>
+          <DialogTitle>{label}</DialogTitle>
+          <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
 
         <Tabs>
           <div className="flex items-center justify-between">
             <TabsList className="my-3">
-              <TabsTrigger value="curl">cURL</TabsTrigger>
-              <TabsTrigger value="sdk">Javascript</TabsTrigger>
-              <TabsTrigger value="ai-sdk">AI SDK</TabsTrigger>
+              {tabs.map((tab) => (
+                <TabsTrigger key={tab.title} value={tab.title}>
+                  {tab.title}
+                </TabsTrigger>
+              ))}
             </TabsList>
+
             <Button asChild size="sm">
               <a
                 href={`/${activeOrganization.slug}/settings/api-keys`}
@@ -110,16 +72,12 @@ export default function ApiDialog() {
               </a>
             </Button>
           </div>
-          <TabsContent value="curl">
-            <CodeBlock>{prepareExample(curlExample)}</CodeBlock>
-          </TabsContent>
-          <TabsContent value="sdk">
-            <CodeBlock>{prepareExample(tsSdkExample)}</CodeBlock>
-          </TabsContent>
 
-          <TabsContent value="ai-sdk">
-            <CodeBlock>{prepareExample(aiSdkExample)}</CodeBlock>
-          </TabsContent>
+          {tabs.map((tab) => (
+            <TabsContent key={tab.title} value={tab.title}>
+              <CodeBlock>{prepareExample(tab.code)}</CodeBlock>
+            </TabsContent>
+          ))}
         </Tabs>
       </DialogContent>
     </Dialog>

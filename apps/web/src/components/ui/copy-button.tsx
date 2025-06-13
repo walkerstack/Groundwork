@@ -40,6 +40,7 @@ export default function CopyButton({ textToCopy, className }: CopyButtonProps) {
           size="icon"
           onClick={handleCopy}
           className={cn("h-8 w-8", className)}
+          type="button"
         >
           {isCopied ? (
             <CheckIcon className="h-4 w-4" />

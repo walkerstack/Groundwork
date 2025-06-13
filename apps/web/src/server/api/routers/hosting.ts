@@ -114,6 +114,7 @@ export const hostingRouter = createTRPCRouter({
         exampleSearchQueries: z.array(z.string()).max(4).optional(),
         welcomeMessage: z.string().optional(),
         citationMetadataPath: z.string().optional(),
+        searchEnabled: z.boolean().optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -154,6 +155,7 @@ export const hostingRouter = createTRPCRouter({
             exampleSearchQueries: input.exampleSearchQueries,
             welcomeMessage: input.welcomeMessage,
             citationMetadataPath: input.citationMetadataPath,
+            searchEnabled: input.searchEnabled,
           },
         });
 

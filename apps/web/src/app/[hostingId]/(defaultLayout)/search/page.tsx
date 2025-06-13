@@ -1,5 +1,6 @@
 "use client";
 
+import { notFound } from "next/navigation";
 import SearchChunk from "@/components/search-chunk";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -12,7 +13,7 @@ import { SearchIcon } from "lucide-react";
 import { useSearch } from "./use-search";
 
 export default function SearchPage() {
-  const { exampleSearchQueries } = useHosting();
+  const { searchEnabled, exampleSearchQueries } = useHosting();
   const {
     inputQuery,
     setInputQuery,
@@ -24,6 +25,10 @@ export default function SearchPage() {
   } = useSearch();
 
   const allData = data ? data.chunks : null;
+
+  if (!searchEnabled) {
+    notFound();
+  }
 
   return (
     <div className="bg-background flex h-[calc(100dvh-calc(var(--spacing)*20))] min-w-0 flex-col pt-4">

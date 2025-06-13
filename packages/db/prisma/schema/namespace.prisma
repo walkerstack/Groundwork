@@ -44,11 +44,15 @@ model Hosting {
   logo   String?
   domain Domain?
 
+  // chat settings
   systemPrompt         String?  @db.Text
   exampleQuestions     String[] @default([]) @db.Text
-  exampleSearchQueries String[] @default([]) @db.Text
   citationMetadataPath String? // Path to use for citation metadata (e.g. "title" or "foo.bar")
   welcomeMessage       String?
+
+  // search settings
+  searchEnabled        Boolean  @default(true)
+  exampleSearchQueries String[] @default([]) @db.Text
 
   protected           Boolean  @default(true) // Whether the namespace is protected from public access
   allowedEmails       String[] @default([]) // relevant when protected is true

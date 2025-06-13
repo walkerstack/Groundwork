@@ -38,6 +38,7 @@ export const POST = withPublicApiHandler(
         protected: true,
         allowedEmails: true,
         allowedEmailDomains: true,
+        searchEnabled: true,
         namespace: {
           select: {
             id: true,
@@ -58,6 +59,13 @@ export const POST = withPublicApiHandler(
     }
 
     await hostingAuth(req, hosting);
+
+    if (!hosting.searchEnabled) {
+      throw new AgentsetApiError({
+        code: "forbidden",
+        message: "Search is disabled for this hosting",
+      });
+    }
 
     // TODO: pass namespace config
     const languageModel = await getNamespaceLanguageModel();

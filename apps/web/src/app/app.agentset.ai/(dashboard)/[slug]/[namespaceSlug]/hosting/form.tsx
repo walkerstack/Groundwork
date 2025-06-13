@@ -36,6 +36,7 @@ type FormSubmissionData = {
   exampleSearchQueries: string[];
   welcomeMessage: string;
   citationMetadataPath?: string;
+  searchEnabled: boolean;
 };
 
 export const schema = z.object({
@@ -54,6 +55,7 @@ export const schema = z.object({
     .max(4),
   welcomeMessage: z.string(),
   citationMetadataPath: z.string().optional(),
+  searchEnabled: z.boolean(),
 });
 
 type FormValues = z.infer<typeof schema>;
@@ -80,6 +82,7 @@ export default function HostingForm({
       exampleSearchQueries: [],
       welcomeMessage: "",
       citationMetadataPath: "",
+      searchEnabled: true,
       ...defaultValues,
     },
   });
@@ -97,6 +100,7 @@ export default function HostingForm({
       exampleSearchQueries: data.exampleSearchQueries,
       welcomeMessage: data.welcomeMessage,
       citationMetadataPath: data.citationMetadataPath,
+      searchEnabled: data.searchEnabled,
     });
   };
 
@@ -351,12 +355,37 @@ export default function HostingForm({
 
             <Separator className="my-4" />
 
-            <SortableList
-              form={form}
-              name="exampleSearchQueries"
-              label="Examples"
-              maxItems={4}
-            />
+            <div className="flex flex-col gap-8">
+              <FormField
+                control={form.control}
+                name="searchEnabled"
+                render={({ field }) => (
+                  <FormItem className="flex items-center justify-between gap-3">
+                    <div>
+                      <FormLabel>Enable Search</FormLabel>
+                      <FormDescription>
+                        Allow users to search through your documents
+                      </FormDescription>
+                    </div>
+                    <FormControl>
+                      <Switch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+
+              {form.watch("searchEnabled") && (
+                <SortableList
+                  form={form}
+                  name="exampleSearchQueries"
+                  label="Examples"
+                  maxItems={4}
+                />
+              )}
+            </div>
           </div>
 
           <div className="flex justify-end">

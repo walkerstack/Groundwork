@@ -10,7 +10,7 @@ import { HOSTING_PREFIX } from "@/lib/constants";
 import { PlusIcon } from "lucide-react";
 
 export default function Header() {
-  const { title } = useHosting();
+  const { title, searchEnabled } = useHosting();
   const { setMessages } = useHostingChat();
   const path = usePathname();
 
@@ -40,16 +40,20 @@ export default function Header() {
           {title}
         </h2>
       </div>
-      <Tabs value={isSearch ? "search" : "chat"}>
-        <TabsList>
-          <TabsTrigger value="chat" asChild>
-            <Link href={`${baseUrl}/`}>Chat</Link>
-          </TabsTrigger>
-          <TabsTrigger value="search" asChild>
-            <Link href={`${baseUrl}/search`}>Search</Link>
-          </TabsTrigger>
-        </TabsList>
-      </Tabs>
+
+      {searchEnabled && (
+        <Tabs value={isSearch ? "search" : "chat"}>
+          <TabsList>
+            <TabsTrigger value="chat" asChild>
+              <Link href={`${baseUrl}/`}>Chat</Link>
+            </TabsTrigger>
+
+            <TabsTrigger value="search" asChild>
+              <Link href={`${baseUrl}/search`}>Search</Link>
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
+      )}
 
       {isSearch ? (
         <div className="h-9 w-28.5" />
