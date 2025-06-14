@@ -1,13 +1,12 @@
 "use client";
 
 import { useMemo } from "react";
-import CopyButton from "@/components/ui/copy-button";
-import { DataWrapper } from "@/components/ui/data-wrapper";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useOrganization } from "@/contexts/organization-context";
 import { useSession } from "@/hooks/use-session";
 import { useTRPC } from "@/trpc/react";
 import { useQuery } from "@tanstack/react-query";
+
+import { CopyButton, DataWrapper, Skeleton } from "@agentset/ui";
 
 import { MemberCard } from "./member-card";
 import { RemoveMemberButton } from "./remove-member";

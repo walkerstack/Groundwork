@@ -2,14 +2,12 @@
 
 import { useState } from "react";
 import SearchChunk from "@/components/search-chunk";
-import { Button } from "@/components/ui/button";
-import { EmptyState } from "@/components/ui/empty-state";
-import { Input } from "@/components/ui/input";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useNamespace } from "@/contexts/namespace-context";
 import { useTRPC } from "@/trpc/react";
 import { useQuery } from "@tanstack/react-query";
 import { SearchIcon } from "lucide-react";
+
+import { Button, EmptyState, Input, Skeleton } from "@agentset/ui";
 
 export default function SearchPageClient() {
   const { activeNamespace } = useNamespace();

@@ -3,15 +3,21 @@
 import type { QueryVectorStoreResult } from "@/lib/vector-store/parse";
 import { useState } from "react";
 import { InfoTooltip } from "@/components/info-tooltip";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Separator } from "@/components/ui/separator";
 import { useNamespace } from "@/contexts/namespace-context";
-import { cn } from "@/lib/utils";
 import { useMutation } from "@tanstack/react-query";
 import { Loader2Icon } from "lucide-react";
 import { toast } from "sonner";
+
+import {
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  cn,
+  Input,
+  Separator,
+} from "@agentset/ui";
 
 export default function BenchmarksPageClient() {
   const { activeNamespace } = useNamespace();

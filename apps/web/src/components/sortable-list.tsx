@@ -5,16 +5,6 @@ import type {
   UseFormReturn,
 } from "react-hook-form";
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import {
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
 import {
   closestCenter,
   DndContext,
@@ -32,6 +22,17 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import { GripVerticalIcon, PlusIcon, XIcon } from "lucide-react";
 import { useFieldArray } from "react-hook-form";
+
+import {
+  Button,
+  cn,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+  Input,
+} from "@agentset/ui";
 
 // Virtual ID type for sortable items
 type VirtualId = string;

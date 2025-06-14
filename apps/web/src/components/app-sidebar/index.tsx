@@ -1,11 +1,12 @@
 import type { LucideIcon } from "lucide-react";
+
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
   SidebarSeparator,
-} from "@/components/ui/sidebar";
+} from "@agentset/ui";
 
 import { NavNamespace } from "./nav-namespace";
 import { NavOrgSettings } from "./nav-org-settings";

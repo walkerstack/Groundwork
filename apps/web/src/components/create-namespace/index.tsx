@@ -8,14 +8,14 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
 import type { EmbeddingConfig, VectorStoreConfig } from "@agentset/validation";
-
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "../ui/dialog";
+} from "@agentset/ui";
+
 import CreateNamespaceDetailsStep from "./details-step";
 import CreateNamespaceEmbeddingStep from "./embedding-step";
 import CreateNamespaceVectorStoreStep from "./vector-store-step";

@@ -2,7 +2,6 @@
 
 import type { ComponentProps } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Button } from "@/components/ui/button";
 import { useOrganization } from "@/contexts/organization-context";
 import { SELF_SERVE_PAID_PLANS } from "@/lib/plans";
 import { capitalize } from "@/lib/string-utils";
@@ -11,6 +10,8 @@ import { getBaseUrl } from "@/lib/utils";
 import { useTRPC } from "@/trpc/react";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
+
+import { Button } from "@agentset/ui";
 
 export function UpgradePlanButton({
   plan,

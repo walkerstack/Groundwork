@@ -1,7 +1,8 @@
 import Link from "next/link";
 import Chat from "@/components/chat";
 import DashboardPageWrapper from "@/components/dashboard-page-wrapper";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
+import { Tabs, TabsList, TabsTrigger } from "@agentset/ui";
 
 import ChatActions from "./chat-actions";
 

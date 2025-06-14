@@ -1,11 +1,11 @@
 "use client";
 
-import { Separator } from "@/components/ui/separator";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useNamespace } from "@/contexts/namespace-context";
 import { useTRPC } from "@/trpc/react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+
+import { Separator, Skeleton } from "@agentset/ui";
 
 import { CustomDomainConfigurator } from "./domain-card";
 import { EmptyState } from "./empty-state";

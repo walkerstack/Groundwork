@@ -1,16 +1,17 @@
 import type { Dispatch, SetStateAction } from "react";
 import { useCallback, useMemo, useState } from "react";
-import { Button } from "@/components/ui/button";
+import { useRouterStuff } from "@/hooks/use-router-stuff";
+import { PLANS, PRO_PLAN } from "@/lib/plans";
+
 import {
+  Button,
   Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { useRouterStuff } from "@/hooks/use-router-stuff";
-import { PLANS, PRO_PLAN } from "@/lib/plans";
+} from "@agentset/ui";
 
 function WelcomeModal({
   showWelcomeModal,

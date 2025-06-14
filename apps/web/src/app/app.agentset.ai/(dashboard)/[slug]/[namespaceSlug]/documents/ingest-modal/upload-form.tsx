@@ -1,17 +1,5 @@
 import { useEffect } from "react";
 import { FileUploader } from "@/components/file-uploader";
-import { Button } from "@/components/ui/button";
-import { DialogFooter } from "@/components/ui/dialog";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { useNamespace } from "@/contexts/namespace-context";
 import { useUploadFiles } from "@/hooks/use-upload";
 import { MAX_UPLOAD_SIZE } from "@/lib/upload";
@@ -21,6 +9,18 @@ import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
+import {
+  Button,
+  DialogFooter,
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+  Input,
+} from "@agentset/ui";
 import { configSchema } from "@agentset/validation";
 
 import IngestConfig from "./config";

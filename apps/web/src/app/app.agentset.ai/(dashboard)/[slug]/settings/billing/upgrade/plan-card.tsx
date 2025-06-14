@@ -1,8 +1,8 @@
 import type { ENTERPRISE_PLAN, PRO_PLAN } from "@/lib/plans";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 import NumberFlow from "@number-flow/react";
 import { CheckIcon, MinusIcon } from "lucide-react";
+
+import { Button, cn } from "@agentset/ui";
 
 import { UpgradePlanButton } from "./upgrade-button";
 

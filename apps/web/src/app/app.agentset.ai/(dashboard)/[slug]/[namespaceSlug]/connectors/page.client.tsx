@@ -1,17 +1,18 @@
 "use client";
 
 import { DeleteConfirmation } from "@/components/delete-confirmation";
-import { Button } from "@/components/ui/button";
+import { TrashIcon } from "lucide-react";
+
+// import { Skeleton } from "@agentset/ui";
 import {
+  Button,
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-// import { Skeleton } from "@/components/ui/skeleton";
-import { cn } from "@/lib/utils";
-import { TrashIcon } from "lucide-react";
+  cn,
+} from "@agentset/ui";
 
 // Mock data for connectors
 const mockConnectors = [

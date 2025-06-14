@@ -1,5 +1,6 @@
-import { Logo } from "@/components/ui/logo";
 import { motion } from "framer-motion";
+
+import { Logo } from "@agentset/ui";
 
 export const Overview = ({
   message = "Welcome to the playground! You can try chatting with your data here.",

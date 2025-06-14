@@ -1,20 +1,4 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { useNamespace } from "@/contexts/namespace-context";
 import { SHORT_DOMAIN } from "@/lib/constants";
 import { useTRPC } from "@/trpc/react";
@@ -28,6 +12,23 @@ import {
   XCircleIcon,
 } from "lucide-react";
 import { toast } from "sonner";
+
+import {
+  Button,
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+  Input,
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@agentset/ui";
 
 import { DnsRecord } from "./dns-record";
 

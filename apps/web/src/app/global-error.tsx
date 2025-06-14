@@ -1,8 +1,8 @@
 "use client";
 
 import { Inter } from "next/font/google";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+
+import { Button, cn } from "@agentset/ui";
 
 const inter = Inter({
   subsets: ["latin"],

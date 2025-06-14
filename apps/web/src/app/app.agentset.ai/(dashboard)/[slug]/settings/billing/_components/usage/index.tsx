@@ -2,16 +2,11 @@
 
 import { useMemo } from "react";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Card, CardDescription } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { Separator } from "@/components/ui/separator";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useOrganization } from "@/contexts/organization-context";
 import { INFINITY_NUMBER } from "@/lib/constants";
 import { getFirstAndLastDay } from "@/lib/datetime";
 import { capitalize } from "@/lib/string-utils";
-import { cn, formatNumber } from "@/lib/utils";
+import { formatNumber } from "@/lib/utils";
 import NumberFlow from "@number-flow/react";
 import {
   BookIcon,
@@ -20,6 +15,16 @@ import {
   SearchIcon,
   UsersIcon,
 } from "lucide-react";
+
+import {
+  Button,
+  Card,
+  CardDescription,
+  cn,
+  Progress,
+  Separator,
+  Skeleton,
+} from "@agentset/ui";
 
 import SubscriptionMenu from "./subscription-menu";
 

@@ -6,8 +6,7 @@ import { useCal } from "@/hooks/use-cal";
 import { INFINITY_NUMBER } from "@/lib/constants";
 import { formatNumber } from "@/lib/utils";
 
-import { Button } from "../ui/button";
-import { Progress } from "../ui/progress";
+import { Button, Progress } from "@agentset/ui";
 
 export function Usage() {
   const { activeOrganization } = useOrganization();

@@ -2,7 +2,6 @@
 
 import type { Session } from "@/lib/auth-types";
 import { useMemo } from "react";
-import { Button } from "@/components/ui/button";
 import { useSession } from "@/hooks/use-session";
 import { authClient } from "@/lib/auth-client";
 import { useRouter } from "@bprogress/next/app";
@@ -10,6 +9,8 @@ import { useMutation } from "@tanstack/react-query";
 import { LaptopIcon, SmartphoneIcon } from "lucide-react";
 import { toast } from "sonner";
 import { UAParser } from "ua-parser-js";
+
+import { Button } from "@agentset/ui";
 
 const SessionItem = ({ session }: { session: Session["session"] }) => {
   const { session: activeSession } = useSession();

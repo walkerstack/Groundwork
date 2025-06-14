@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
 import { useSession } from "@/hooks/use-session";
 import { authClient } from "@/lib/auth-client";
+
+import { Button } from "@agentset/ui";
 
 export default function NotAllowed() {
   const [isSigningOut, setIsSigningOut] = useState(false);

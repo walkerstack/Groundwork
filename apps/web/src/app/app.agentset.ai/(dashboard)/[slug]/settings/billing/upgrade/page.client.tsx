@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useOrganization } from "@/contexts/organization-context";
 import { useCal } from "@/hooks/use-cal";
 import {
@@ -12,6 +11,8 @@ import {
   PRO_PLAN,
 } from "@/lib/plans";
 import { ChevronLeftIcon } from "lucide-react";
+
+import { Tabs, TabsList, TabsTrigger } from "@agentset/ui";
 
 import PlanCard from "./plan-card";
 

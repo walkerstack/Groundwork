@@ -1,5 +1,6 @@
-import { Separator } from "@/components/ui/separator";
 import { constructMetadata } from "@/lib/metadata";
+
+import { Separator } from "@agentset/ui";
 
 import InviteMemberDialog from "./invite-dialog";
 import TeamSettingsPage from "./page.client";

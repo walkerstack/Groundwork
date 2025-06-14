@@ -1,13 +1,16 @@
 "use client";
 
 import type { Stripe } from "stripe";
-import { CardAmex } from "@/components/icons/card-amex";
-import { CardDiscover } from "@/components/icons/card-discover";
-import { CardMastercard } from "@/components/icons/card-mastercard";
-import { CardVisa } from "@/components/icons/card-visa";
-import { StripeLink } from "@/components/icons/stripe-link";
 import { capitalize } from "@/lib/string-utils";
 import { CreditCardIcon, LandmarkIcon } from "lucide-react";
+
+import {
+  CardAmex,
+  CardDiscover,
+  CardMastercard,
+  CardVisa,
+  StripeLink,
+} from "@agentset/ui";
 
 export const PaymentMethodTypesList = (paymentMethod?: Stripe.PaymentMethod) =>
   [

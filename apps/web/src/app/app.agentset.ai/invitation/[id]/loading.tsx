@@ -1,14 +1,16 @@
+import { BuildingIcon } from "lucide-react";
+
 import {
+  Avatar,
+  AvatarFallback,
   Card,
   CardContent,
   CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { BuildingIcon } from "lucide-react";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Skeleton } from "@/components/ui/skeleton";
+  Skeleton,
+} from "@agentset/ui";
 
 export default function InvitationLoading() {
   return (

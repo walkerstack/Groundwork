@@ -1,4 +1,4 @@
-import { Spinner } from "../ui/spinner";
+import { Spinner } from "@agentset/ui";
 
 export default function LayoutLoader() {
   return (

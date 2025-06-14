@@ -1,13 +1,14 @@
 "use client";
 
 import { useNamespaceChat } from "@/components/chat/use-chat";
-import { Button } from "@/components/ui/button";
 import {
   aiSdkExample,
   curlExample,
   tsSdkExample,
 } from "@/lib/code-examples/playground";
 import { PlusIcon } from "lucide-react";
+
+import { Button } from "@agentset/ui";
 
 import ApiDialog from "./api-dialog";
 import ChatSettings from "./chat-settings";

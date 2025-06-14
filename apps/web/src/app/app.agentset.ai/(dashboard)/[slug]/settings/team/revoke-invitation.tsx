@@ -1,9 +1,10 @@
-import { Button } from "@/components/ui/button";
 import { useOrganization } from "@/contexts/organization-context";
 import { authClient } from "@/lib/auth-client";
 import { useTRPC } from "@/trpc/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+
+import { Button } from "@agentset/ui";
 
 export const RevokeInvitationButton = ({
   invitationId,

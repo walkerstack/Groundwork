@@ -2,21 +2,22 @@
 
 import type { RouterOutputs } from "@/trpc/react";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { DataWrapper } from "@/components/ui/data-wrapper";
-import { EmptyState } from "@/components/ui/empty-state";
-import { Separator } from "@/components/ui/separator";
-import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { useOrganization } from "@/contexts/organization-context";
 import { formatNumber } from "@/lib/utils";
 import { useTRPC } from "@/trpc/react";
 import { useQuery } from "@tanstack/react-query";
 import { ChevronLeftIcon, DollarSignIcon, ReceiptTextIcon } from "lucide-react";
+
+import {
+  Button,
+  DataWrapper,
+  EmptyState,
+  Separator,
+  Skeleton,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@agentset/ui";
 
 export default function OrganizationInvoicesClient() {
   const { activeOrganization } = useOrganization();

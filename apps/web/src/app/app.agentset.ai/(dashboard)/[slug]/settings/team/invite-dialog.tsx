@@ -2,8 +2,15 @@
 
 import type { Role } from "@/lib/auth-types";
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { useOrganization } from "@/contexts/organization-context";
+import { authClient } from "@/lib/auth-client";
+import { useTRPC } from "@/trpc/react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { PlusIcon } from "lucide-react";
+import { toast } from "sonner";
+
 import {
+  Button,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -11,22 +18,14 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
+  Input,
+  Label,
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { useOrganization } from "@/contexts/organization-context";
-import { authClient } from "@/lib/auth-client";
-import { useTRPC } from "@/trpc/react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { PlusIcon } from "lucide-react";
-import { toast } from "sonner";
+} from "@agentset/ui";
 
 function InviteMemberDialog() {
   const [open, setOpen] = useState(false);

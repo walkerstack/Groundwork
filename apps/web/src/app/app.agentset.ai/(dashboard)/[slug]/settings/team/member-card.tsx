@@ -1,5 +1,6 @@
 import type { Role } from "@/lib/auth-types";
-import { EntityAvatar } from "@/components/ui/avatar";
+
+import { EntityAvatar } from "@agentset/ui";
 
 import RoleSelector from "./role-selector";
 

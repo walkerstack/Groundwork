@@ -1,7 +1,12 @@
 import { useState } from "react";
 import { useChatSettings } from "@/components/chat/chat-settings.store";
-import { Button } from "@/components/ui/button";
+import { useNamespace } from "@/contexts/namespace-context";
+import { DEFAULT_SYSTEM_PROMPT } from "@/lib/prompts";
+import { Settings2Icon } from "lucide-react";
+import { toast } from "sonner";
+
 import {
+  Button,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -9,14 +14,10 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { useNamespace } from "@/contexts/namespace-context";
-import { DEFAULT_SYSTEM_PROMPT } from "@/lib/prompts";
-import { Settings2Icon } from "lucide-react";
-import { toast } from "sonner";
+  Input,
+  Label,
+  Textarea,
+} from "@agentset/ui";
 
 const defaultPrompt = DEFAULT_SYSTEM_PROMPT.compile().trim();
 

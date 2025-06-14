@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { useParams, usePathname, useRouter } from "next/navigation";
+import { useOrganization } from "@/contexts/organization-context";
+import { ArrowUpRightIcon, ChevronRightIcon } from "lucide-react";
+
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "@/components/ui/collapsible";
-import {
   SidebarGroup,
   SidebarGroupLabel,
   SidebarMenu,
@@ -16,9 +17,7 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-} from "@/components/ui/sidebar";
-import { useOrganization } from "@/contexts/organization-context";
-import { ArrowUpRightIcon, ChevronRightIcon } from "lucide-react";
+} from "@agentset/ui";
 
 import type { SidebarItemType } from ".";
 

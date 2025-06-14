@@ -1,28 +1,28 @@
 import type { QueryVectorStoreResult } from "@/lib/vector-store/parse";
 import type { Message } from "ai";
 import SearchChunk from "@/components/search-chunk";
+import { LogsIcon } from "lucide-react";
+
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@/components/ui/accordion";
-import { Button } from "@/components/ui/button";
-import {
+  Button,
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { LogsIcon } from "lucide-react";
+} from "@agentset/ui";
 
 import { CodeBlock } from "../code-block";
 

@@ -1,7 +1,6 @@
-import { cn } from "@/lib/utils";
+import { cn, SidebarTrigger } from "@agentset/ui";
 
 import { NavUser } from "./app-sidebar/nav-user";
-import { SidebarTrigger } from "./ui/sidebar";
 
 export default function DashboardPageWrapper({
   children,

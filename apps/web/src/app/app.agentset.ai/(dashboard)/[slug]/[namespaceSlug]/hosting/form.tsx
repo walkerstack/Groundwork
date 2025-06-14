@@ -1,20 +1,5 @@
-import AvatarUploader from "@/components/avatar-uploader";
 import ListInput from "@/components/list-input";
 import SortableList from "@/components/sortable-list";
-import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Separator } from "@/components/ui/separator";
-import { Switch } from "@/components/ui/switch";
-import { Textarea } from "@/components/ui/textarea";
 import { APP_DOMAIN, HOSTING_PREFIX } from "@/lib/constants";
 import { DEFAULT_SYSTEM_PROMPT } from "@/lib/prompts";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -22,6 +7,22 @@ import { ArrowUpRightIcon, CopyIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+
+import {
+  AvatarUploader,
+  Button,
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+  Input,
+  Separator,
+  Switch,
+  Textarea,
+} from "@agentset/ui";
 
 // Separate type for API submission
 type FormSubmissionData = {

@@ -5,9 +5,9 @@ import type { UseChatHelpers } from "@ai-sdk/react";
 import type { Message } from "ai";
 import type { Dispatch, SetStateAction } from "react";
 import { useEffect, useRef, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { ChatRequestOptions } from "ai";
+
+import { Button, Textarea } from "@agentset/ui";
 
 export type MessageEditorProps = {
   message: Message;

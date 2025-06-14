@@ -5,7 +5,14 @@ import React, { useMemo, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import CreateNamespaceDialog from "@/components/create-namespace";
-import { EntityAvatar } from "@/components/ui/avatar";
+import { useOrganization } from "@/contexts/organization-context";
+import { authClient } from "@/lib/auth-client";
+import { useTRPC } from "@/trpc/react";
+import { useRouter } from "@bprogress/next/app";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { ChevronsUpDownIcon, PlusIcon, SettingsIcon } from "lucide-react";
+import { toast } from "sonner";
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,21 +24,13 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
+  EntityAvatar,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  Skeleton,
   useSidebar,
-} from "@/components/ui/sidebar";
-import { Skeleton } from "@/components/ui/skeleton";
-import { useOrganization } from "@/contexts/organization-context";
-import { authClient } from "@/lib/auth-client";
-import { useTRPC } from "@/trpc/react";
-import { useRouter } from "@bprogress/next/app";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { ChevronsUpDownIcon, PlusIcon, SettingsIcon } from "lucide-react";
-import { toast } from "sonner";
+} from "@agentset/ui";
 
 import CreateOrganizationDialog from "./create-org-dialog";
 

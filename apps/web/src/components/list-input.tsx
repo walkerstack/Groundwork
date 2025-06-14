@@ -3,18 +3,19 @@ import type {
   FieldPathByValue,
   UseFormReturn,
 } from "react-hook-form";
-import { Button } from "@/components/ui/button";
+import { PlusIcon, XIcon } from "lucide-react";
+import { useFieldArray } from "react-hook-form";
+
 import {
+  Button,
   FormControl,
   FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { PlusIcon, XIcon } from "lucide-react";
-import { useFieldArray } from "react-hook-form";
+  Input,
+} from "@agentset/ui";
 
 export default function ListInput<
   T extends object,

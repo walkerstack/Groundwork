@@ -1,5 +1,5 @@
 ---
-description:
+description: 
 globs: apps/web/**/*.ts
 alwaysApply: false
 ---
@@ -17,9 +17,9 @@ Components are available in the `src/components/ui` directory, following the ali
 Import components from the ui directory using the configured aliases:
 
 ```tsx
-import { Button } from "@/components/ui/button"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@agentset/ui"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@agentset/ui"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@agentset/ui"
 ```
 
 Example usage:

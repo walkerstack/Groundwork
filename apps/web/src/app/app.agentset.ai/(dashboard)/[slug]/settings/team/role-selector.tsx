@@ -1,19 +1,18 @@
 import type { Role } from "@/lib/auth-types";
-import { Button } from "@/components/ui/button";
+import { ChevronDownIcon } from "lucide-react";
+
 import {
+  Button,
   Command,
   CommandEmpty,
   CommandGroup,
   CommandInput,
   CommandItem,
   CommandList,
-} from "@/components/ui/command";
-import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover";
-import { ChevronDownIcon } from "lucide-react";
+} from "@agentset/ui";
 
 const roles = [
   {
