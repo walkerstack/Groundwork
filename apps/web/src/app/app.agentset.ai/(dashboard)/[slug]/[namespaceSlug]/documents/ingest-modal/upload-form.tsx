@@ -1,5 +1,4 @@
 import { useEffect } from "react";
-import { FileUploader } from "@/components/file-uploader";
 import { useNamespace } from "@/contexts/namespace-context";
 import { useUploadFiles } from "@/hooks/use-upload";
 import { MAX_UPLOAD_SIZE } from "@/lib/upload";
@@ -12,6 +11,7 @@ import { z } from "zod";
 import {
   Button,
   DialogFooter,
+  FileUploader,
   Form,
   FormControl,
   FormDescription,

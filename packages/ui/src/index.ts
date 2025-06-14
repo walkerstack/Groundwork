@@ -24,6 +24,7 @@ export * from "./components/dropdown-menu";
 export * from "./components/empty-state";
 
 export * from "./components/form";
+export * from "./components/file-uploader";
 
 export * from "./components/hover-card";
 export * from "./components/input";

@@ -64,7 +64,6 @@
     "next": "15.3.2",
     "react": "catalog:react19",
     "react-dom": "catalog:react19",
-    "react-dropzone": "^14.3.8",
     "react-markdown": "^10.1.0",
     "remark-gfm": "^4.0.1",
     "resend": "^4.1.2",
