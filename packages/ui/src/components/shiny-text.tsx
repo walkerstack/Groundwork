@@ -7,7 +7,7 @@ interface ShinyTextProps extends React.HTMLAttributes<HTMLSpanElement> {
   disabled?: boolean;
 }
 
-const ShinyText = ({
+export const ShinyText = ({
   children,
   disabled = false,
   shimmerWidth = 5,
@@ -40,5 +40,3 @@ const ShinyText = ({
     </span>
   );
 };
-
-export default ShinyText;

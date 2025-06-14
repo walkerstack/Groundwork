@@ -8,9 +8,10 @@ import equal from "fast-deep-equal";
 import { AnimatePresence, motion } from "framer-motion";
 import { PencilIcon, SparklesIcon } from "lucide-react";
 
-import ShinyText, {
+import {
   Button,
   cn,
+  ShinyText,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
