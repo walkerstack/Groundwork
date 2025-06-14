@@ -414,6 +414,9 @@ importers:
       radix-ui:
         specifier: ^1.4.2
         version: 1.4.2(@types/react-dom@19.1.2(@types/react@19.1.2))(@types/react@19.1.2)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      react:
+        specifier: catalog:react19
+        version: 19.1.0
       react-dropzone:
         specifier: ^14.3.8
         version: 14.3.8(react@19.1.0)
@@ -445,9 +448,6 @@ importers:
       prettier:
         specifier: 'catalog:'
         version: 3.5.3
-      react:
-        specifier: catalog:react19
-        version: 19.1.0
       typescript:
         specifier: 'catalog:'
         version: 5.8.2
