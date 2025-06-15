@@ -8,9 +8,8 @@ import {
   SidebarSeparator,
 } from "@agentset/ui";
 
-import { NavNamespace } from "./nav-namespace";
-import { NavOrgSettings } from "./nav-org-settings";
 import { OrganizationSwitcher } from "./org-switcher";
+import { SidebarLinks } from "./sidebar-links";
 import { SupportItems } from "./support-items";
 import { Usage } from "./usage";
 
@@ -38,8 +37,7 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
 
       <SidebarContent>
-        <NavOrgSettings />
-        <NavNamespace />
+        <SidebarLinks />
       </SidebarContent>
 
       <SidebarFooter className="px-0">
