@@ -7,7 +7,9 @@ import { makeChunk } from "@/lib/chunk";
 import { getNamespaceEmbeddingModel } from "@/lib/embedding";
 import { chunkArray } from "@/lib/functions";
 import { KeywordStore } from "@/lib/keyword-store";
+import { meterIngestedPages } from "@/lib/meters";
 import { getPartitionDocumentBody } from "@/lib/partition";
+import { isProPlan } from "@/lib/plans";
 import { redis } from "@/lib/redis";
 import { getNamespaceVectorStore } from "@/lib/vector-store";
 import { qstashClient, qstashReceiver } from "@/lib/workflow";
@@ -110,7 +112,22 @@ export const { POST } = serve<TriggerDocumentJobBody>(
       const { documentId } = context.requestPayload;
       const doc = await db.document.findUnique({
         where: { id: documentId },
-        include: { ingestJob: { include: { namespace: true } } },
+        include: {
+          ingestJob: {
+            include: {
+              namespace: {
+                include: {
+                  organization: {
+                    select: {
+                      plan: true,
+                      stripeId: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
       });
 
       if (!doc) {
@@ -368,6 +385,22 @@ export const { POST } = serve<TriggerDocumentJobBody>(
         await redis.del(...keyBatch);
       }
     });
+
+    // log usage to stripe
+    const stripeCustomerId = namespace.organization.stripeId;
+    if (
+      isProPlan(namespace.organization.plan) &&
+      !!stripeCustomerId &&
+      !shouldCleanup // don't log usage if re-processing
+    ) {
+      await context.run("log-usage-to-stripe", async () => {
+        await meterIngestedPages({
+          documentId: document.id,
+          totalPages,
+          stripeCustomerId,
+        });
+      });
+    }
   },
   {
     failureFunction: async ({ context, failResponse }) => {

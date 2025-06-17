@@ -1,3 +1,5 @@
+import { env } from "@/env";
+
 import type { Prisma } from "@agentset/db";
 
 import { INFINITY_NUMBER } from "./constants";
@@ -53,8 +55,8 @@ export const PLANS = [
         "price_1RE26ODPtsw7PNYQduDp19Gx", // yearly
         "price_1RE26ODPtsw7PNYQlDfyMYjV", // monthly
 
-        "price_1RE25PDPtsw7PNYQXPwhPIAt", // yearly (test),
-        "price_1RE25PDPtsw7PNYQQjlEQbPf", // monthly (test),
+        "price_1RE25PDPtsw7PNYQXPwhPIAt", // yearly (test)
+        "price_1RE25PDPtsw7PNYQQjlEQbPf", // monthly (test)
       ],
     },
     limits: {
@@ -92,6 +94,20 @@ export const ENTERPRISE_PLAN = {
     // { id: "users", text: "1 user" },
     // { id: "namespaces", text: "3 namespaces" },
   ] satisfies PlanFeature[],
+};
+
+export const PRO_PLAN_METERED = {
+  lookupKey: "pro_plan_metered",
+  meterName: "ingested_pages",
+  priceId: {
+    test: "price_1RapvfDPtsw7PNYQvLZvqIpc",
+    live: "price_1RaqhNDPtsw7PNYQ9lqtoORc",
+  },
+};
+
+export const getStripeEnvironment = () => {
+  if (env.NODE_ENV === "production") return "live";
+  return "test";
 };
 
 export const FREE_PLAN = PLANS.find((plan) => plan.name === "Free")!;
@@ -145,4 +161,8 @@ export const planToOrganizationFields = (plan: (typeof PLANS)[number]) => {
     apiRatelimit: plan.limits.api,
     // TODO: add other limits
   } satisfies Prisma.OrganizationUpdateInput;
+};
+
+export const isProPlan = (plan: string) => {
+  return plan.toLowerCase() === "pro";
 };

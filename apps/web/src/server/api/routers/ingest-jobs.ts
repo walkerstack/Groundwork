@@ -1,3 +1,4 @@
+import { isProPlan } from "@/lib/plans";
 import { triggerReIngestJob } from "@/lib/workflow";
 import {
   createIngestJobSchema,
@@ -67,7 +68,12 @@ export const ingestJobRouter = createTRPCRouter({
         throw new TRPCError({ code: "NOT_FOUND" });
       }
 
-      if (organization.totalPages >= organization.pagesLimit) {
+      // if it's not a pro plan, check if the user has exceeded the limit
+      // pro plan is unlimited with usage based billing
+      if (
+        !isProPlan(organization.plan) &&
+        organization.totalPages >= organization.pagesLimit
+      ) {
         throw new TRPCError({
           code: "BAD_REQUEST",
           message: "You've reached the maximum number of pages.",

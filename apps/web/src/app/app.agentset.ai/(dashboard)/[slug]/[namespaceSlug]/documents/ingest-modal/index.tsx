@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useNamespace } from "@/contexts/namespace-context";
 import { useOrganization } from "@/contexts/organization-context";
+import { isProPlan } from "@/lib/plans";
 import { useTRPC } from "@/trpc/react";
 import { useQueryClient } from "@tanstack/react-query";
 import { PlusIcon } from "lucide-react";
@@ -60,7 +61,10 @@ export function IngestModal() {
   const isPending =
     queryClient.isMutating(trpc.ingestJob.ingest.mutationOptions()) > 0;
 
+  // if it's not a pro plan, check if the user has exceeded the limit
+  // pro plan is unlimited with usage based billing
   const isOverLimit =
+    !isProPlan(activeOrganization.plan) &&
     activeOrganization.totalPages >= activeOrganization.pagesLimit;
 
   return (

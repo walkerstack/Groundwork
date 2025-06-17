@@ -2,7 +2,11 @@ import type Stripe from "stripe";
 import { limiter } from "@/lib/bottleneck";
 import { APP_DOMAIN } from "@/lib/constants";
 import { log } from "@/lib/log";
-import { getPlanFromPriceId, planToOrganizationFields } from "@/lib/plans";
+import {
+  getPlanFromPriceId,
+  planToOrganizationFields,
+  PRO_PLAN_METERED,
+} from "@/lib/plans";
 import { sendEmail } from "@/lib/resend";
 import { stripe } from "@/lib/stripe";
 
@@ -30,8 +34,11 @@ export async function checkoutSessionCompleted(event: Stripe.Event) {
   const subscription = await stripe.subscriptions.retrieve(
     checkoutSession.subscription as string,
   );
-  const priceId = subscription.items.data[0]?.price.id;
 
+  // ignore metered plan
+  const priceId = subscription.items.data.filter(
+    (item) => item.price.lookup_key !== PRO_PLAN_METERED.lookupKey,
+  )[0]?.price.id;
   const plan = getPlanFromPriceId(priceId);
 
   if (!plan) {
