@@ -81,7 +81,7 @@ export default function DashboardPage() {
           <div>
             <div className="mb-5 flex justify-end">{createButton}</div>
 
-            <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
               {namespaces.map((namespace) => {
                 const didNotFinishOnboarding =
                   namespace.totalPlaygroundUsage === 0;
@@ -93,14 +93,12 @@ export default function DashboardPage() {
                   >
                     <p className="font-medium">{namespace.name}</p>
                     <div className="text-muted-foreground mt-5 flex flex-wrap items-center gap-2 text-sm">
-                      <p>
-                        {formatNumber(namespace.totalPages, "decimal")} pages
-                      </p>
+                      <p>{formatNumber(namespace.totalPages)} pages</p>
                       <Separator
                         orientation="vertical"
                         className="!h-4 shrink-0"
                       />
-                      <p>{namespace.totalDocuments} documents</p>
+                      <p>{formatNumber(namespace.totalDocuments)} documents</p>
                     </div>
                   </Link>
                 );
