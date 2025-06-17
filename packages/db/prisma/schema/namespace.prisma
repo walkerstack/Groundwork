@@ -18,10 +18,10 @@ model Namespace {
   connections Connection[]
   ingestJobs  IngestJob[]
 
-  totalIngestJobs      Int @default(0) // Total number of ingest jobs in the namespace
-  totalDocuments       Int @default(0) // Total number of documents in the namespace
-  totalPages           Int @default(0)
-  totalPlaygroundUsage Int @default(0) // Total number of playground requests in the namespace
+  totalIngestJobs      Int   @default(0) // Total number of ingest jobs in the namespace
+  totalDocuments       Int   @default(0) // Total number of documents in the namespace
+  totalPages           Float @default(0.0)
+  totalPlaygroundUsage Int   @default(0) // Total number of playground requests in the namespace
 
   keywordEnabled Boolean @default(false) // whether keyword + hybrid search is enabled
 
