@@ -71,17 +71,13 @@ export default function PlanUsage() {
         <div className="flex items-center gap-1">
           {activeOrganization.plan !== "pro" && (
             <Button asChild>
-              <Link
-                href={`/${activeOrganization.slug}/settings/billing/upgrade`}
-              >
+              <Link href={`/${activeOrganization.slug}/billing/upgrade`}>
                 Upgrade
               </Link>
             </Button>
           )}
           <Button asChild variant="ghost">
-            <Link
-              href={`/${activeOrganization.slug}/settings/billing/invoices`}
-            >
+            <Link href={`/${activeOrganization.slug}/billing/invoices`}>
               View invoices
             </Link>
           </Button>

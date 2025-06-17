@@ -1,14 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, usePathname, useRouter } from "next/navigation";
 import { useNamespace } from "@/contexts/namespace-context";
 import { useOrganization } from "@/contexts/organization-context";
 import { useTRPC } from "@/trpc/react";
 import { useQuery } from "@tanstack/react-query";
 import { ChevronsUpDownIcon, PlusIcon } from "lucide-react";
 
-import { Namespace } from "@agentset/db";
+import type { Namespace } from "@agentset/db";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -19,13 +19,8 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  Select,
-  SelectContent,
-  SelectTrigger,
-  SelectValue,
   SidebarTrigger,
 } from "@agentset/ui";
 
@@ -36,27 +31,28 @@ const NamespaceSwitcher = () => {
   const { activeNamespace } = useNamespace();
   const { activeOrganization } = useOrganization();
   const router = useRouter();
+  const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
   const trpc = useTRPC();
-  const {
-    data: namespaces,
-    isLoading,
-    error,
-  } = useQuery(
+  const { data: namespaces, isLoading } = useQuery(
     trpc.namespace.getOrgNamespaces.queryOptions({
       orgId: activeOrganization.id,
     }),
   );
 
   const handleNamespaceChange = (namespace: Namespace) => {
-    router.push(`/${activeOrganization.slug}/${namespace.slug}`);
+    const relativePath = pathname.replace(
+      `/${activeOrganization.slug}/${activeNamespace.slug}`,
+      `/${activeOrganization.slug}/${namespace.slug}`,
+    );
+    router.push(relativePath);
   };
 
   return (
     <>
       <DropdownMenu>
-        <DropdownMenuTrigger asChild>
+        <DropdownMenuTrigger asChild disabled={isLoading}>
           <Button
             variant="ghost"
             className="focus-visible:bg-accent text-foreground h-8 px-0! focus-visible:ring-0"

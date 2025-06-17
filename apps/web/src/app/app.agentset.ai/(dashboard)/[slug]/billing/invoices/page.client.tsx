@@ -32,7 +32,7 @@ export default function OrganizationInvoicesClient() {
     <div>
       <div>
         <Link
-          href={`/${activeOrganization.slug}/settings/billing`}
+          href={`/${activeOrganization.slug}/billing`}
           title="Back to billing"
           className="group flex items-center gap-2"
         >
