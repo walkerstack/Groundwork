@@ -1,6 +1,6 @@
 import { InfoIcon } from "lucide-react";
 
-import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@agentset/ui";
 
 export function InfoTooltip({ text }: { text: string }) {
   return (

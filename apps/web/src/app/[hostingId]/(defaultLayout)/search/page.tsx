@@ -2,13 +2,11 @@
 
 import { notFound } from "next/navigation";
 import SearchChunk from "@/components/search-chunk";
-import { Button } from "@/components/ui/button";
-import { EmptyState } from "@/components/ui/empty-state";
-import { Input } from "@/components/ui/input";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useHosting } from "@/contexts/hosting-context";
 import { motion } from "framer-motion";
 import { SearchIcon } from "lucide-react";
+
+import { Button, EmptyState, Input, Skeleton } from "@agentset/ui";
 
 import { useSearch } from "./use-search";
 

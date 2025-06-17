@@ -1,10 +1,10 @@
 import { memo } from "react";
-import { Button } from "@/components/ui/button";
 import { useNamespace } from "@/contexts/namespace-context";
 import { useSession } from "@/hooks/use-session";
-import { cn } from "@/lib/utils";
 import { BoxIcon, TelescopeIcon } from "lucide-react";
 import { useShallow } from "zustand/react/shallow";
+
+import { Button, cn } from "@agentset/ui";
 
 import { useChatSettings } from "./chat-settings.store";
 

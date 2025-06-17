@@ -20,8 +20,8 @@ model Organization {
   totalDocuments  Int @default(0) // Total number of documents in the organization
   totalIngestJobs Int @default(0) // Total number of ingest jobs in the organization
 
-  totalPages Int @default(0)
-  pagesLimit Int @default(1000)
+  totalPages Float @default(0.0)
+  pagesLimit Int   @default(1000)
 
   searchUsage Int @default(0)
   searchLimit Int @default(10000)

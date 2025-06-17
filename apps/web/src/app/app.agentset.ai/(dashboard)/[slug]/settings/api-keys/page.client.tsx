@@ -1,9 +1,10 @@
 "use client";
 
-import { DataTable } from "@/components/data-table";
 import { useOrganization } from "@/contexts/organization-context";
 import { useTRPC } from "@/trpc/react";
 import { useQuery } from "@tanstack/react-query";
+
+import { DataTable } from "@agentset/ui";
 
 import { columns } from "./columns";
 import CreateApiKey from "./create-api-key";

@@ -6,8 +6,7 @@ import { useCal } from "@/hooks/use-cal";
 import { INFINITY_NUMBER } from "@/lib/constants";
 import { formatNumber } from "@/lib/utils";
 
-import { Button } from "../ui/button";
-import { Progress } from "../ui/progress";
+import { Button, Progress } from "@agentset/ui";
 
 export function Usage() {
   const { activeOrganization } = useOrganization();
@@ -72,9 +71,7 @@ export function Usage() {
         <div className="mt-6 flex flex-col gap-2">
           {activeOrganization.plan === "free" && (
             <Button asChild className="w-full">
-              <Link
-                href={`/${activeOrganization.slug}/settings/billing/upgrade`}
-              >
+              <Link href={`/${activeOrganization.slug}/billing/upgrade`}>
                 Get Pro
               </Link>
             </Button>

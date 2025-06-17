@@ -1,15 +1,17 @@
 "use client";
 
-import DiscordIcon from "@/components/icons/discord";
-import DropboxIcon from "@/components/icons/dropbox";
-import GmailIcon from "@/components/icons/gmail";
-import GoogleDriveIcon from "@/components/icons/google-drive";
-import NotionIcon from "@/components/icons/notion";
-import OneDriveIcon from "@/components/icons/onedrive";
-import S3Icon from "@/components/icons/s3";
-import SlackIcon from "@/components/icons/slack";
-import { OrbitingCircles } from "@/components/orbiting-circles";
-import { Button } from "@/components/ui/button";
+import {
+  Button,
+  DiscordIcon,
+  DropboxIcon,
+  GmailIcon,
+  GoogleDriveIcon,
+  NotionIcon,
+  OneDriveIcon,
+  OrbitingCircles,
+  S3Icon,
+  SlackIcon,
+} from "@agentset/ui";
 
 export default function EmptyState() {
   return (

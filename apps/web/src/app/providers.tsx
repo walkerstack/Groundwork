@@ -1,8 +1,9 @@
 "use client";
 
-import { Toaster } from "@/components/ui/sonner";
 import { TRPCReactProvider } from "@/trpc/react";
 import { ProgressProvider } from "@bprogress/next/app";
+
+import { Toaster } from "@agentset/ui";
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   return (

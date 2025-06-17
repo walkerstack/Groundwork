@@ -3,18 +3,19 @@
 import type { UseChatHelpers } from "@ai-sdk/react";
 import type { JSONValue, UIMessage } from "ai";
 import { memo, useState } from "react";
-import { Button } from "@/components/ui/button";
-import ShinyText from "@/components/ui/shiny-text";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { sanitizeText } from "@/lib/string-utils";
-import { cn } from "@/lib/utils";
 import equal from "fast-deep-equal";
 import { AnimatePresence, motion } from "framer-motion";
 import { PencilIcon, SparklesIcon } from "lucide-react";
+
+import {
+  Button,
+  cn,
+  ShinyText,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@agentset/ui";
 
 import { Markdown } from "./markdown";
 import { MessageActions } from "./message-actions";

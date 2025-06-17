@@ -1,15 +1,11 @@
 import type { Message } from "ai";
 import { memo } from "react";
-import { Button } from "@/components/ui/button";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { useIsHosting } from "@/contexts/hosting-context";
 import { CopyIcon } from "lucide-react";
 import { toast } from "sonner";
 import { useCopyToClipboard } from "usehooks-ts";
+
+import { Button, Tooltip, TooltipContent, TooltipTrigger } from "@agentset/ui";
 
 import MessageLogs from "./logs";
 

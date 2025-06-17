@@ -1,18 +1,19 @@
 import {
+  AnthropicIcon,
+  GoogleIcon,
+  MicrosoftAzureIcon,
+  OpenAIIcon,
+  PineconeIcon,
+  QdrantIcon,
+  UpstashIcon,
+} from "@agentset/ui";
+import {
   AzureEmbeddingConfigSchema,
   GoogleEmbeddingConfigSchema,
   OpenAIEmbeddingConfigSchema,
   PineconeVectorStoreConfigSchema,
   VoyageEmbeddingConfigSchema,
 } from "@agentset/validation";
-
-import AnthropicIcon from "../icons/anthropic";
-import MicrosoftAzureIcon from "../icons/azure";
-import GoogleIcon from "../icons/google";
-import OpenAIIcon from "../icons/openai";
-import PineconeIcon from "../icons/pinecone";
-import QdrantIcon from "../icons/qdrant";
-import UpstashIcon from "../icons/upstash";
 
 export const embeddingModels = [
   {

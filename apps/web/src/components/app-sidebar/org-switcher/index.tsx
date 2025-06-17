@@ -1,30 +1,8 @@
 "use client";
 
 import type { RouterOutputs } from "@/trpc/react";
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
-import CreateNamespaceDialog from "@/components/create-namespace";
-import { EntityAvatar } from "@/components/ui/avatar";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuPortal,
-  DropdownMenuSeparator,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  useSidebar,
-} from "@/components/ui/sidebar";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useOrganization } from "@/contexts/organization-context";
 import { authClient } from "@/lib/auth-client";
 import { useTRPC } from "@/trpc/react";
@@ -33,16 +11,28 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { ChevronsUpDownIcon, PlusIcon, SettingsIcon } from "lucide-react";
 import { toast } from "sonner";
 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  EntityAvatar,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  useSidebar,
+} from "@agentset/ui";
+
 import CreateOrganizationDialog from "./create-org-dialog";
 
 type Organization = RouterOutputs["organization"]["all"][number];
-type Namespace = Organization["namespaces"][number];
 
 export function OrganizationSwitcher() {
   const { isMobile } = useSidebar();
   const router = useRouter();
   const { activeOrganization } = useOrganization();
-  const { namespaceSlug } = useParams();
 
   const trpc = useTRPC();
   const { data: organizations } = useQuery(
@@ -50,8 +40,6 @@ export function OrganizationSwitcher() {
   );
 
   const [createOrgOpen, setCreateOrgOpen] = useState(false);
-  const [createNamespaceOrg, setCreateNamespaceOrg] =
-    useState<null | Organization>(null);
 
   const { mutateAsync: setActiveOrganization, isPending } = useMutation({
     mutationFn: async (organization: Organization) => {
@@ -70,27 +58,14 @@ export function OrganizationSwitcher() {
     },
   });
 
-  const handleNamespaceChange = async (
-    organization: Organization,
-    namespace: Namespace,
-  ) => {
-    if (isPending || namespace.slug === namespaceSlug) {
+  const handleOrganizationChange = async (organization: Organization) => {
+    if (isPending) {
       return;
     }
 
-    if (organization.id !== activeOrganization.id) {
-      await setActiveOrganization(organization);
-    }
-
-    router.push(`/${organization.slug}/${namespace.slug}`);
+    router.push(`/${organization.slug}`);
+    await setActiveOrganization(organization);
   };
-
-  const activeNamespace = useMemo(() => {
-    if (!organizations || !namespaceSlug) return null;
-    return organizations
-      .flatMap((org) => org.namespaces)
-      .find((ns) => ns.slug === namespaceSlug);
-  }, [organizations, namespaceSlug]);
 
   return (
     <SidebarMenu>
@@ -99,53 +74,34 @@ export function OrganizationSwitcher() {
         setOpen={setCreateOrgOpen}
       />
 
-      <CreateNamespaceDialog
-        organization={createNamespaceOrg}
-        open={!!createNamespaceOrg}
-        setOpen={(open) =>
-          setCreateNamespaceOrg(open ? createNamespaceOrg : null)
-        }
-      />
-
       <SidebarMenuItem>
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <SidebarMenuButton
-              size="lg"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-              disabled={isPending}
+          <div className="flex h-12 items-center pl-2">
+            <Link
+              href={`/${activeOrganization.slug}`}
+              className="flex w-full items-center gap-2"
             >
               <EntityAvatar entity={activeOrganization} />
 
               <div className="grid flex-1 text-left text-sm leading-tight">
-                {namespaceSlug ? (
-                  <>
-                    {activeNamespace ? (
-                      <span className="truncate font-semibold">
-                        {activeNamespace.name}
-                      </span>
-                    ) : (
-                      <Skeleton className="h-4 w-28" />
-                    )}
-
-                    <span className="truncate text-xs">
-                      {activeOrganization.name}
-                    </span>
-                  </>
-                ) : (
-                  <>
-                    <span className="truncate font-semibold">
-                      {activeOrganization.name}
-                    </span>
-                    <span className="truncate text-xs">
-                      Navigate to namespace
-                    </span>
-                  </>
-                )}
+                <span className="truncate font-semibold">
+                  {activeOrganization.name}
+                </span>
+                <span className="truncate text-xs">
+                  {activeOrganization.plan.toUpperCase()}
+                </span>
               </div>
-              <ChevronsUpDownIcon className="ml-auto" />
-            </SidebarMenuButton>
-          </DropdownMenuTrigger>
+            </Link>
+
+            <DropdownMenuTrigger disabled={isPending} asChild>
+              <SidebarMenuButton
+                size="lg"
+                className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground w-fit"
+              >
+                <ChevronsUpDownIcon className="size-4" />
+              </SidebarMenuButton>
+            </DropdownMenuTrigger>
+          </div>
 
           <DropdownMenuContent
             className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
@@ -158,12 +114,24 @@ export function OrganizationSwitcher() {
             </DropdownMenuLabel>
 
             {organizations?.map((organization) => (
-              <OrganizationMenuItem
+              <DropdownMenuItem
+                className="gap-2 p-2"
                 key={organization.id}
-                organization={organization}
-                handleNamespaceChange={handleNamespaceChange}
-                setCreateNamespaceOrg={setCreateNamespaceOrg}
-              />
+                onClick={() => handleOrganizationChange(organization)}
+              >
+                <EntityAvatar
+                  entity={organization}
+                  className="border-border size-8 shrink-0 rounded-sm border"
+                  fallbackClassName="bg-transparent rounded-none text-foreground"
+                />
+
+                <div>
+                  <p>{organization.name}</p>
+                  <p className="text-muted-foreground text-xs">
+                    {organization.plan.toUpperCase()}
+                  </p>
+                </div>
+              </DropdownMenuItem>
             ))}
 
             <DropdownMenuSeparator />
@@ -194,66 +162,3 @@ export function OrganizationSwitcher() {
     </SidebarMenu>
   );
 }
-
-const OrganizationMenuItem = ({
-  organization,
-  handleNamespaceChange,
-  setCreateNamespaceOrg,
-}: {
-  organization: Organization;
-  handleNamespaceChange: (
-    organization: Organization,
-    namespace: Namespace,
-  ) => void;
-  setCreateNamespaceOrg: (organization: Organization) => void;
-}) => {
-  return (
-    <DropdownMenuSub>
-      <DropdownMenuSubTrigger className="gap-2 p-2">
-        <EntityAvatar
-          entity={organization}
-          className="border-border size-8 shrink-0 rounded-sm border"
-          fallbackClassName="bg-transparent rounded-none text-foreground"
-        />
-
-        <div>
-          <p>{organization.name}</p>
-          <p className="text-muted-foreground text-xs">
-            {organization.plan.toUpperCase()}
-          </p>
-        </div>
-      </DropdownMenuSubTrigger>
-      <DropdownMenuPortal>
-        <DropdownMenuSubContent className="min-w-50">
-          {organization.namespaces.length > 0 ? (
-            organization.namespaces.map((namespace) => (
-              <DropdownMenuItem
-                key={namespace.id}
-                className="gap-2 px-2 py-2.5"
-                onClick={() => handleNamespaceChange(organization, namespace)}
-              >
-                <span>{namespace.name}</span>
-              </DropdownMenuItem>
-            ))
-          ) : (
-            <p className="text-muted-foreground py-2 text-center text-xs">
-              No namespaces
-            </p>
-          )}
-          <DropdownMenuSeparator />
-
-          <DropdownMenuItem
-            className="gap-2 p-2"
-            onClick={() => setCreateNamespaceOrg(organization)}
-          >
-            <PlusIcon className="size-4" />
-
-            <div className="text-muted-foreground font-medium">
-              New Namespace
-            </div>
-          </DropdownMenuItem>
-        </DropdownMenuSubContent>
-      </DropdownMenuPortal>
-    </DropdownMenuSub>
-  );
-};

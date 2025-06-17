@@ -1,27 +1,25 @@
 "use client";
 
-import type { BadgeProps } from "@/components/ui/badge";
 import type { ColumnDef } from "@tanstack/react-table";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { capitalize } from "@/lib/string-utils";
 import { formatDuration } from "@/lib/utils";
 import { ChevronDownIcon, ChevronRightIcon } from "lucide-react";
 
 import type { IngestJob } from "@agentset/db";
+import type { BadgeProps } from "@agentset/ui";
 import { IngestJobStatus } from "@agentset/db";
+import {
+  Badge,
+  Button,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@agentset/ui";
 
 import { JobActions } from "./actions";
 

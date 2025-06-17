@@ -1,13 +1,15 @@
 "use client";
 
+import { Fragment } from "react";
 import Link from "next/link";
 import { useParams, usePathname, useRouter } from "next/navigation";
+import { useOrganization } from "@/contexts/organization-context";
+import { ArrowUpRightIcon, ChevronRightIcon } from "lucide-react";
+
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "@/components/ui/collapsible";
-import {
   SidebarGroup,
   SidebarGroupLabel,
   SidebarMenu,
@@ -16,9 +18,7 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-} from "@/components/ui/sidebar";
-import { useOrganization } from "@/contexts/organization-context";
-import { ArrowUpRightIcon, ChevronRightIcon } from "lucide-react";
+} from "@agentset/ui";
 
 import type { SidebarItemType } from ".";
 
@@ -58,31 +58,35 @@ export function NavItems({
 
       <SidebarMenu>
         {items.map((item) => {
-          const url = processUrl(
-            item.url!,
-            slug as string,
-            namespaceSlug as string,
-          );
+          const url = item.url
+            ? processUrl(item.url, slug as string, namespaceSlug as string)
+            : null;
+
+          const Comp = url ? Link : Fragment;
 
           if (!item.items && (!item.adminOnly || isAdmin)) {
             return (
               <SidebarMenuButton
                 key={item.title}
-                asChild
+                asChild={!!url}
                 tooltip={item.title}
-                isActive={isActive(url, item.exact)}
+                isActive={!!url && isActive(url, item.exact)}
               >
-                <Link
-                  href={url}
-                  target={item.external ? "_blank" : undefined}
-                  onMouseEnter={() => {
-                    router.prefetch(url);
-                  }}
+                <Comp
+                  {...(url
+                    ? ({
+                        href: url,
+                        target: item.external ? "_blank" : undefined,
+                        onMouseEnter: () => {
+                          router.prefetch(url);
+                        },
+                      } as any)
+                    : {})}
                 >
                   {item.icon && <item.icon />}
                   <span>{item.title}</span>
                   {item.external && <ArrowUpRightIcon className="ml-auto" />}
-                </Link>
+                </Comp>
               </SidebarMenuButton>
             );
           }
@@ -96,15 +100,19 @@ export function NavItems({
             >
               <SidebarMenuItem>
                 <CollapsibleTrigger asChild>
-                  <SidebarMenuButton tooltip={item.title} asChild>
-                    <Link
-                      href={url}
-                      target={item.external ? "_blank" : undefined}
+                  <SidebarMenuButton tooltip={item.title} asChild={!!url}>
+                    <Comp
+                      {...(url
+                        ? ({
+                            href: url,
+                            target: item.external ? "_blank" : undefined,
+                          } as any)
+                        : {})}
                     >
                       {item.icon && <item.icon />}
                       <span>{item.title}</span>
                       <ChevronRightIcon className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
-                    </Link>
+                    </Comp>
                   </SidebarMenuButton>
                 </CollapsibleTrigger>
                 <CollapsibleContent>

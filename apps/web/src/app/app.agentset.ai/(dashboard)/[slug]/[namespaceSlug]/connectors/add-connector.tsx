@@ -1,13 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import DropboxIcon from "@/components/icons/dropbox";
-import GoogleDriveIcon from "@/components/icons/google-drive";
-import NotionIcon from "@/components/icons/notion";
-import OneDriveIcon from "@/components/icons/onedrive";
-import S3Icon from "@/components/icons/s3";
-import { Button } from "@/components/ui/button";
+import { capitalize } from "@/lib/string-utils";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { PlusIcon } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+
 import {
+  Button,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -15,30 +16,19 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import {
+  DropboxIcon,
   Form,
   FormControl,
   FormField,
   FormItem,
   FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import RadioButton from "@/components/ui/radio-button";
-import { RadioGroup } from "@/components/ui/radio-group";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { capitalize } from "@/lib/string-utils";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { PlusIcon } from "lucide-react";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
+  GoogleDriveIcon,
+  NotionIcon,
+  OneDriveIcon,
+  RadioButton,
+  RadioGroup,
+  S3Icon,
+} from "@agentset/ui";
 
 const formSchema = z.object({
   connectorProvider: z.string(),

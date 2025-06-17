@@ -2,6 +2,7 @@ import { AgentsetApiError, exceededLimitError } from "@/lib/api/errors";
 import { withNamespaceApiHandler } from "@/lib/api/handler";
 import { makeApiSuccessResponse } from "@/lib/api/response";
 import { parseRequestBody } from "@/lib/api/utils";
+import { INFINITY_NUMBER } from "@/lib/constants";
 import { queryVectorStore } from "@/lib/vector-store";
 import { queryVectorStoreSchema } from "@/schemas/api/query";
 import { waitUntil } from "@vercel/functions";
@@ -13,7 +14,13 @@ export const preferredRegion = "iad1"; // make this closer to the DB
 
 export const POST = withNamespaceApiHandler(
   async ({ req, namespace, tenantId, organization, headers }) => {
-    if (organization.searchUsage >= organization.searchLimit) {
+    // if it's not a pro plan, check if the user has exceeded the limit
+    // pro plan is unlimited but has INFINITY_NUMBER in the db
+    // TODO: set hard limits to prevent abuse
+    if (
+      INFINITY_NUMBER !== organization.searchLimit &&
+      organization.searchUsage >= organization.searchLimit
+    ) {
       throw new AgentsetApiError({
         code: "rate_limit_exceeded",
         message: exceededLimitError({

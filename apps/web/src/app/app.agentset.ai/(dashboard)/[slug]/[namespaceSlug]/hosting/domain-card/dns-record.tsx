@@ -1,7 +1,7 @@
 import { Fragment } from "react";
-import CopyButton from "@/components/ui/copy-button";
-import { cn } from "@/lib/utils";
 import { InfoIcon } from "lucide-react";
+
+import { cn, CopyButton } from "@agentset/ui";
 
 const MarkdownText = ({ text }: { text: string }) => {
   return (

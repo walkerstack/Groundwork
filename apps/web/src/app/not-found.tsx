@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
+
+import { Button } from "@agentset/ui";
 
 export default function NotFound() {
   return (

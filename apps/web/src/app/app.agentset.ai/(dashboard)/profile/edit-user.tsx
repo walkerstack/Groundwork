@@ -2,15 +2,20 @@
 
 import type { Session } from "@/lib/auth-types";
 import { useState } from "react";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { useSession } from "@/hooks/use-session";
 import { authClient } from "@/lib/auth-client";
 import { useRouter } from "@bprogress/next/app";
 import { Loader2Icon, XIcon } from "lucide-react";
 import { toast } from "sonner";
+
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+  Button,
+  Input,
+  Label,
+} from "@agentset/ui";
 
 async function convertImageToBase64(file: File): Promise<string> {
   return new Promise((resolve, reject) => {

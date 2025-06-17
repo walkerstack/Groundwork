@@ -6,16 +6,14 @@ import type React from "react";
 import type { Dispatch, SetStateAction } from "react";
 import { memo, useCallback, useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Textarea } from "@/components/ui/textarea";
 import { useIsHosting } from "@/contexts/hosting-context";
 import { useScrollToBottom } from "@/hooks/use-scroll-to-bottom";
-import { cn } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowDownIcon, ArrowUpIcon } from "lucide-react";
 import { toast } from "sonner";
 import { useLocalStorage, useWindowSize } from "usehooks-ts";
+
+import { Button, cn, Skeleton, Textarea } from "@agentset/ui";
 
 import { SuggestedActions } from "./suggested-actions";
 

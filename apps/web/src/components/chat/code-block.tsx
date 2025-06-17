@@ -1,7 +1,6 @@
 "use client";
 
-import CopyButton from "@/components/ui/copy-button";
-import { cn } from "@/lib/utils";
+import { cn, CopyButton } from "@agentset/ui";
 
 interface CodeBlockProps {
   inline?: boolean;

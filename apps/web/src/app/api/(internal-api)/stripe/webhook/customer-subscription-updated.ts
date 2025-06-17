@@ -1,7 +1,11 @@
 import type Stripe from "stripe";
 import { NextResponse } from "next/server";
 import { log } from "@/lib/log";
-import { getPlanFromPriceId, planToOrganizationFields } from "@/lib/plans";
+import {
+  getPlanFromPriceId,
+  planToOrganizationFields,
+  PRO_PLAN_METERED,
+} from "@/lib/plans";
 
 import { db } from "@agentset/db";
 
@@ -9,8 +13,11 @@ import { sendCancellationFeedback } from "./utils";
 
 export async function customerSubscriptionUpdated(event: Stripe.Event) {
   const subscriptionUpdated = event.data.object as Stripe.Subscription;
-  const priceId = subscriptionUpdated.items.data[0]?.price.id;
 
+  // ignore metered plan
+  const priceId = subscriptionUpdated.items.data.filter(
+    (item) => item.price.lookup_key !== PRO_PLAN_METERED.lookupKey,
+  )[0]?.price.id;
   const plan = getPlanFromPriceId(priceId);
 
   if (!plan) {

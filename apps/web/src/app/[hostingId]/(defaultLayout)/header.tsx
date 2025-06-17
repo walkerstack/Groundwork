@@ -3,11 +3,11 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useHostingChat } from "@/components/chat/use-hosting-chat";
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useHosting } from "@/contexts/hosting-context";
 import { HOSTING_PREFIX } from "@/lib/constants";
 import { PlusIcon } from "lucide-react";
+
+import { Button, Tabs, TabsList, TabsTrigger } from "@agentset/ui";
 
 export default function Header() {
   const { title, searchEnabled } = useHosting();

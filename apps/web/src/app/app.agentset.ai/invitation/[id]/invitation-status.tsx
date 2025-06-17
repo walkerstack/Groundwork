@@ -1,7 +1,6 @@
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
 import Link from "next/link";
+
+import { Button, Card, CardContent, CardFooter, cn } from "@agentset/ui";
 
 export const InvitationStatus = ({
   icon: Icon,

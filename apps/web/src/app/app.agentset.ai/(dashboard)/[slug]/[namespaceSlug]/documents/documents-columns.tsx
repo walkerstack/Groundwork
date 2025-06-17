@@ -1,17 +1,18 @@
-import type { BadgeProps } from "@/components/ui/badge";
 import type { ColumnDef } from "@tanstack/react-table";
-import { Badge } from "@/components/ui/badge";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { capitalize } from "@/lib/string-utils";
-import { formatBytes, formatDuration, formatNumber } from "@/lib/utils";
+import { formatDuration, formatNumber } from "@/lib/utils";
 import { BookTextIcon, Code2Icon, FileTextIcon, ImageIcon } from "lucide-react";
 
 import type { Document } from "@agentset/db";
+import type { BadgeProps } from "@agentset/ui";
 import { DocumentStatus } from "@agentset/db";
+import {
+  Badge,
+  formatBytes,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@agentset/ui";
 
 import DocumentActions from "./document-actions";
 

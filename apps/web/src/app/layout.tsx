@@ -2,7 +2,8 @@ import "@/styles/globals.css";
 
 import { Inter } from "next/font/google";
 import { constructMetadata } from "@/lib/metadata";
-import { cn } from "@/lib/utils";
+
+import { cn } from "@agentset/ui";
 
 import Providers from "./providers";
 

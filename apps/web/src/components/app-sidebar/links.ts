@@ -1,15 +1,13 @@
 import {
-  AlertTriangleIcon,
   BookIcon,
   ChartNoAxesColumnIcon,
   CircleHelpIcon,
-  CreditCardIcon,
   FilesIcon,
+  FoldersIcon,
   GlobeIcon,
-  HelpCircleIcon,
   HomeIcon,
-  LockIcon,
   MessagesSquareIcon,
+  ReceiptIcon,
   RocketIcon,
   SettingsIcon,
   UnplugIcon,
@@ -19,16 +17,46 @@ import {
 import type { SidebarItemType } from ".";
 
 const createOrgUrl = (url: string) => `/{slug}${url}`;
+const createNamespaceUrl = (url: string) => `/{slug}/{namespaceSlug}${url}`;
 
-export const secondaryItems: SidebarItemType[] = [
+export const dashboardItems: SidebarItemType[] = [
   {
-    title: "Get Help",
-    icon: HelpCircleIcon,
-    url: createOrgUrl("/help"),
+    title: "Namespaces",
+    url: createOrgUrl("/"),
+    icon: FoldersIcon,
+    exact: true,
+  },
+  {
+    title: "Team",
+    url: createOrgUrl("/team"),
+    icon: UsersIcon,
+  },
+  {
+    title: "Billing",
+    url: createOrgUrl("/billing"),
+    icon: ReceiptIcon,
+  },
+  {
+    title: "Settings",
+    icon: SettingsIcon,
+    items: [
+      {
+        title: "General",
+        url: createOrgUrl("/settings"),
+        exact: true,
+      },
+      {
+        title: "API Keys",
+        url: createOrgUrl("/settings/api-keys"),
+      },
+      {
+        title: "Danger",
+        url: createOrgUrl("/settings/danger"),
+        adminOnly: true,
+      },
+    ],
   },
 ];
-
-const createNamespaceUrl = (url: string) => `/{slug}/{namespaceSlug}${url}`;
 
 export const namespaceItems: SidebarItemType[] = [
   {
@@ -67,36 +95,6 @@ export const namespaceItems: SidebarItemType[] = [
     title: "Hosting",
     url: createNamespaceUrl("/hosting"),
     icon: GlobeIcon,
-  },
-];
-
-export const settingsItems: SidebarItemType[] = [
-  {
-    title: "General",
-    url: createOrgUrl("/settings"),
-    icon: SettingsIcon,
-    exact: true,
-  },
-  {
-    title: "API Keys",
-    url: createOrgUrl("/settings/api-keys"),
-    icon: LockIcon,
-  },
-  {
-    title: "Team",
-    url: createOrgUrl("/settings/team"),
-    icon: UsersIcon,
-  },
-  {
-    title: "Billing",
-    url: createOrgUrl("/settings/billing"),
-    icon: CreditCardIcon,
-  },
-  {
-    title: "Danger",
-    url: createOrgUrl("/settings/danger"),
-    icon: AlertTriangleIcon,
-    adminOnly: true,
   },
 ];
 

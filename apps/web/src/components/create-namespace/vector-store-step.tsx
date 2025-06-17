@@ -1,35 +1,33 @@
 "use client";
 
 import { useEffect, useMemo } from "react";
-import { Button } from "@/components/ui/button";
-import { DialogFooter } from "@/components/ui/dialog";
+import { camelCaseToWords, capitalize } from "@/lib/string-utils";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+
 import {
+  Button,
+  DialogFooter,
   Form,
   FormControl,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
-} from "@/components/ui/form";
-import { camelCaseToWords, capitalize } from "@/lib/string-utils";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
-
-import { VectorStoreSchema } from "@agentset/validation";
-
-import { Input } from "../ui/input";
-import { Label } from "../ui/label";
-import { Logo } from "../ui/logo";
-import RadioButton from "../ui/radio-button";
-import { RadioGroup } from "../ui/radio-group";
-import {
+  Input,
+  Label,
+  Logo,
+  RadioButton,
+  RadioGroup,
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../ui/select";
+} from "@agentset/ui";
+import { VectorStoreSchema } from "@agentset/validation";
+
 import { vectorStores } from "./models";
 
 const formSchema = z.object({

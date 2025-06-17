@@ -1,20 +1,24 @@
 "use client";
 
 import { CodeBlock } from "@/components/chat/code-block";
-import { Button } from "@/components/ui/button";
+import { useNamespace } from "@/contexts/namespace-context";
+import { useOrganization } from "@/contexts/organization-context";
+import { prefixId } from "@/lib/api/ids";
+import { ArrowUpRightIcon, Code2Icon } from "lucide-react";
+
 import {
+  Button,
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useNamespace } from "@/contexts/namespace-context";
-import { useOrganization } from "@/contexts/organization-context";
-import { prefixId } from "@/lib/api/ids";
-import { ArrowUpRightIcon, Code2Icon } from "lucide-react";
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@agentset/ui";
 
 export default function ApiDialog({
   variant = "outline",

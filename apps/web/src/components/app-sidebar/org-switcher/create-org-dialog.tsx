@@ -1,4 +1,6 @@
 import { CreateOrgForm } from "@/app/app.agentset.ai/(dashboard)/create-organization/create-org-form";
+import { toast } from "sonner";
+
 import {
   Dialog,
   DialogContent,
@@ -6,8 +8,7 @@ import {
   DialogHeader,
   DialogPortal,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { toast } from "sonner";
+} from "@agentset/ui";
 
 function CreateOrganizationDialog({
   open,

@@ -4,7 +4,7 @@ import type { UseChatHelpers } from "@ai-sdk/react";
 import { memo } from "react";
 import { motion } from "framer-motion";
 
-import { Button } from "../ui/button";
+import { Button } from "@agentset/ui";
 
 interface SuggestedActionsProps {
   append: UseChatHelpers["append"];

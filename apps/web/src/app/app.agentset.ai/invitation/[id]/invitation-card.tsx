@@ -2,21 +2,23 @@
 
 import type { Invitation } from "@/lib/auth-types";
 import { useState } from "react";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { authClient } from "@/lib/auth-client";
+import { useMutation } from "@tanstack/react-query";
+import { AlertCircleIcon, BuildingIcon, CheckIcon, XIcon } from "lucide-react";
+import { toast } from "sonner";
+
 import {
+  Avatar,
+  AvatarFallback,
+  Badge,
+  Button,
   Card,
   CardContent,
   CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { authClient } from "@/lib/auth-client";
-import { useMutation } from "@tanstack/react-query";
-import { AlertCircleIcon, BuildingIcon, CheckIcon, XIcon } from "lucide-react";
-import { toast } from "sonner";
+} from "@agentset/ui";
 
 import { InvitationStatus } from "./invitation-status";
 

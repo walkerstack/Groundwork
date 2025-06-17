@@ -1,17 +1,6 @@
 "use client";
 
 import { Fragment, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { DialogFooter } from "@/components/ui/dialog";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { authClient } from "@/lib/auth-client";
 import { toSlug } from "@/lib/slug";
 import { useRouter } from "@bprogress/next/app";
@@ -20,6 +9,18 @@ import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+
+import {
+  Button,
+  DialogFooter,
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+  Input,
+} from "@agentset/ui";
 
 const formSchema = z.object({
   name: z.string().min(1),

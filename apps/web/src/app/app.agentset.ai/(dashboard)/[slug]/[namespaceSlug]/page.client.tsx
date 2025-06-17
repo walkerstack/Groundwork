@@ -1,19 +1,20 @@
 "use client";
 
 import { useState } from "react";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { useNamespace } from "@/contexts/namespace-context";
+import { prefixId } from "@/lib/api/ids";
+import { formatNumber } from "@/lib/utils";
+
 import {
+  Badge,
+  Button,
   Card,
   CardContent,
   CardDescription,
   CardHeader,
-} from "@/components/ui/card";
-import CopyButton from "@/components/ui/copy-button";
-import { Separator } from "@/components/ui/separator";
-import { useNamespace } from "@/contexts/namespace-context";
-import { prefixId } from "@/lib/api/ids";
-import { formatNumber } from "@/lib/utils";
+  CopyButton,
+  Separator,
+} from "@agentset/ui";
 
 const SensitiveInfo = ({ info }: { info: unknown }) => {
   const [show, setShow] = useState(false);

@@ -1,12 +1,13 @@
-import { Button } from "@/components/ui/button";
+import { useNamespace } from "@/contexts/namespace-context";
+import { useTRPC } from "@/trpc/react";
+
 import {
+  Button,
   Card,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { useNamespace } from "@/contexts/namespace-context";
-import { useTRPC } from "@/trpc/react";
+} from "@agentset/ui";
 
 import "@dnd-kit/core";
 

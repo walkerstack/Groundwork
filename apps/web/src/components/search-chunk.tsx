@@ -1,8 +1,9 @@
 import type { QueryVectorStoreResult } from "@/lib/vector-store/parse";
-import { useMemo, useState } from "react";
+import { useState } from "react";
+
+import { Button } from "@agentset/ui";
 
 import { CodeBlock } from "./chat/code-block";
-import { Button } from "./ui/button";
 
 const CollapsibleMetadata = ({ metadata }: { metadata: unknown }) => {
   const [open, setOpen] = useState(false);

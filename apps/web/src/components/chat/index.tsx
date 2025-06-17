@@ -1,7 +1,8 @@
 "use client";
 
 import { useHosting } from "@/contexts/hosting-context";
-import { cn } from "@/lib/utils";
+
+import { cn } from "@agentset/ui";
 
 import { MultimodalInput } from "./chat-input";
 import { Messages } from "./messages";

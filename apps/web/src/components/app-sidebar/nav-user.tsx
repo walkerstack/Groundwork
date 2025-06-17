@@ -2,7 +2,11 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { EntityAvatar } from "@/components/ui/avatar";
+import { useSession } from "@/hooks/use-session";
+import { authClient } from "@/lib/auth-client";
+import { useRouter } from "@bprogress/next/app";
+import { BadgeCheckIcon, LogOutIcon } from "lucide-react";
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,13 +14,9 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { useSession } from "@/hooks/use-session";
-import { authClient } from "@/lib/auth-client";
-import { useRouter } from "@bprogress/next/app";
-import { BadgeCheckIcon, LogOutIcon } from "lucide-react";
-
-import { Skeleton } from "../ui/skeleton";
+  EntityAvatar,
+  Skeleton,
+} from "@agentset/ui";
 
 export function NavUser() {
   const { session, isLoading } = useSession();

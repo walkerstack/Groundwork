@@ -1,3 +1,4 @@
+import { getStripeEnvironment, isProPlan, PRO_PLAN_METERED } from "@/lib/plans";
 import { stripe } from "@/lib/stripe";
 import { getBaseUrl } from "@/lib/utils";
 import { TRPCError } from "@trpc/server";
@@ -91,16 +92,9 @@ export const billingRouter = createTRPCRouter({
           customer: ctx.organization.stripeId,
           return_url: baseUrl,
           flow_data: {
-            type: "subscription_update_confirm",
-            subscription_update_confirm: {
+            type: "subscription_update",
+            subscription_update: {
               subscription: activeSubscription.id,
-              items: [
-                {
-                  id: activeSubscription.items.data[0]!.id,
-                  quantity: 1,
-                  price: priceId,
-                },
-              ],
             },
           },
         });
@@ -124,7 +118,16 @@ export const billingRouter = createTRPCRouter({
           billing_address_collection: "required",
           success_url: `${getBaseUrl()}/${ctx.organization.slug}?upgraded=true&plan=${planKey}&period=${period}`,
           cancel_url: baseUrl,
-          line_items: [{ price: priceId, quantity: 1 }],
+          line_items: [
+            { price: priceId, quantity: 1 },
+            ...(isProPlan(plan)
+              ? [
+                  {
+                    price: PRO_PLAN_METERED.priceId[getStripeEnvironment()],
+                  },
+                ]
+              : []),
+          ],
           allow_promotion_codes: true,
           automatic_tax: {
             enabled: true,
@@ -177,7 +180,7 @@ export const billingRouter = createTRPCRouter({
     try {
       const { url } = await stripe.billingPortal.sessions.create({
         customer: ctx.organization.stripeId,
-        return_url: `${getBaseUrl()}/${ctx.organization.slug}/settings/billing`,
+        return_url: `${getBaseUrl()}/${ctx.organization.slug}/billing`,
       });
       return url;
     } catch (error: any) {
@@ -231,7 +234,7 @@ export const billingRouter = createTRPCRouter({
       if (!input.method) {
         const { url } = await stripe.billingPortal.sessions.create({
           customer: ctx.organization.stripeId,
-          return_url: `${getBaseUrl()}/${ctx.organization.slug}/settings/billing`,
+          return_url: `${getBaseUrl()}/${ctx.organization.slug}/billing`,
           flow_data: {
             type: "payment_method_update",
           },
@@ -244,8 +247,8 @@ export const billingRouter = createTRPCRouter({
         mode: "setup",
         customer: ctx.organization.stripeId,
         payment_method_types: [input.method],
-        success_url: `${getBaseUrl()}/${ctx.organization.slug}/settings/billing`,
-        cancel_url: `${getBaseUrl()}/${ctx.organization.slug}/settings/billing`,
+        success_url: `${getBaseUrl()}/${ctx.organization.slug}/billing`,
+        cancel_url: `${getBaseUrl()}/${ctx.organization.slug}/billing`,
       });
 
       return url;
@@ -274,7 +277,7 @@ export const billingRouter = createTRPCRouter({
 
       const { url } = await stripe.billingPortal.sessions.create({
         customer: ctx.organization.stripeId,
-        return_url: `${getBaseUrl()}/${ctx.organization.slug}/settings/billing`,
+        return_url: `${getBaseUrl()}/${ctx.organization.slug}/billing`,
         flow_data: {
           type: "subscription_cancel",
           subscription_cancel: {

@@ -1,11 +1,4 @@
 import type { Row } from "@tanstack/react-table";
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { useNamespace } from "@/contexts/namespace-context";
 import { prefixId } from "@/lib/api/ids";
 import { useTRPC } from "@/trpc/react";
@@ -14,6 +7,13 @@ import { CopyIcon, EllipsisVerticalIcon, Trash2Icon } from "lucide-react";
 import { toast } from "sonner";
 
 import { DocumentStatus } from "@agentset/db";
+import {
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@agentset/ui";
 
 import type { DocumentCol } from "./documents-columns";
 

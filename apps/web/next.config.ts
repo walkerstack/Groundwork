@@ -19,6 +19,7 @@ const config: NextConfig = {
     "@agentset/db",
     "@agentset/emails",
     "@agentset/validation",
+    "@agentset/ui",
   ],
 
   /** We already do linting and typechecking as separate tasks in CI */

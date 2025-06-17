@@ -2,17 +2,22 @@
 
 import { useState } from "react";
 import { CodeBlock } from "@/components/chat/code-block";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { prefixId } from "@/lib/api/ids";
+import { InfoIcon } from "lucide-react";
+
 import {
+  Alert,
+  AlertDescription,
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { prefixId } from "@/lib/api/ids";
-import { InfoIcon } from "lucide-react";
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@agentset/ui";
 
 import type { JobsTableMeta } from "./columns";
 import { columns } from "./columns";

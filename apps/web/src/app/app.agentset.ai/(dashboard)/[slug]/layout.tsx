@@ -1,7 +1,8 @@
 import { AppSidebar } from "@/components/app-sidebar";
 import { ModalProvider } from "@/components/modals";
-import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { OrganizationProvider } from "@/contexts/organization-context";
+
+import { SidebarInset, SidebarProvider } from "@agentset/ui";
 
 import type { OrganizationParams } from "./get-organization";
 import { getOrganization } from "./get-organization";

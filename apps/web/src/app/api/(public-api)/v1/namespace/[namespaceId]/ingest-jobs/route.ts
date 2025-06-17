@@ -3,6 +3,7 @@ import { withNamespaceApiHandler } from "@/lib/api/handler";
 import { prefixId } from "@/lib/api/ids";
 import { makeApiSuccessResponse } from "@/lib/api/response";
 import { parseRequestBody } from "@/lib/api/utils";
+import { isProPlan } from "@/lib/plans";
 import {
   createIngestJobSchema,
   getIngestionJobsSchema,
@@ -55,7 +56,12 @@ export const GET = withNamespaceApiHandler(
 
 export const POST = withNamespaceApiHandler(
   async ({ req, namespace, tenantId, headers, organization }) => {
-    if (organization.totalPages >= organization.pagesLimit) {
+    // if it's not a pro plan, check if the user has exceeded the limit
+    // pro plan is unlimited with usage based billing
+    if (
+      !isProPlan(organization.plan) &&
+      organization.totalPages >= organization.pagesLimit
+    ) {
       throw new AgentsetApiError({
         code: "rate_limit_exceeded",
         message: exceededLimitError({
