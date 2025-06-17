@@ -124,7 +124,6 @@ export const billingRouter = createTRPCRouter({
               ? [
                   {
                     price: PRO_PLAN_METERED.priceId[getStripeEnvironment()],
-                    quantity: 0,
                   },
                 ]
               : []),

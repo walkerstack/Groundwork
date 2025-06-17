@@ -14,31 +14,44 @@ const BATCH_SIZE = 30;
 
 export const { POST } = serve<DeleteIngestJobBody>(
   async (context) => {
-    const { namespace, shouldDeleteNamespace, shouldDeleteOrg, ...ingestJob } =
-      await context.run("get-config", async () => {
-        const { jobId } = context.requestPayload;
-        const job = await db.ingestJob.findUnique({
-          where: { id: jobId },
-          select: {
-            id: true,
-            tenantId: true,
-            payload: true,
-            workflowRunsIds: true,
-            namespace: { select: { id: true, organizationId: true } },
-          },
-        });
-
-        if (!job) {
-          throw new Error("Ingestion job not found");
-        }
-
-        return {
-          ...job,
-          shouldDeleteNamespace:
-            context.requestPayload.deleteNamespaceWhenDone ?? false,
-          shouldDeleteOrg: context.requestPayload.deleteOrgWhenDone ?? false,
-        };
+    const data = await context.run("get-config", async () => {
+      const { jobId } = context.requestPayload;
+      const job = await db.ingestJob.findUnique({
+        where: { id: jobId },
+        select: {
+          id: true,
+          tenantId: true,
+          payload: true,
+          workflowRunsIds: true,
+          namespace: { select: { id: true, organizationId: true } },
+        },
       });
+
+      const shouldDeleteNamespace =
+        context.requestPayload.deleteNamespaceWhenDone ?? false;
+      const shouldDeleteOrg = context.requestPayload.deleteOrgWhenDone ?? false;
+
+      if (!job) {
+        return {
+          notFound: true,
+          shouldDeleteNamespace: false,
+          shouldDeleteOrg: false,
+        };
+      }
+
+      return {
+        ...job,
+        shouldDeleteNamespace,
+        shouldDeleteOrg,
+      };
+    });
+
+    if ("notFound" in data) {
+      return;
+    }
+
+    const { namespace, shouldDeleteNamespace, shouldDeleteOrg, ...ingestJob } =
+      data;
 
     await context.run("update-status-deleting", async () => {
       await db.ingestJob.update({

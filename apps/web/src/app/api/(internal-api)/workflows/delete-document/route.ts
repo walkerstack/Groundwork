@@ -12,13 +12,7 @@ const BATCH_SIZE = 30;
 
 export const { POST } = serve<DeleteDocumentBody>(
   async (context) => {
-    const {
-      ingestJob: { namespace, ...ingestJob },
-      shouldDeleteJob,
-      shouldDeleteNamespace,
-      shouldDeleteOrg,
-      ...document
-    } = await context.run("get-config", async () => {
+    const data = await context.run("get-config", async () => {
       const { documentId } = context.requestPayload;
       const doc = await db.document.findUnique({
         where: { id: documentId },
@@ -33,7 +27,12 @@ export const { POST } = serve<DeleteDocumentBody>(
       });
 
       if (!doc) {
-        throw new Error("Ingestion job not found");
+        return {
+          notFound: true,
+          shouldDeleteJob: false,
+          shouldDeleteNamespace: false,
+          shouldDeleteOrg: false,
+        };
       }
 
       return {
@@ -44,6 +43,18 @@ export const { POST } = serve<DeleteDocumentBody>(
         shouldDeleteOrg: context.requestPayload.deleteOrgWhenDone ?? false,
       };
     });
+
+    if ("notFound" in data) {
+      return;
+    }
+
+    const {
+      ingestJob: { namespace, ...ingestJob },
+      shouldDeleteJob,
+      shouldDeleteNamespace,
+      shouldDeleteOrg,
+      ...document
+    } = data;
 
     await context.run("update-status-deleting", async () => {
       await db.document.update({
