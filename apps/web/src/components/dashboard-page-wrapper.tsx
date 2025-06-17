@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
-import { useParams, usePathname, useRouter } from "next/navigation";
+import { useState, useTransition } from "react";
+import { useParams, usePathname } from "next/navigation";
 import { useNamespace } from "@/contexts/namespace-context";
 import { useOrganization } from "@/contexts/organization-context";
 import { useTRPC } from "@/trpc/react";
+import { useRouter } from "@bprogress/next/app";
 import { useQuery } from "@tanstack/react-query";
 import { ChevronsUpDownIcon, PlusIcon } from "lucide-react";
 
@@ -33,6 +34,7 @@ const NamespaceSwitcher = () => {
   const router = useRouter();
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
   const trpc = useTRPC();
   const { data: namespaces, isLoading } = useQuery(
@@ -46,13 +48,16 @@ const NamespaceSwitcher = () => {
       `/${activeOrganization.slug}/${activeNamespace.slug}`,
       `/${activeOrganization.slug}/${namespace.slug}`,
     );
-    router.push(relativePath);
+
+    startTransition(() => {
+      router.push(relativePath);
+    });
   };
 
   return (
     <>
       <DropdownMenu>
-        <DropdownMenuTrigger asChild disabled={isLoading}>
+        <DropdownMenuTrigger asChild disabled={isLoading || isPending}>
           <Button
             variant="ghost"
             className="focus-visible:bg-accent text-foreground h-8 px-0! focus-visible:ring-0"
